@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UHG VBC AI Hands-On Lab · Snowflake Quickstart</title>
+  <style>
+    :root {
+      --sf-blue: #29B5E8;
+      --sf-blue-dark: #0073A8;
+      --sf-navy: #11283D;
+      --sf-bg: #F7F9FC;
+      --sf-white: #FFFFFF;
+      --sf-border: #E1E8EF;
+      --sf-text: #1A2633;
+      --sf-muted: #5A7089;
+      --sf-success: #00B28A;
+      --sf-warn: #F59E0B;
+      --sf-code-bg: #0F1C2A;
+      --sf-code-text: #CDD9E5;
+      --sidebar-w: 280px;
+      --header-h: 60px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--sf-bg);
+      color: var(--sf-text);
+      line-height: 1.65;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--header-h);
+      background: var(--sf-navy);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    }
+    header .logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    header .logo svg { width: 32px; height: 32px; }
+    header .logo-text { color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+    header .logo-sep { color: #4A6680; font-size: 18px; margin: 0 4px; }
+    header .lab-title { color: var(--sf-blue); font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    header .header-badges { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600;
+    }
+    .badge-time { background: rgba(41,181,232,.15); color: var(--sf-blue); border: 1px solid rgba(41,181,232,.3); }
+    .badge-level { background: rgba(0,178,138,.12); color: var(--sf-success); border: 1px solid rgba(0,178,138,.3); }
+
+    /* ── Layout ── */
+    .layout { display: flex; padding-top: var(--header-h); min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    nav#sidebar {
+      position: fixed; top: var(--header-h); left: 0;
+      width: var(--sidebar-w); height: calc(100vh - var(--header-h));
+      background: var(--sf-white);
+      border-right: 1px solid var(--sf-border);
+      overflow-y: auto; overflow-x: hidden;
+      padding: 16px 0 32px;
+    }
+    .nav-section { margin-bottom: 4px; }
+
+    .nav-module-btn {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 20px 9px 16px;
+      background: none; border: none; cursor: pointer;
+      font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: var(--sf-muted);
+      transition: color .15s;
+    }
+    .nav-module-btn:hover { color: var(--sf-blue-dark); }
+    .nav-module-btn .chevron {
+      transition: transform .2s;
+      font-size: 10px; color: var(--sf-border);
+    }
+    .nav-module-btn.open .chevron { transform: rotate(90deg); color: var(--sf-blue); }
+    .nav-module-btn.open { color: var(--sf-blue-dark); }
+
+    .nav-steps { display: none; }
+    .nav-steps.open { display: block; }
+
+    .nav-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 16px 8px 20px;
+      cursor: pointer; text-decoration: none;
+      font-size: 13px; color: var(--sf-text);
+      border-left: 3px solid transparent;
+      transition: background .12s, border-color .12s;
+    }
+    .nav-step:hover { background: #EEF5FB; }
+    .nav-step.active {
+      background: #E3F3FD;
+      border-left-color: var(--sf-blue);
+      color: var(--sf-blue-dark);
+      font-weight: 600;
+    }
+    .nav-step .step-num {
+      flex-shrink: 0; width: 20px; height: 20px;
+      border-radius: 50%; background: var(--sf-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: var(--sf-muted);
+      margin-top: 1px;
+    }
+    .nav-step.active .step-num { background: var(--sf-blue); color: #fff; }
+    .nav-step.done .step-num { background: var(--sf-success); color: #fff; }
+    .nav-step .step-label { line-height: 1.35; }
+
+    .nav-divider { height: 1px; background: var(--sf-border); margin: 8px 16px; }
+
+    /* progress bar */
+    .progress-wrap { padding: 12px 20px 4px; }
+    .progress-label { font-size: 11px; color: var(--sf-muted); margin-bottom: 5px; display: flex; justify-content: space-between; }
+    .progress-bar { height: 4px; background: var(--sf-border); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--sf-blue); border-radius: 2px; transition: width .3s; }
+
+    /* ── Main ── */
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 0 0 80px;
+    }
+
+    /* ── Step content ── */
+    .step-content { display: none; max-width: 860px; padding: 40px 48px; }
+    .step-content.active { display: block; }
+
+    .step-header { margin-bottom: 28px; }
+    .step-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
+      color: var(--sf-muted); margin-bottom: 8px;
+    }
+    .step-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sf-blue); }
+    .section-heading {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 20px; font-weight: 700; color: var(--sf-navy);
+      margin: 36px 0 10px; letter-spacing: .2px;
+    }
+    .section-heading.first { margin-top: 0; }
+    .section-heading .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sf-blue); flex-shrink: 0; }
+    .step-header h1 { font-size: 28px; font-weight: 700; color: var(--sf-navy); line-height: 1.25; }
+    .step-header .step-meta {
+      display: flex; gap: 16px; align-items: center; margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .step-meta-item { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--sf-muted); }
+    .step-meta-item svg { width: 14px; height: 14px; }
+
+    .step-content p { font-size: 15px; color: var(--sf-text); margin-bottom: 16px; }
+    .step-content h2 { font-size: 20px; font-weight: 700; color: var(--sf-navy); margin: 32px 0 12px; }
+    .step-content h3 { font-size: 16px; font-weight: 700; color: var(--sf-navy); margin: 24px 0 8px; }
+    .step-content ul, .step-content ol { padding-left: 22px; margin-bottom: 16px; }
+    .step-content li { font-size: 15px; margin-bottom: 6px; }
+    .step-content strong { color: var(--sf-navy); }
+
+    /* callout boxes */
+    .callout {
+      border-radius: 8px; padding: 14px 18px; margin: 20px 0;
+      display: flex; gap: 12px; align-items: flex-start; font-size: 14px;
+    }
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout-info { background: #EEF6FF; border: 1px solid #BEE0F9; color: #1A497C; }
+    .callout-warn { background: #FFFBEB; border: 1px solid #FCD34D; color: #78350F; }
+    .callout-tip  { background: #ECFDF5; border: 1px solid #6EE7B7; color: #065F46; }
+    .callout-wow  { background: linear-gradient(135deg,#EEF6FF,#F0FDF4); border: 1px solid #93C5FD; color: #1E3A5F; }
+
+    /* code blocks */
+    .code-block-wrap { position: relative; margin: 18px 0; border-radius: 10px; overflow: hidden; }
+    .code-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #1A2E42; padding: 8px 14px;
+      font-size: 11.5px; color: #7BA5C2; font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .code-block-lang { display: flex; align-items: center; gap: 6px; }
+    .code-block-lang .lang-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sf-blue); }
+    .copy-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(41,181,232,.15); border: 1px solid rgba(41,181,232,.25);
+      color: var(--sf-blue); border-radius: 5px;
+      padding: 3px 10px; font-size: 11.5px; font-weight: 600;
+      cursor: pointer; transition: background .15s, color .15s;
+      font-family: -apple-system, sans-serif;
+    }
+    .copy-btn:hover { background: rgba(41,181,232,.3); }
+    .copy-btn.copied { background: rgba(0,178,138,.2); border-color: rgba(0,178,138,.35); color: var(--sf-success); }
+    .copy-btn svg { width: 12px; height: 12px; }
+    pre {
+      margin: 0; overflow-x: auto;
+      background: var(--sf-code-bg);
+      padding: 18px 20px;
+    }
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--sf-code-text);
+    }
+    .code-block-wrap pre code { display: block; }
+    p code, li code, div code, td code {
+      background: #FEF0E2; color: #B34A00; padding: 1px 6px;
+      border-radius: 4px; font-size: 13px;
+    }
+
+    /* prompt blocks (Cortex Code prompts) */
+    .prompt-block {
+      background: linear-gradient(135deg, #F0F7FF, #F5FFFE);
+      border: 1px solid #BEE0F9;
+      border-left: 4px solid var(--sf-blue);
+      border-radius: 8px; padding: 14px 18px;
+      margin: 16px 0;
+    }
+    .prompt-block .prompt-label {
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+      color: var(--sf-blue-dark); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .prompt-block p {
+      font-size: 14.5px; color: #1A3A5C; margin-bottom: 0; font-style: italic;
+    }
+    .prompt-block .prompt-copy-row {
+      display: flex; justify-content: flex-end; margin-top: 8px;
+    }
+
+    /* timing pill */
+    .timing-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(41,181,232,.1); color: var(--sf-blue-dark);
+      border: 1px solid rgba(41,181,232,.25);
+      border-radius: 20px; padding: 3px 12px; font-size: 12px; font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    /* step nav buttons */
+    .step-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 44px; padding-top: 24px;
+      border-top: 1px solid var(--sf-border);
+    }
+    .step-nav-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all .15s;
+      border: 1.5px solid var(--sf-border);
+      background: var(--sf-white); color: var(--sf-text);
+    }
+    .step-nav-btn:hover { border-color: var(--sf-blue); color: var(--sf-blue-dark); }
+    .step-nav-btn.primary {
+      background: var(--sf-blue); color: #fff; border-color: var(--sf-blue);
+    }
+    .step-nav-btn.primary:hover { background: var(--sf-blue-dark); border-color: var(--sf-blue-dark); }
+    .step-nav-btn.hidden { visibility: hidden; }
+
+    /* discussion list */
+    .discussion-list { list-style: none; padding: 0; }
+    .discussion-list li {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid var(--sf-border); font-size: 14.5px;
+    }
+    .discussion-list li:last-child { border-bottom: none; }
+    .discussion-list .bullet { color: var(--sf-blue); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    /* table */
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th { background: var(--sf-navy); color: #fff; padding: 10px 14px; text-align: left; font-size: 12.5px; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--sf-border); }
+    tr:hover td { background: #F0F7FF; }
+
+    /* overview cards */
+    .module-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 24px 0; }
+    .module-card {
+      background: var(--sf-white); border: 1px solid var(--sf-border);
+      border-radius: 10px; padding: 18px 16px;
+      transition: box-shadow .15s, border-color .15s; cursor: pointer;
+    }
+    .module-card:hover { box-shadow: 0 4px 16px rgba(41,181,232,.15); border-color: var(--sf-blue); }
+    .module-card .card-num { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--sf-muted); margin-bottom: 6px; }
+    .module-card .card-title { font-size: 15px; font-weight: 700; color: var(--sf-navy); margin-bottom: 4px; }
+    .module-card .card-time { font-size: 12px; color: var(--sf-muted); }
+    .module-card .card-icon { font-size: 24px; margin-bottom: 10px; }
+
+    /* naming convention table highlight */
+    .naming-row td:first-child { font-weight: 600; color: var(--sf-blue-dark); font-family: monospace; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav#sidebar { display: none; }
+      main { margin-left: 0; }
+      .step-content { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header>
+  <a class="logo" href="#">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#29B5E8"/>
+      <path d="M16 8l2.4 4.8 5.1.7-3.75 3.6.9 5.1L16 19.8l-4.65 2.4.9-5.1L8.5 13.5l5.1-.7L16 8z" fill="white"/>
+    </svg>
+    <span class="logo-text">Snowflake</span>
+    <span class="logo-sep">/</span>
+    <span class="lab-title">UHG Value-Based Care AI — Hands-On Lab</span>
+  </a>
+  <div class="header-badges">
+    <span class="badge badge-time">⏱ approximately 2 hrs</span>
+    <span class="badge badge-level">✦ Intermediate</span>
+    <span style="color:#4A6680; font-size:11px; font-weight:600; letter-spacing:.5px; margin-left:4px;">v9</span>
+  </div>
+</header>
+
+<!-- ══════════════════ LAYOUT ══════════════════ -->
+<div class="layout">
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav id="sidebar">
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Progress</span><span id="progress-pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="nav-divider" style="margin-top:12px"></div>
+
+  <!-- Overview -->
+  <div class="nav-section">
+    <div class="nav-module-btn open" onclick="toggleModule(this)">
+      <span>Overview and Setup</span><span class="chevron">▶</span>
+    </div>
+    <div class="nav-steps open">
+      <a class="nav-step active" onclick="showStep('step-overview')" href="#">
+        <div class="step-num">1</div>
+        <div class="step-label">Lab Overview</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-naming')" href="#">
+        <div class="step-num">2</div>
+        <div class="step-label">Lab Setup</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m1-marketplace')" href="#">
+        <div class="step-num">3</div>
+        <div class="step-label">Get Marketplace Data</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Module 1 -->
+  <div class="nav-section">
+    <div class="nav-module-btn open" onclick="toggleModule(this)">
+      <span>Module 1 · Cortex Analyst</span><span class="chevron">▶</span>
+    </div>
+    <div class="nav-steps open">
+      <a class="nav-step" onclick="showStep('step-m1-create-sv')" href="#">
+        <div class="step-num">4</div>
+        <div class="step-label">Create Semantic View</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m1-update-sv')" href="#">
+        <div class="step-num">5</div>
+        <div class="step-label">Update Semantic View</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m2-s2')" href="#">
+        <div class="step-num">6</div>
+        <div class="step-label">Ask VBC Questions</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Module 2 -->
+  <div class="nav-section">
+    <div class="nav-module-btn open" onclick="toggleModule(this)">
+      <span>Module 2 · Cortex Search</span><span class="chevron">▶</span>
+    </div>
+    <div class="nav-steps open">
+      <a class="nav-step" onclick="showStep('step-m2-overview')" href="#">
+        <div class="step-num">7</div>
+        <div class="step-label">Cortex Search Overview</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m1-s2')" href="#">
+        <div class="step-num">8</div>
+        <div class="step-label">Create Clinical Notes Table</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m1-s4')" href="#">
+        <div class="step-num">9</div>
+        <div class="step-label">Query the Search Service</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Module 3 -->
+  <div class="nav-section">
+    <div class="nav-module-btn open" onclick="toggleModule(this)">
+      <span>Module 3 · Cortex Agents</span><span class="chevron">▶</span>
+    </div>
+    <div class="nav-steps open">
+      <a class="nav-step" onclick="showStep('step-m3-context')" href="#">
+        <div class="step-num">10</div><div class="step-label">Why Agents?</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m3-s1')" href="#">
+        <div class="step-num">11</div><div class="step-label">Create the VBC Care Agent</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m3-test')" href="#">
+        <div class="step-num">12</div><div class="step-label">Test in Snowflake Intelligence</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-m3-explore')" href="#">
+        <div class="step-num">13</div><div class="step-label">Free Exploration</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Wrap-up -->
+  <div class="nav-section">
+    <div class="nav-module-btn open" onclick="toggleModule(this)">
+      <span>Wrap-Up</span><span class="chevron">▶</span>
+    </div>
+    <div class="nav-steps open">
+      <a class="nav-step" onclick="showStep('step-takeaways')" href="#">
+        <div class="step-num">14</div>
+        <div class="step-label">Key Takeaways &amp; Next Steps</div>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════ MAIN CONTENT ══════════════════ -->
+<main>
+
+<!-- ─────────────────── 1. OVERVIEW ─────────────────── -->
+<div id="step-overview" class="step-content active">
+  <div class="step-header">
+    <div class="section-heading first"><span class="dot"></span>Lab Overview</div>
+    <h1>UHG Value-Based Care AI Hands-On Lab</h1>
+    <div class="step-meta">
+      <span class="step-meta-item">⏱ approximately 2 hours</span>
+      <span class="step-meta-item">🏥 Optum / UHG Data Science &amp; Engineering</span>
+    </div>
+  </div>
+  <div class="timing-pill">⏱ ~5 min · orientation</div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">🔑</span>
+    <div><strong>Your Snowflake account:</strong> Each participant has a dedicated Snowflake account assigned at registration. Your login credentials are available on the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/instructions" style="color:var(--sf-blue-dark)">lab instructions page</a>. Log in before proceeding.</div>
+  </div>
+
+  <h2>The Narrative</h2>
+  <p>Optum manages care for millions of members under value-based care contracts — ACOs, bundled payments, quality bonus programs. Success in VBC depends on answering two types of questions at scale:</p>
+  <ol>
+    <li><strong>Analytical questions over structured data</strong> — <em>"Which patient populations are driving the highest total cost of care? Where are we seeing avoidable ED utilization?"</em> These answers live in claims, encounters, and clinical measures.</li>
+    <li><strong>Clinical questions over unstructured data</strong> — <em>"What does this patient's care history show about gaps in their chronic disease management?"</em> These answers live in clinical notes and care plans.</li>
+  </ol>
+  <p>Today you will build the core components of a VBC care intelligence platform that bridges both.</p>
+
+  <h2>What You'll Build</h2>
+  <div class="module-cards">
+    <div class="module-card" onclick="showStep('step-m1-create-sv')">
+      <div class="card-icon">📊</div>
+      <div class="card-num">Module 1 · ~30 min</div>
+      <div class="card-title">Cortex Analyst</div>
+      <div class="card-time">Natural language VBC metrics &amp; analytics</div>
+    </div>
+    <div class="module-card" onclick="showStep('step-m2-overview')">
+      <div class="card-icon">🔍</div>
+      <div class="card-num">Module 2 · ~30 min</div>
+      <div class="card-title">Cortex Search</div>
+      <div class="card-time">Semantic search over AI-generated clinical notes</div>
+    </div>
+    <div class="module-card" onclick="showStep('step-m3-context')">
+      <div class="card-icon">🤖</div>
+      <div class="card-num">Module 3 · ~30 min</div>
+      <div class="card-title">Cortex Agents</div>
+      <div class="card-time">Care intelligence agent across both tools</div>
+    </div>
+  </div>
+
+  <h2>Data Sources</h2>
+  <p>During the lab you will set up two data sources:</p>
+  <ul>
+    <li><strong>Snowflake Marketplace</strong> — acquire the Synthea synthetic healthcare dataset directly from the Marketplace. This provides the core clinical and claims tables.</li>
+    <li><strong>CSV upload</strong> — load the <code>CLINICAL_NOTES</code> table from the CSV file provided as part of this lab.</li>
+  </ul>
+  <table style="color:#1e2e3d">
+    <tr><th>Table</th><th>Description</th></tr>
+    <tr><td><code>PATIENTS</code></td><td>Demographics, income, SDOH proxies</td></tr>
+    <tr><td><code>ENCOUNTERS</code></td><td>Visit-level data with encounter class and costs</td></tr>
+    <tr><td><code>CONDITIONS</code></td><td>SNOMED-CT diagnoses</td></tr>
+    <tr><td><code>OBSERVATIONS</code></td><td>LOINC-coded labs and vitals (HbA1c, BP, BMI)</td></tr>
+    <tr><td><code>MEDICATIONS</code></td><td>RxNorm prescriptions with costs</td></tr>
+    <tr><td><code>PROVIDERS</code></td><td>Clinician data with specialties</td></tr>
+    <tr><td><code>PAYERS</code></td><td>Payer/insurer reference data</td></tr>
+    <tr><td><code>PROCEDURES</code></td><td>CPT-coded procedures with costs</td></tr>
+    <tr><td><code>CLINICAL_NOTES</code></td><td>AI-generated SOAP-format clinical notes from Synthea patient records — loaded via CSV (1,500 rows)</td></tr>
+  </table>
+
+  <div class="step-nav">
+    <button class="step-nav-btn hidden">← Previous</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-naming')">Lab Setup →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── 2. LAB SETUP ─────────────────── -->
+<div id="step-naming" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Setup</div>
+    <h1>Lab Setup</h1>
+  </div>
+  <div class="timing-pill">⏱ ~10 min</div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">🔑</span>
+    <div>
+      <strong>Before proceeding — log in to your Snowflake account.</strong> Your login link, username, and password are available on the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/instructions" target="_blank" style="color:var(--sf-blue-dark)">lab instructions page</a>. Once you are logged in, come back here and continue.
+      <br><br>
+      <strong>Having trouble accessing your account?</strong> If you are attending <strong>in person</strong>, ask one of the Snowflake lab assistants for help. If you are attending <strong>remotely</strong>, post in the meeting chat and someone will assist you.
+    </div>
+  </div>
+
+  <div class="callout callout-tip" style="align-items:center;">
+    <img src="images/cortex-code-ui-icon.png" alt="Cortex Code" style="width:28px; height:28px; flex-shrink:0; border-radius:5px;">
+    <div><strong>Need help at any point?</strong> Use <strong>Cortex Code</strong> inside Snowflake Snowsight — it's the AI assistant built directly into the platform. Ask it questions, get unstuck on SQL, or have it walk you through any step in this lab.</div>
+  </div>
+
+  <p>Complete the following steps to prepare your environment before starting the lab modules.</p>
+
+  <h3>1. Configure AI Model Access</h3>
+  <p>Before anything else, AI model access needs to be enabled at the account level. We want to ensure the lab account is configured with access to all available models — these will be used throughout the lab with <strong>Cortex Code</strong> and <strong>Cortex Agents</strong>. Enabling cross-region inference allows Snowflake to route requests to the best available model endpoint regardless of region.</p>
+  <p>Open Cortex Code by clicking the <img src="images/cortex-code-ui-icon.png" alt="Cortex Code icon" style="height:18px; vertical-align:middle; margin:0 2px;"> icon on the right edge of the Snowsight UI, then paste and send the following prompt:</p>
+  <div class="code-block-wrap">
+    <div class="code-block-header">
+      <div class="code-block-lang"><span class="lang-dot"></span>Cortex Code Prompt</div>
+      <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+    <pre style="white-space: pre-wrap; word-break: break-word;"><code>Switch to the ACCOUNTADMIN role, then enable cross-region inference for any region and set the model allowlist to allow all models on this account.</code></pre>
+  </div>
+  <p>Cortex Code will look up the relevant documentation and then present the SQL commands it needs to run — one to set <code>CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION'</code> and one to set <code>CORTEX_MODELS_ALLOWLIST = 'All'</code>. For each command, a <strong>Run this command?</strong> prompt will appear — click <strong>Yes</strong> to execute it.</p>
+  <p>When complete, you should see a confirmation that all Cortex AI models are now available across any region on your account.</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">🔄</span>
+    <div><strong>Refresh your browser now.</strong> Once models are enabled, refresh the page so Cortex Code picks up the updated model list. After refreshing, open Cortex Code and click the <strong>Auto</strong> button at the bottom right of the chat input — you'll see the full list of available models including Claude Opus 4.6, Claude Sonnet 4.6, OpenAI GPT 5.4, and others. Leaving it on <strong>Auto</strong> lets Cortex Code select the best model for each task automatically.</div>
+  </div>
+
+  <h3>2. Create a Workspace</h3>
+  <ol>
+    <li>At the top of the workspace panel, click the <strong>+</strong> button — a <strong>Create new</strong> menu appears with three options.</li>
+    <li>Click <strong>Private workspace</strong>.</li>
+    <li>In the <strong>Create workspace</strong> dialog, enter <code>snowday</code> as the workspace name.</li>
+    <li>Click <strong>Create</strong>. Your new workspace will open automatically.</li>
+  </ol>
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>A Workspace is the primary IDE inside Snowsight. It's a unified environment for working across SQL, Python, notebooks, Streamlit apps, agents, dbt projects, and more — and Snowflake is actively expanding the object types it supports. We'll use the <code>snowday</code> workspace as our home base throughout this lab.</div>
+  </div>
+
+  <h3>3. Create a Database &amp; Schema</h3>
+  <p>Next, create a SQL file in your workspace and run the setup script to create your personal database and schema.</p>
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>For the purposes of this lab we'll be using the <strong>ACCOUNTADMIN</strong> role for all tasks. This simplifies permissions so you can focus on building — no role-switching required.</div>
+  </div>
+  <ol>
+    <li>In the <strong>snowday</strong> workspace panel, click <strong>+ Add new</strong>.</li>
+    <li>From the menu, select <strong>SQL File</strong>.</li>
+    <li>Name the file <code>Setup.sql</code> and press <strong>Enter</strong>.</li>
+    <li>Paste the following SQL into the file, then run it by clicking the <strong>▶ dropdown</strong> at the top of the editor and selecting <strong>Run all</strong> (or press <strong>⌘ + Shift + Return</strong>):</li>
+  </ol>
+  <div class="code-block-wrap">
+    <div class="code-block-header">
+      <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
+      <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+    <pre><code>USE ROLE ACCOUNTADMIN;
+
+-- Upgrade warehouse to Gen2 Medium for this lab
+ALTER WAREHOUSE DEFAULT_WH SET
+  WAREHOUSE_SIZE = 'MEDIUM',
+  GENERATION = '2';
+
+-- Create your personal lab database and schema
+CREATE DATABASE IF NOT EXISTS VBC_LAB
+  COMMENT = 'Value Based Care hands-on lab database';
+
+CREATE SCHEMA IF NOT EXISTS VBC_LAB.CARE_ANALYTICS
+  COMMENT = 'Care analytics schema for VBC lab assets';
+
+-- Confirm
+SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
+  </div>
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>The last statement — <code>SHOW SCHEMAS IN DATABASE VBC_LAB</code> — returns a results table at the bottom of the editor. You should see 3 rows: <code>CARE_ANALYTICS</code>, <code>INFORMATION_SCHEMA</code>, and <code>PUBLIC</code>. If <code>CARE_ANALYTICS</code> is listed with <code>VBC_LAB</code> as the database and <code>ACCOUNTADMIN</code> as the owner, the setup ran successfully.</div>
+  </div>
+
+  <h3>4. About Setting Your Context in Snowflake</h3>
+  <p>In Snowflake, your <strong>context</strong> tells the platform what role, warehouse, database, and schema to use for everything you do. It's always visible as a status bar at the bottom of the Snowsight editor — for example:</p>
+
+  <div style="background:var(--sf-navy); color:#cdd6f4; font-family:monospace; font-size:13px; padding:10px 16px; border-radius:6px; margin:12px 0 20px; display:inline-block;">
+    ACCOUNTADMIN &nbsp;•&nbsp; DEFAULT_WH (Medium) &nbsp;•&nbsp; VBC_LAB &nbsp;•&nbsp; CARE_ANALYTICS
+  </div>
+
+  <p>Getting into the habit of checking your context before running any SQL is important — it's one of the most common sources of errors and confusion. If the wrong database or schema is active, objects you create may end up in unexpected places, or queries may fail to find the tables they're looking for.</p>
+
+  <p>Click any component in the context bar to change it. For this lab, always confirm your context is set to:</p>
+  <ul>
+    <li><strong>Role:</strong> <code>ACCOUNTADMIN</code></li>
+    <li><strong>Warehouse:</strong> <code>DEFAULT_WH</code></li>
+    <li><strong>Database:</strong> <code>VBC_LAB</code></li>
+    <li><strong>Schema:</strong> <code>CARE_ANALYTICS</code></li>
+  </ul>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>You can also set context explicitly at the top of any SQL file using <code>USE ROLE</code>, <code>USE WAREHOUSE</code>, <code>USE DATABASE</code>, and <code>USE SCHEMA</code>. This is good practice for any script you share or reuse — it makes the context self-contained and removes any guesswork.</div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-overview')">← Lab Overview</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m1-marketplace')">Step 3: Get Marketplace Data →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M2 OVERVIEW: CORTEX SEARCH ─────────────────── -->
+<div id="step-m2-overview" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 2 · Step 7</div>
+    <h1>Cortex Search Overview</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min</div>
+
+  <h2>What Is Cortex Search?</h2>
+  <p>Cortex Search is Snowflake's fully managed search service for unstructured text. Point it at any text column in a Snowflake table and it automatically indexes the content, generates <strong>vector embeddings</strong> (a numerical fingerprint of each piece of text that captures its meaning, not just its words), and serves search queries — with no infrastructure to manage, no model to train, and no pipeline to build.</p>
+  <p>Under the hood it uses <strong>hybrid search</strong>: a combination of those meaning-based embeddings and traditional keyword scoring (which handles exact word and phrase matching). Together these outperform either method alone, especially for domain-specific content like clinical documentation.</p>
+
+  <h2>Semantic Search — What That Means</h2>
+  <p>Traditional keyword search finds documents containing the exact words you typed. <strong>Semantic search</strong> finds documents that mean what you're asking, even if the words don't match.</p>
+  <p>In a clinical context this matters enormously. A care manager searching for <em>"patient with poorly controlled blood sugar missing labs"</em> should surface notes that mention HbA1c, A1C, glycemic index, or endocrinology follow-up — none of which contain the search phrase. Cortex Search handles this automatically because it understands the meaning behind words, not just the words themselves.</p>
+
+  <h2>What We're Doing in This Lab</h2>
+  <p>We have a dataset of <strong>1,500 AI-generated clinical notes</strong> in SOAP format (Subjective, Objective, Assessment, Plan) — synthetic patient records produced from the Synthea dataset. These notes are in a CSV file called <code>Clinical_Notes_RAW.csv</code>, available on the <strong>Lab Instructions</strong> landing page (linked from the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/register" target="_blank">lab registration page</a>).</p>
+  <p>In this module we will:</p>
+  <ol>
+    <li>Load <code>Clinical_Notes_RAW.csv</code> into a Snowflake table in <code>VBC_LAB.CARE_ANALYTICS</code></li>
+    <li>Create a <strong>Cortex Search Service</strong> on top of that table — one SQL command</li>
+    <li>Query the service to verify it works</li>
+  </ol>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🤖</span>
+    <div><strong>Why this matters for Module 3:</strong> The agent we build in Module 3 will have two tools available to it — the <strong>semantic view</strong> from Module 1 (structured VBC analytics via Cortex Analyst) and the <strong>Cortex Search service</strong> from this module (unstructured clinical notes). The agent decides which tool to use based on the question. Structured metrics questions route to Analyst; narrative patient history questions route to Search.</div>
+  </div>
+
+  <h2>Other Example Uses for Cortex Search</h2>
+  <ul>
+    <li>Searching provider directory and formulary documentation</li>
+    <li>Surfacing relevant clinical protocols for specific diagnoses</li>
+    <li>Finding prior authorization documentation for specific medications</li>
+    <li>Identifying patients with similar care gaps across a large population</li>
+    <li>Making contracts, policies, or compliance documents queryable by plain language</li>
+  </ul>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m2-s2')">← Ask VBC Questions</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m1-s2')">Step 8: Create Clinical Notes Table →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M1 S2: CLINICAL NOTES ─────────────────── -->
+<div id="step-m1-s2" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 2 · Step 8</div>
+    <h1>Create the Clinical Notes Table</h1>
+  </div>
+  <div class="timing-pill">⏱ ~20 min</div>
+
+  <p>This step uses a Snowflake Workspace Notebook to load <code>Clinical_Notes_RAW.csv</code> into Snowflake — but it's not a simple file import. Before the data ever lands in a table, the notebook uses <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql" target="_blank" style="color:var(--sf-blue)">Cortex AI Functions</a> to scan every note for PII and data quality issues, redact anything it finds in-flight, then create the clean <code>CLINICAL_NOTES</code> table and the Cortex Search service on top of it in one pass.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">📥</span>
+    <div>Both <code>02_enriched_loading_demo.ipynb</code> and <code>Clinical_Notes_RAW.csv</code> are available on the <strong>Lab Instructions</strong> landing page, linked from the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/register" target="_blank" style="color:var(--sf-blue)">lab registration page</a>. Download both before starting the steps below.</div>
+  </div>
+
+  <h2>Part 1 — Upload the Notebook to Your Workspace</h2>
+  <ol>
+    <li>In Snowsight, navigate to <strong>Projects</strong> in the left sidebar and open your <strong>snowday</strong> workspace.</li>
+    <li>Click <strong>Add new</strong> and select <strong>Upload Files</strong> from the dropdown.</li>
+    <li>In the file picker, navigate to your local Snowday folder and select <code>02_enriched_loading_demo.ipynb</code>.</li>
+    <li>Once uploaded, click the notebook name in the file list to open it.</li>
+  </ol>
+
+  <h2>Part 2 — Connect a Runtime</h2>
+  <p>Workspace notebooks run Python inside a dedicated container called a <strong>runtime service</strong>. Your account won't have one yet — you need to create it before running any cells.</p>
+  <ol>
+    <li>In the notebook toolbar, click <strong>Connect</strong> (top left, next to the Run all button).</li>
+    <li>A dialog appears showing service configuration — leave all defaults as-is (CPU, Python 3.12, v2.4) and click <strong>Create and connect</strong>.</li>
+    <li>The button will switch to <strong>Connecting...</strong> and gray out. Wait 1–2 minutes for the runtime to start.</li>
+    <li>When it turns green and shows <strong>Connected</strong>, you're ready to proceed.</li>
+  </ol>
+
+  <h2>Part 3 — Upload the CSV to Your Workspace</h2>
+  <p>The notebook reads <code>Clinical_Notes_RAW.csv</code> directly from your workspace root. <strong>Do this before running any cells</strong> — the first SQL cell will fail if the file isn't present.</p>
+  <ol>
+    <li>Using the same <strong>Add new → Upload Files</strong> flow, upload <code>Clinical_Notes_RAW.csv</code> to your <strong>snowday</strong> workspace.</li>
+    <li>Confirm the file appears in the workspace file list on the left side of the screen.</li>
+  </ol>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>Snowsight may automatically open the CSV as a preview tab when you upload it. You can close that tab — it's just a file preview and has no effect on the notebook.</div>
+  </div>
+
+  <h2>Part 4 — Run the Notebook</h2>
+  <p>Run each cell individually using the <strong>Run cell</strong> button on the right side of each cell, or press <strong>Shift + Enter</strong>. Read the markdown text above each cell before running it — the notebook is self-documenting and explains what each step does. Results appear directly below the cell after it executes.</p>
+  <p>Two cells take 1–2 minutes each (the AI_COMPLETE quality scan and the final load step). That's expected — an LLM is processing 1,500 rows.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div><strong>Run all</strong> is best used for re-running the entire notebook from scratch after you've already been through it once. On your first pass, go cell by cell so you can see what each step produces.</div>
+  </div>
+
+  <p>If something goes wrong, click the <strong>▾</strong> chevron next to the <strong>Connected</strong> button to access kernel controls:</p>
+  <ul>
+    <li><strong>Restart kernel</strong> — Clears all variables but keeps packages. Use this if a cell gets stuck or produces an unexpected error mid-run.</li>
+    <li><strong>Shut down kernel</strong> — Fully stops the runtime. Use this for a completely clean start; you'll need to reconnect afterward.</li>
+  </ul>
+
+  <h2>What the Notebook Does</h2>
+  <ol>
+    <li><strong>Setup &amp; Stage</strong> — Sets the session context to <code>VBC_LAB.CARE_ANALYTICS</code>, creates an internal stage, and copies the CSV from your workspace onto it. A preview shows raw rows read directly from stage — no table exists yet.</li>
+    <li><strong>AI_COMPLETE — Data quality scan</strong> <em>(~1–2 min)</em> — An LLM scans all 1,500 notes for PII hidden in the note text (SSNs, phone numbers, email addresses, physical addresses) and flags any mismatches between the structured metadata and what the note actually says. Only rows with issues are returned.</li>
+    <li><strong>AI_REDACT — Preview</strong> — For the flagged rows, shows exactly what PII was found and what placeholder it will be replaced with (e.g. <code>[NATIONAL_ID]</code>, <code>[EMAIL]</code>, <code>[ADDRESS]</code>) before anything is written.</li>
+    <li><strong>AI_REDACT + Load</strong> <em>(~1–2 min)</em> — Creates the final <code>CLINICAL_NOTES</code> table in a single pass. Flagged rows have PII replaced in-flight; clean rows pass through unchanged. The raw PII never touches a permanent table.</li>
+    <li><strong>Create Cortex Search Service</strong> — Creates <code>CLINICAL_NOTES_SEARCH</code> on the clean table and runs a semantic test query to confirm it's working.</li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em> — a clinical term that doesn't appear verbatim in any note. If the results come back about Cystic Fibrosis (CF) patients, semantic search is working correctly.</div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m2-overview')">← Cortex Search Overview</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m1-s4')">Step 9: Query the Search Service →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M1 S4: QUERY ─────────────────── -->
+<div id="step-m1-s4" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 2 · Step 9</div>
+    <h1>Query the Search Service</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min</div>
+
+  <p>The notebook created the <code>CLINICAL_NOTES</code> table and built a Cortex Search index on its <code>NOTE_TEXT</code> column, named <code>CLINICAL_NOTES_SEARCH</code>. Now let's verify it's working and explore it using the built-in Cortex Search Playground — a UI for running searches directly against your service without writing any code.</p>
+
+  <h2>Navigate to Your Search Service</h2>
+  <ol>
+    <li>In the Snowsight left sidebar, click <strong>AI &amp; ML</strong>, then select <strong>Search</strong>.</li>
+    <li>You'll see the Cortex Search service list. Confirm <code>CLINICAL_NOTES_SEARCH</code> is listed with both <strong>Indexing</strong> and <strong>Serving</strong> showing <strong>ACTIVE</strong> and 1,510 rows.</li>
+    <li>Click on <strong>CLINICAL_NOTES_SEARCH</strong> to open the service detail page.</li>
+  </ol>
+
+  <h2>Review the Service Details</h2>
+  <p>The detail page has three tabs — take a moment to look around:</p>
+  <ul>
+    <li><strong>Search Service</strong> — Shows which column is being searched (<code>NOTE_TEXT</code>), which columns are available as filter attributes (<code>NOTE_DATE</code>, <code>NOTE_TYPE</code>, <code>PROVIDER_NAME</code>, and others), the embedding model in use (<code>snowflake-arctic-embed-m-v1.5</code>), and the REST API endpoint if you want to call the service programmatically.</li>
+    <li><strong>Data Preview</strong> — Browse the raw rows in the underlying table.</li>
+    <li><strong>Costs</strong> — Track compute usage for the service.</li>
+  </ul>
+
+  <h2>Open the Playground</h2>
+  <p>Click <strong>Playground</strong> in the top-right corner of the service detail page. This opens an interactive search UI pointed at <code>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</code>.</p>
+
+  <h2>Try These Searches</h2>
+  <p>Type a search phrase into the box and click the search button. Results appear as a ranked list — hover over any result to expand the full note text.</p>
+
+  <h2>Search 1 — Diabetes Care Gaps</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">🔍 Search Phrase</div>
+    <p>patients with poorly controlled diabetes and missed lab follow-ups</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'patients with poorly controlled diabetes and missed lab follow-ups')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Search 2 — High-Risk Heart Failure</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">🔍 Search Phrase</div>
+    <p>high-risk patients with recent emergency department visits for heart failure</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'high-risk patients with recent emergency department visits for heart failure')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Search 3 — Preventive Care Gaps</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">🔍 Search Phrase</div>
+    <p>patients with gaps in preventive screenings or annual wellness visits</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'patients with gaps in preventive screenings or annual wellness visits')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>None of these phrases appear verbatim in the notes — the search works because it understands meaning, not just words.</div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m1-s2')">← Create Clinical Notes Table</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-context')">Module 3: Cortex Agents →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M1 STEP 3: MARKETPLACE ─────────────────── -->
+<div id="step-m1-marketplace" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Step 3</div>
+    <h1>Get Marketplace Data</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min</div>
+
+  <div class="section-heading first"><span class="dot"></span>About the Dataset</div>
+  <p>All three modules in this lab are built on the same data foundation: the <strong>Synthea synthetic healthcare dataset</strong>. Before we start building with Cortex Analyst, Cortex Search, or Cortex Agents, we need this data in your account — that's why this is the first thing we do.</p>
+
+  <p>When you get a dataset from the Marketplace, <strong>no data is copied into your account</strong>. Instead, Snowflake uses secure data sharing — the provider's data stays in their account and your account is granted read access to it. It appears as a database in your account and behaves like any other, but the underlying storage belongs to the provider. This means the data is always current and there's nothing to load or maintain.</p>
+
+  <p>The dataset is <strong>Synthetic Healthcare Data - Clinical and Claims</strong>, published by Snowflake Virtual Hands-On Labs. It contains realistic but fully synthetic patient records — no PHI — covering patients, encounters, conditions, medications, procedures, observations, claims, and more.</p>
+
+  <div class="section-heading"><span class="dot"></span>Steps to add Synthea dataset from marketplace</div>
+  <ol>
+    <li>In the Snowsight left sidebar, hover over <strong>Marketplace</strong>. In the flyout, click <strong>Snowflake Marketplace</strong>.</li>
+    <li>In the search bar, type <code>synthea</code>. In the autocomplete, click <strong>Synthetic Healthcare Data - Clinical and Claims</strong> under <em>Data Products</em>.</li>
+    <li>The search results will show 1 data product — <strong>Synthetic Healthcare Data - Clinical and Claims</strong> by <em>Snowflake Virtual Hands-On Labs</em>. It is free and instantly accessible. Click the listing to open it.</li>
+    <li>On the listing detail page, click <strong>Get</strong> in the top-right corner.</li>
+    <li>A <strong>Complete your profile to get data products</strong> dialog will appear. Enter the email you used to register for the lab and click <strong>Save</strong>.</li>
+    <li>A <strong>Get it for Free</strong> dialog will appear. Under <strong>Options → Database name</strong>, clear the default and type <code>Synthea</code>. Leave the roles field empty — ACCOUNTADMIN already has access. Click <strong>Get</strong>.</li>
+    <li>A <strong>Ready to Use</strong> confirmation will appear with a green checkmark and the database name <code>SYNTHEA</code>. Click <strong>Query Data</strong> — this opens the sample worksheet with example queries pre-loaded.</li>
+  </ol>
+
+  <div class="section-heading"><span class="dot"></span>Explore the Synthea Dataset</div>
+  <p>Before running the example queries, set your context so Snowflake knows which database and schema to use. In the worksheet toolbar, click the <strong>database context dropdown</strong> (it shows the current database name) and select <code>SYNTHEA</code>. Then click the schema dropdown next to it and select <code>SILVER</code>.</p>
+  <p>To run a query, place your cursor inside it and click the blue <strong>▶ Run</strong> button, or press <strong>⌘ + Return</strong> (Mac) / <strong>Ctrl + Enter</strong> (Windows). To run all at once, use <strong>▶ dropdown → Run all</strong> or <strong>⌘ + Shift + Return</strong>. Run each of the example queries to confirm the data is accessible.</p>
+  <p>Click the <strong>database icon</strong> at the top of the workspace panel to open the Database Explorer. Expand <code>SYNTHEA</code>, then expand <code>SILVER</code>, then expand <strong>Tables</strong> — you should see 18 tables including <code>PATIENTS</code>, <code>ENCOUNTERS</code>, <code>CONDITIONS</code>, <code>MEDICATIONS</code>, <code>OBSERVATIONS</code>, <code>CLAIMS</code>, and more. When done, close the <strong>Synthetic Healthcare Data</strong> example worksheet.</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>If the queries return results, the <code>SYNTHEA</code> database is live and ready. You're all set to start building on top of it.</div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-naming')">← Lab Setup</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m1-create-sv')">Step 4: Create Semantic View →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M1 STEP 4: CREATE SV ─────────────────── -->
+<div id="step-m1-create-sv" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 1 · Step 4</div>
+    <h1>Create Semantic View</h1>
+  </div>
+  <div class="timing-pill">⏱ ~10 min</div>
+
+  <div class="section-heading first"><span class="dot"></span>What is a Semantic View?</div>
+  <p>A <strong>semantic view</strong> is a native Snowflake object — defined using SQL DDL and stored at the schema level — that organizes business metrics, dimension relationships, and domain logic directly in your database. Rather than embedding business logic in every query or BI tool, you define it once in the semantic view and it becomes the authoritative source for how your data should be interpreted.</p>
+  <p>Semantic views power <strong>Cortex Analyst</strong>, Snowflake's natural language query engine. Once a semantic view is in place, users can ask plain-language questions and get accurate SQL-backed answers — because the semantic layer already knows what the data means.</p>
+
+  <div class="section-heading"><span class="dot"></span>Create the Semantic View with Autopilot</div>
+  <ol>
+    <li>If the left navigation panel is collapsed, click the <strong>→ Show navigation</strong> arrow on the left edge of the screen to expand it.</li>
+    <li>In the left sidebar, hover over <strong>AI &amp; ML</strong>. In the flyout, under <strong>Cortex AI</strong>, click <strong>Analyst</strong>.</li>
+    <li>On the Cortex Analyst page, click <strong>Create with Autopilot</strong> in the top-right corner.</li>
+    <li>A <strong>Provide context</strong> screen appears. You can optionally upload example SQL queries or a Tableau data source to improve how Autopilot generates the semantic view — but for this lab, click <strong>Skip</strong>.</li>
+    <li>On the <strong>Name your semantic view</strong> screen:
+      <ul>
+        <li>Set the name to <code>VBC_ANALYTICS_SV</code></li>
+        <li>Leave <strong>Semantic view</strong> selected — it is the recommended option and the native Snowflake object type</li>
+        <li>Confirm the schema is set to <code>VBC_LAB.CARE_ANALYTICS</code></li>
+      </ul>
+    </li>
+    <li>Click <strong>Next</strong>.</li>
+  </ol>
+
+  <div class="section-heading"><span class="dot"></span>Select Tables</div>
+  <p>The next screen shows all tables available across your databases. Navigate to <strong>SYNTHEA → SILVER</strong> and select the following 8 tables — these cover the core clinical and financial data needed to answer Value Based Care questions around cost, utilization, quality, risk, and provider performance.</p>
+  <ul>
+    <li><code>CONDITIONS</code></li>
+    <li><code>ENCOUNTERS</code></li>
+    <li><code>MEDICATIONS</code></li>
+    <li><code>OBSERVATIONS</code></li>
+    <li><code>PATIENTS</code></li>
+    <li><code>PAYERS</code></li>
+    <li><code>PROCEDURES</code></li>
+    <li><code>PROVIDERS</code></li>
+  </ul>
+  <p>You should see <strong>Selected 8</strong> in the tab at the top of the table list. Click <strong>Next</strong>.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>These 8 tables are enough to support questions across all major VBC categories — cost management, utilization, quality measures, risk stratification, and provider performance. The semantic view and Cortex Agent we build in this lab are designed around these tables.</div>
+  </div>
+
+  <div class="section-heading"><span class="dot"></span>Select Columns</div>
+  <p>The next screen lists all columns across the 8 selected tables. Click <strong>Select all</strong> — we'll include all 127 columns. Two options at the bottom of the screen are already checked; leave them both on:</p>
+  <ul>
+    <li><strong>Add sample values</strong> — pulls a few real values from each column so Cortex Analyst can give better answers to natural language questions</li>
+    <li><strong>Add descriptions</strong> — uses AI to generate sensible descriptions for each column, saving you from writing them manually</li>
+  </ul>
+  <p>Click <strong>Create</strong>.</p>
+
+  <div class="section-heading"><span class="dot"></span>Generating the Semantic View</div>
+  <p>Autopilot will begin building your semantic view. Click <strong>Show details</strong> to watch progress. The process runs through four stages:</p>
+  <ul>
+    <li><strong>Discovering logical tables</strong> — identifies the 8 tables and creates the base structure</li>
+    <li><strong>Identifying dimensions and metrics</strong> — classifies columns into dimensions, facts, and metrics</li>
+    <li><strong>Building table relationships</strong> — attempts to infer joins between tables</li>
+    <li><strong>Adding descriptions</strong> — generates natural language descriptions and aliases for all 8 tables and 127 columns</li>
+  </ul>
+  <p>Generation is complete when <strong>Generation completed</strong> appears with a full green progress bar and a <strong>Your semantic view is ready</strong> dialog. You may see a warning — that's expected and fine. There should be no errors.</p>
+  <p>Click the <strong>X</strong> in the top-right corner of the <strong>Your semantic view is ready</strong> card to dismiss it, then scroll down to see the <strong>Logical tables</strong> section. Each of the 8 tables will be listed with its auto-generated dimensions, time dimensions, and facts.</p>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m1-marketplace')">← Get Marketplace Data</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m1-update-sv')">Step 5: Update Semantic View →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M1 UPDATE SV ─────────────────── -->
+<div id="step-m1-update-sv" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 1 · Step 5</div>
+    <h1>Update Semantic View</h1>
+  </div>
+  <div class="timing-pill">⏱ ~15 min</div>
+
+  <div class="section-heading"><span class="dot"></span>Add Relationships, Metrics, and Dimensions</div>
+  <p>The Autopilot-generated semantic view is a solid starting point, but it needs a few refinements before it's ready for production questions:</p>
+  <ul>
+    <li><strong>Add relationships</strong> — define the table join logic using the Suggestions panel in the UI</li>
+    <li><strong>Add metrics and dimensions</strong> — define VBC-specific measures and expression-based dimensions using Cortex Code</li>
+  </ul>
+  <p>The <strong>Suggestions</strong> and <strong>Playground</strong> tabs are visible on the right side of the page.</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <div>If Cortex Code is open on the right side of your screen, consider closing it for now by clicking the <strong>→|</strong> arrow at the top right. This frees up screen space while you work in the Cortex Analyst UI.</div>
+  </div>
+
+  <div class="section-heading"><span class="dot"></span>1. Add Relationships</div>
+  <p>Autopilot likely didn't detect any relationships automatically — but the <strong>Suggestions</strong> panel has already figured them out for you. In the Suggestions panel on the right, expand the <strong>Relationships</strong> section. You should see 12 suggested relationships.</p>
+  <p>For each one:</p>
+  <ol>
+    <li>Click <strong>Review</strong> — the <strong>Add relationship</strong> dialog will open in the semantic view editor, pre-filled with the table names, relationship type, and join columns.</li>
+    <li>Click <strong>Add</strong> to accept it.</li>
+    <li>Repeat for all 12 relationships. The <strong>Relationships</strong> counter on the semantic view should reach <strong>12</strong> when done.</li>
+  </ol>
+  <p>Click <strong>Save</strong> in the top-right corner. You should see a <strong>Saved semantic view successfully</strong> confirmation.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>You may see <strong>1 warning</strong> after saving. Click it to review — it's a suggestion about query history and is safe to ignore for this lab.</div>
+  </div>
+
+  <div class="section-heading"><span class="dot"></span>2. Add Metrics and Dimensions</div>
+  <p>Beyond what Autopilot generates, we need two types of additions for this lab:</p>
+  <ul>
+    <li><strong>Metrics</strong> are named calculations — business measures defined once in the semantic view so every query uses the same logic. For example, <em>Average Cost per Encounter</em> is <code>AVG(total_claim_cost)</code>. Without a metric, Cortex Analyst has to guess the formula each time. You can expand <strong>Metrics</strong> in the Suggestions panel to see what Autopilot identified — but for this lab we'll use a specific set of VBC metrics and dimensions, added via Cortex Code below.</li>
+    <li><strong>Dimensions</strong> are attributes used to slice and filter data. Most dimensions come directly from a column, but <em>expression-based</em> dimensions are derived from logic. For example, <em>Patient Income Band</em> isn't a column in the data — it's a <code>CASE</code> expression that buckets the <code>INCOME</code> value into ranges like <code>&lt;30k</code>, <code>30-60k</code>, etc. These let Cortex Analyst answer questions like "show cost by income band" without any transformation in the query.</li>
+  </ul>
+  <ol>
+    <li>Click the <img src="images/cortex-code-ui-icon.png" alt="Cortex Code icon" style="height:18px; vertical-align:middle; margin:0 2px;"> icon on the right edge of the Snowsight UI to open Cortex Code. Click the <strong>New chat</strong> button (pencil icon) to start a fresh session.</li>
+    <li>Paste the following prompt into <strong>Cortex Code</strong> (not the Analyst Playground) and send it:</li>
+  </ol>
+  <div class="code-block-wrap">
+    <div class="code-block-header">
+      <div class="code-block-lang"><span class="lang-dot"></span>Cortex Code Prompt</div>
+      <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+    <pre style="white-space: pre-wrap; word-break: break-word;"><code>I need to programmatically create an updated version of my semantic view. Follow these steps:
+
+Step 1: Export the original DDL to my workspace
+
+Export the DDL for semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV to my workspace named snowday, saving it as create_vbc_analytics_sv_updated.sql. Use this approach:
+
+Create a temporary stage in VBC_LAB.CARE_ANALYTICS
+Use COPY INTO to write the GET_DDL('SEMANTIC VIEW', 'VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV') output to the stage as a single file called create_vbc_analytics_sv_updated.sql with FILE_FORMAT = (TYPE = CSV FIELD_DELIMITER = NONE RECORD_DELIMITER = NONE COMPRESSION = NONE) SINGLE = TRUE
+Use SHOW WORKSPACES IN ACCOUNT to get the correct database, schema, and workspace names. The workspace URI requires quoted identifiers — use the exact values from the output (the database name contains a $)
+Use COPY FILES to copy the file from the stage into the workspace
+Drop the temporary stage
+
+Step 2: Modify the exported file in-place
+
+Read the exported file and make these targeted edits (do NOT reconstruct the file — use the edit tool to make point changes):
+
+Change the view name from VBC_ANALYTICS_SV to VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED
+
+Add these new dimensions in the dimensions section:
+
+After PATIENTS.DEATHDATE: add PATIENTS.PATIENT_INCOME_BAND as CASE WHEN INCOME &lt; 30000 THEN '&lt;30k' WHEN INCOME &gt;= 30000 AND INCOME &lt; 60000 THEN '30-60k' WHEN INCOME &gt;= 60000 AND INCOME &lt; 100000 THEN '60-100k' WHEN INCOME &gt;= 100000 THEN '100k+' ELSE 'Unknown' END comment='Patient income band categorization'
+
+After ENCOUNTERS.ENCOUNTERCLASS, add these two dimensions in order:
+ENCOUNTERS.ENCOUNTER_MONTH as DATE_TRUNC('MONTH', ENCOUNTER_START) comment='Month of encounter'
+ENCOUNTERS.ENCOUNTER_YEAR as YEAR(ENCOUNTER_START) comment='Year of encounter'
+
+Insert a new metrics section between the closing ) of dimensions and the with extension block:
+
+metrics (
+    ENCOUNTERS.TOTAL_COST_OF_CARE as SUM(TOTAL_CLAIM_COST) comment='Total cost of care across all encounters',
+    ENCOUNTERS.PAYER_COVERAGE_RATE as DIV0(SUM(PAYER_COVERAGE), SUM(TOTAL_CLAIM_COST)) comment='Payer coverage rate',
+    ENCOUNTERS.AVG_COST_PER_ENCOUNTER as AVG(TOTAL_CLAIM_COST) comment='Average cost per encounter',
+    ENCOUNTERS.TOTAL_ENCOUNTER_COUNT as COUNT(ENCOUNTER_ID) comment='Total count of encounters',
+    ENCOUNTERS.AVOIDABLE_ED_RATE as DIV0(SUM(CASE WHEN ENCOUNTERCLASS = 'emergency' AND REASONCODE IN ('59621000','15777000','195662009','10509002','444814009','40055000','271737000','427898007','195967001','233604007','82423001','431855005','431856006','162864005') THEN 1 ELSE 0 END), COUNT(ENCOUNTER_ID)) comment='Rate of avoidable ED visits for ambulatory-sensitive conditions relative to total encounters'
+)
+
+Do not execute the updated DDL.</code></pre>
+  </div>
+
+  <p>Cortex Code will make a plan and carry out the requested changes autonomously. During the process it will ask permission before running each command — click to allow each one. At some point it will ask to switch from the Analyst screen over to <strong>Workspaces</strong>. Once in the workspace, open the SQL file — you'll see the changes highlighted as a diff. Use the <strong>Previous / Next</strong> controls at the bottom of the editor to step through each of the 4 changes. When Cortex Code finishes, click the blue <strong>Keep all</strong> button at the bottom right to accept all changes to the file.</p>
+
+  <div class="callout callout-info" style="display:block; padding:16px 20px;">
+    <div style="font-weight:600; margin-bottom:10px;">What we're adding to the semantic view</div>
+    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--sf-border);">
+          <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:90px;">Type</th>
+          <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:200px;">Name</th>
+          <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600;">Definition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Cost of Care</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">SUM(total_claim_cost)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Payer Coverage Rate</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DIV0(SUM(payer_coverage), SUM(total_claim_cost))</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Average Cost per Encounter</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">AVG(total_claim_cost)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Avoidable ED Rate</td><td style="padding:7px 10px;">Emergency encounters for ambulatory-sensitive conditions / total encounters</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Encounter Count</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">COUNT(encounter_id)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Patient Income Band</td><td style="padding:7px 10px;">&lt;30k, 30-60k, 60-100k, 100k+</td></tr>
+        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Month / Year</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DATE_TRUNC / YEAR(encounter_start)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>We provided the metrics and dimensions as a text prompt here for reproducibility — but Cortex Code also accepts <strong>images and screenshots</strong>. If you had this list in a screenshot or a photo of a whiteboard, you could have attached it directly and asked Cortex Code to do the same thing. Keep that in mind as you use it throughout the lab.</div>
+  </div>
+  <ol start="3">
+    <li><strong>Create the updated semantic view using the script created by Cortex Code.</strong> Cortex Code will export the current semantic view DDL to your workspace, modify it in place, and save it as <code>create_vbc_analytics_sv_updated.sql</code> in your <strong>snowday</strong> workspace. Review the final DDL, then run it using the blue <strong>▶ Run</strong> button or <strong>⌘ + Return</strong>. You should see a <strong>Semantic view VBC_ANALYTICS_SV_UPDATED successfully created</strong> confirmation in the results pane. Click the <strong>database icon</strong> at the top of the workspace panel to open the Database Explorer and expand <strong>VBC_LAB → CARE_ANALYTICS → Semantic Views</strong> — you should now see both <code>VBC_ANALYTICS_SV</code> and <code>VBC_ANALYTICS_SV_UPDATED</code>.</li>
+    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV_UPDATED</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables, then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground. Close Cortex Code if it's open to free up screen space.</li>
+  </ol>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m1-create-sv')">← Create Semantic View</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m2-s2')">Step 6: Ask VBC Questions →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M2 S2: QUERY ─────────────────── -->
+<div id="step-m2-s2" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 1 · Step 6</div>
+    <h1>Ask Value-Based Care Questions</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min hands-on</div>
+
+  <p>With <strong>VBC_ANALYTICS_SV_UPDATED</strong> open in Cortex Analyst and the <strong>Playground</strong> tab active on the right, type a question into the prompt box and click <strong>Run</strong>. Try any of these — or ask anything you're curious about:</p>
+
+  <h2>Question 1 — Cost by Income Band</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <p>Which patient income bands have the highest average cost per encounter?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Which patient income bands have the highest average cost per encounter?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Question 2 — Avoidable ED by Income Band</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <p>What is the avoidable ED utilization rate broken down by income band?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'What is the avoidable ED utilization rate broken down by income band?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Question 3 — Monthly Cost Trends</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <p>Show me total cost of care trends month over month, segmented by encounter class.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Show me total cost of care trends month over month, segmented by encounter class.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Question 4 — Payer Coverage Gap by State</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <p>Which states have the highest payer coverage gap — meaning the highest proportion of costs not covered by insurance?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Which states have the highest payer coverage gap — meaning the highest proportion of costs not covered by insurance?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m1-update-sv')">← Update Semantic View</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m2-overview')">Module 2: Cortex Search →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M3 CONTEXT ─────────────────── -->
+<div id="step-m3-context" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 3 · Cortex Agents</div>
+    <h1>Why Agents?</h1>
+    <div class="step-meta">
+      <span class="step-meta-item">⏱ ~30 minutes total</span>
+    </div>
+  </div>
+
+  <div class="timing-pill">⏱ 3 min — Business Context</div>
+
+  <p>You now have two powerful tools: a semantic search over clinical documentation, and a natural language analytics engine over VBC metrics. But real care management questions don't fit neatly into one category:</p>
+
+  <div class="callout callout-wow">
+    <span class="callout-icon">💬</span>
+    <div><em>"This patient had three ED visits this year — what's driving it, and does their care plan address it?"</em><br><br>That requires both their <strong>clinical notes</strong> AND their <strong>utilization data</strong>. That's what a Cortex Agent does — it reasons across both tools and synthesizes one answer.</div>
+  </div>
+
+  <h2>Key Concepts</h2>
+  <ul>
+    <li><strong>Tool orchestration</strong> — The agent is given a set of tools (a search service and a semantic view) and decides which to use per question. No if/else routing logic to write.</li>
+    <li><strong>Multi-tool synthesis</strong> — For complex questions, the agent calls multiple tools and synthesizes a single coherent answer.</li>
+    <li><strong>Guardrails</strong> — Agents are scoped to their tools. Questions outside that scope are declined gracefully.</li>
+    <li><strong>Auditability</strong> — Every tool call and reasoning step can be logged — critical in a regulated environment like UHG.</li>
+  </ul>
+
+  <h2>VBC Use Cases</h2>
+  <ul>
+    <li>Care manager co-pilot — surface patient risk from notes + utilization trends in one answer</li>
+    <li>Quality analyst assistant — combine protocol documentation with HEDIS measure data</li>
+    <li>Population health dashboard back-end — answer complex cohort questions automatically</li>
+    <li>Prior auth triage — match policy documentation with patient claims history</li>
+  </ul>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m1-s4')">← Query the Search Service</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-s1')">Step 1: Create the Agent →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M3 S1: CREATE AGENT ─────────────────── -->
+<div id="step-m3-s1" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 1</div>
+    <h1>Create the VBC Care Agent</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min</div>
+
+  <p>You'll create a Cortex Agent using Cortex Code, then navigate to the Agent UI in Snowsight to review what was built. The agent will have two tools: structured VBC analytics via Cortex Analyst, and unstructured clinical notes via Cortex Search.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">📖</span>
+    <div>This step follows the patterns from the <a href="https://www.snowflake.com/en/developers/guides/best-practices-to-building-cortex-agents/" target="_blank" style="color:var(--sf-blue)">Snowflake Cortex Agents Best Practices Guide</a>. Worth bookmarking for production agent development.</div>
+  </div>
+
+  <h2>Step 1 — Create the Agent with Cortex Code</h2>
+  <p>Open a <strong>new Cortex Code chat</strong> in Snowsight and paste the prompt below. Cortex Code will create the agent, configure both tools, and set the orchestration and response instructions.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">💡</span>
+    <div>Start a fresh chat — don't paste this into an existing conversation. A clean context helps Cortex Code focus entirely on the agent creation task.</div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Paste into Cortex Code</div>
+    <p>Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:</p>
+    <p>Name: VBCCAREAGENT<br>Display name: VBC_CARE_AGENT</p>
+    <p>Add two tools:<br>
+    1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED — for structured questions about costs, encounters, utilization, and VBC metrics<br>
+    2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives</p>
+    <p>Orchestration instructions:<br>
+    You are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.</p>
+    <p>Response instructions:<br>
+    Always cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div><strong>Checkpoint:</strong> Cortex Code will confirm the agent was created and list both tools — <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV_UPDATED</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It will also suggest a follow-up test query — you can skip this for now and proceed to the next step.</div>
+  </div>
+
+  <h2>Step 2 — Review the Agent in Snowsight</h2>
+  <p>After Cortex Code confirms creation, navigate to the Agent UI to review what was built:</p>
+  <ol>
+    <li>In the Snowsight left nav, go to <strong>AI &amp; ML → Agents</strong></li>
+    <li>Click on <strong>VBCCAREAGENT</strong></li>
+    <li>Click the <strong>Edit</strong> button in the top right — this opens the full configuration view</li>
+    <li>Review the tabs:
+      <ul>
+        <li><strong>About</strong> — confirm the display name is <code>VBC_CARE_AGENT</code></li>
+        <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCANALYTICS</strong> (Cortex Analyst, bound to <code>VBC_ANALYTICS_SV_UPDATED</code>) and <strong>CLINICALNOTES</strong> (Cortex Search Services, bound to <code>CLINICAL_NOTES_SEARCH</code>)</li>
+        <li><strong>Orchestration</strong> — review the orchestration and response instructions that were set by Cortex Code</li>
+      </ul>
+    </li>
+    <li>Click <strong>Cancel</strong> when done — no changes needed</li>
+  </ol>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">💡</span>
+    <div>The <strong>Access</strong> tab controls which roles can use this agent. For this lab you can leave the defaults. In production you would restrict access here before deploying to end users.</div>
+  </div>
+
+  <h2>Step 3 — Quick Verification in Agent Chat</h2>
+  <p>Before moving to Snowflake Intelligence, do a quick sanity check using the chat panel on the right side of the agent detail page. This confirms the agent is live and both tools are reachable.</p>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Agent Chat (Snowsight)</div>
+    <p>How many patients are in the dataset?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'How many patients are in the dataset?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Agent Chat (Snowsight) — Search verification</div>
+    <p>Is there any PII data in the clinical notes?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Is there any PII data in the clinical notes?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>The first question should return a number via <strong>Cortex Analyst</strong>. The second should return clinical note excerpts via <strong>Cortex Search</strong>. If both respond — not errors — both tools are reachable. Move on to the next step.</div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m3-context')">← Why Agents?</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-test')">Step 2: Test in Snowflake Intelligence →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M3 TEST ─────────────────── -->
+<div id="step-m3-test" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 2</div>
+    <h1>Test in Snowflake Intelligence</h1>
+  </div>
+  <div class="timing-pill">⏱ ~15 min · Slow down here!</div>
+
+  <p>Snowflake Intelligence is the end-user experience built on top of your agent — a polished conversational interface designed for care managers and analysts who don't live in Snowsight. You'll run three questions here to see the agent route, reason, and respond.</p>
+
+  <h2>Open Snowflake Intelligence</h2>
+  <ol>
+    <li>In Snowsight, navigate to <strong>AI &amp; ML → Agents → VBCCAREAGENT</strong></li>
+    <li>Click the <strong>Preview in Snowflake Intelligence</strong> button at the top of the agent detail page</li>
+    <li>A <strong>Sign in to Snowflake</strong> screen will appear — use the same username and password as your Snowflake account</li>
+    <li>After signing in, Snowflake Intelligence opens with <strong>VBC_CARE_AGENT</strong> loaded and ready</li>
+  </ol>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">💡</span>
+    <div>The right panel shows <strong>Agent details</strong>: key data objects (ClinicalNotes, VBCAnalytics) and the agent's connection to Snowflake. Type your questions in the chat bar at the bottom — it shows <strong>VBC_CARE_AGENT</strong> as the active agent.</div>
+  </div>
+
+  <h2>Question 1 — Clinical Notes (Search)</h2>
+  <p>This should route to <strong>Cortex Search</strong>. Watch the reasoning trace — you'll see it search ClinicalNotes multiple times before composing its answer.</p>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Snowflake Intelligence</div>
+    <p>Find patients in clinical notes who have documented gaps in diabetes management or missed HbA1c follow-ups.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Find patients in clinical notes who have documented gaps in diabetes management or missed HbA1c follow-ups.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>You'll see "Searched ClinicalNotes" appear in the reasoning trace as the agent works. The final response will surface specific patient findings with source citations.</div>
+  </div>
+
+  <h2>Question 2 — VBC Metrics (Analyst)</h2>
+  <p>This should route to <strong>Cortex Analyst</strong>. The agent will query the VBC analytics semantic view and return structured data.</p>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Snowflake Intelligence</div>
+    <p>What is the total cost of care for patients with diabetes diagnoses, and how does their ED utilization rate compare to the overall population?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'What is the total cost of care for patients with diabetes diagnoses, and how does their ED utilization rate compare to the overall population?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+  <div class="callout callout-tip">
+    <span class="callout-icon">✅</span>
+    <div>The agent automatically selected a different tool this time — no routing logic required. Look for the VBCAnalytics tool in the reasoning trace.</div>
+  </div>
+
+  <h2>Question 3 — Both Tools (The Wow Moment)</h2>
+  <p>This question requires <em>both</em> tools. Watch the agent decompose it, call each tool in sequence, then synthesize a single answer. Read the full response.</p>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Snowflake Intelligence — Multi-Tool Question</div>
+    <p>We're seeing high avoidable ED utilization in our diabetic population. What do the clinical notes say about care plan adherence for these patients, and what does the data show about their encounter patterns?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, &quot;We're seeing high avoidable ED utilization in our diabetic population. What do the clinical notes say about care plan adherence for these patients, and what does the data show about their encounter patterns?&quot;)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="callout callout-wow">
+    <span class="callout-icon">⭐</span>
+    <div>This is what makes agents different from a search bar or a dashboard. The agent:<br><br>
+    <strong>1.</strong> Breaks the question into two sub-questions<br>
+    <strong>2.</strong> Searches <strong>ClinicalNotes</strong> → retrieves notes about diabetes care plan adherence<br>
+    <strong>3.</strong> Queries <strong>VBCAnalytics</strong> → pulls encounter patterns for diabetic patients<br>
+    <strong>4.</strong> Synthesizes both results into one coherent answer — citing both sources<br><br>
+    No if/else routing logic to write. No joins across systems. The agent does the reasoning.
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m3-s1')">← Create the Agent</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-explore')">Step 3: Free Exploration →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── M3 EXPLORE ─────────────────── -->
+<div id="step-m3-explore" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 3</div>
+    <h1>Free Exploration</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min</div>
+
+  <p>Keep going in Snowflake Intelligence. Think about what a care manager, quality analyst, or program director would actually want to know. Try to push the agent to use both tools in the same answer.</p>
+
+  <h2>Suggested Prompts if You're Stuck</h2>
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Snowflake Intelligence — Option A</div>
+    <p>Which providers have the highest rate of patients with unresolved care plan goals in their notes?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Which providers have the highest rate of patients with unresolved care plan goals in their notes?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Snowflake Intelligence — Option B</div>
+    <p>Find clinical notes that mention social determinants of health concerns like housing or food insecurity, and compare the cost profile of those patients to the overall population.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Find clinical notes that mention social determinants of health concerns like housing or food insecurity, and compare the cost profile of those patients to the overall population.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Snowflake Intelligence — Option C</div>
+    <p>What patterns appear in notes for patients who had inpatient admissions within 30 days of an outpatient encounter?</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'What patterns appear in notes for patients who had inpatient admissions within 30 days of an outpatient encounter?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">🚀</span>
+    <div><strong>Fast finisher bonus:</strong> Go back to the Orchestration tab on VBCCAREAGENT and tighten the response instructions — for example, add a rule that responses must always include a confidence caveat for clinical findings. How does the answer change?</div>
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m3-test')">← Test in Snowflake Intelligence</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-takeaways')">Key Takeaways →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── TAKEAWAYS ─────────────────── -->
+<div id="step-takeaways" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Wrap-Up</div>
+    <h1>Key Takeaways &amp; Next Steps</h1>
+  </div>
+  <div class="timing-pill">⏱ ~5 min</div>
+
+  <h2>What You Built Today</h2>
+  <ul class="discussion-list">
+    <li><span class="bullet">📊</span><strong>Cortex Analyst + Semantic View</strong> — democratizes VBC analytics. Program managers ask in plain English; governance and consistent definitions stay intact.</li>
+    <li><span class="bullet">🔍</span><strong>Cortex Search</strong> — makes clinical documentation conversationally discoverable. Care managers find relevant patient history using natural language, in seconds.</li>
+    <li><span class="bullet">🤖</span><strong>Cortex Agent</strong> — bridges clinical notes and structured data. The most complex care management questions can now be answered automatically, across both sources.</li>
+    <li><span class="bullet">🧠</span><strong>Snowflake Intelligence</strong> — surfaces the agent as a polished conversational UI for business users, no SQL required.</li>
+    <li><span class="bullet">❄️</span><strong>Everything runs inside Snowflake</strong> — no data egress, no separate AI infrastructure, no new security perimeter. Critical for HIPAA compliance.</li>
+  </ul>
+
+  <div class="callout callout-wow">
+    <span class="callout-icon">⏱</span>
+    <div>All of this was built in approximately 2 hours, using synthetic but clinically realistic data, <strong>without building or hosting a single AI model.</strong></div>
+  </div>
+
+  <h2>Continue Learning — Snowflake Resources</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+    <div style="background: #f5f8fb; border-radius: 8px; padding: 16px;">
+      <div style="font-weight:600; margin-bottom: 8px; color: var(--sf-navy);">&#128218; Quickstart Guides</div>
+      <ul style="margin:0; padding-left:18px; font-size:14px; line-height:1.9;">
+        <li><a href="https://quickstarts.snowflake.com/guide/getting_started_with_cortex_search/" target="_blank" style="color:var(--sf-blue)">Getting Started with Cortex Search</a></li>
+        <li><a href="https://quickstarts.snowflake.com/guide/getting_started_with_cortex_analyst/" target="_blank" style="color:var(--sf-blue)">Getting Started with Cortex Analyst</a></li>
+        <li><a href="https://quickstarts.snowflake.com/guide/getting_started_cortex_agents/" target="_blank" style="color:var(--sf-blue)">Getting Started with Cortex Agents</a></li>
+      </ul>
+    </div>
+    <div style="background: #f5f8fb; border-radius: 8px; padding: 16px;">
+      <div style="font-weight:600; margin-bottom: 8px; color: var(--sf-navy);">&#128214; Documentation</div>
+      <ul style="margin:0; padding-left:18px; font-size:14px; line-height:1.9;">
+        <li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview" target="_blank" style="color:var(--sf-blue)">Cortex Search Overview</a></li>
+        <li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst/overview" target="_blank" style="color:var(--sf-blue)">Cortex Analyst Overview</a></li>
+        <li><a href="https://www.snowflake.com/en/developers/guides/getting-started-with-cortex-agent-evaluations/" target="_blank" style="color:var(--sf-blue)">Cortex Agent Evaluations Guide</a></li>
+      </ul>
+    </div>
+  </div>
+  <div style="background: #f5f8fb; border-radius: 8px; padding: 16px; margin-top: 16px;">
+    <div style="font-weight:600; margin-bottom: 8px; color: var(--sf-navy);">&#127891; Snowflake Academy — Earn Badges</div>
+    <ul style="margin:0; padding-left:18px; font-size:14px; line-height:1.9;">
+      <li><a href="https://learn.snowflake.com/courses/course-v1:snowflake+ESS-BD-100+B/about" target="_blank" style="color:var(--sf-blue)">Intro to Snowflake — Snowflake Academy Badge</a></li>
+      <li><a href="https://learn.snowflake.com/courses/course-v1:snowflake+ESS-CORTEX-200+B/about" target="_blank" style="color:var(--sf-blue)">Getting Started with Snowflake Cortex AI — Badge</a></li>
+      <li><a href="https://learn.snowflake.com" target="_blank" style="color:var(--sf-blue)">Browse all Snowflake Academy courses →</a></li>
+    </ul>
+  </div>
+
+  <h2>Objects You Created</h2>
+  <table>
+    <tr><th>Object</th><th>Name</th></tr>
+    <tr><td>Table</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES</td></tr>
+    <tr><td>Cortex Search Service</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</td></tr>
+    <tr><td>Semantic View</td><td>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED</td></tr>
+    <tr><td>Cortex Agent</td><td>VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT</td></tr>
+  </table>
+
+  <h2>Bonus Extensions — If There's Extra Time</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0 24px;">
+    <div style="background: linear-gradient(135deg,#EEF6FF,#F0FDF4); border: 1px solid #93C5FD; border-radius: 10px; padding: 18px;">
+      <div style="font-size:22px; margin-bottom:8px">🖥️</div>
+      <div style="font-weight:700; color:var(--sf-navy); margin-bottom:6px">Option A: Streamlit UI on SPCS</div>
+      <p style="font-size:13.5px; margin-bottom:10px">Use Cortex Code to build a Streamlit app that lets users chat with your agent, deployed to Snowpark Container Services.</p>
+      <div class="prompt-block" style="margin:0 0 10px 0">
+        <div class="prompt-label">💬 Cortex Code Prompt</div>
+        <p style="font-size:13px">Build a Streamlit app that provides a chat interface for VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT. Users should be able to type a question, submit it to the agent, and see the response displayed in the app. Deploy it to Snowpark Container Services.</p>
+      </div>
+      <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/developer-guide/streamlit/app-development/runtime-environments" target="_blank" style="color:var(--sf-blue)">📄 Streamlit runtime environments →</a></p>
+    </div>
+    <div style="background: linear-gradient(135deg,#F5F3FF,#EFF6FF); border: 1px solid #C4B5FD; border-radius: 10px; padding: 18px;">
+      <div style="font-size:22px; margin-bottom:8px">📚</div>
+      <div style="font-weight:700; color:var(--sf-navy); margin-bottom:6px">Option B: PubMed Knowledge Extension</div>
+      <p style="font-size:13.5px; margin-bottom:10px">Add peer-reviewed medical literature as a third tool — RAG as a reusable data product from Marketplace.</p>
+      <ol style="font-size:13px; padding-left:18px; margin:0 0 10px 0">
+        <li>Search for <strong>PubMed Knowledge Extension</strong> in Snowflake Marketplace and install it</li>
+        <li>Add it as a third tool to VBCCAREAGENT — it's already a search index, no additional setup required</li>
+        <li>Ask: <em>"What does the evidence say about care management for reducing avoidable ED utilization in diabetic patients?"</em></li>
+      </ol>
+      <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-knowledge-extensions/cke-overview" target="_blank" style="color:var(--sf-blue)">📄 Cortex Knowledge Extensions overview →</a></p>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 32px 0 16px; color: var(--sf-muted); font-size: 13px;">
+    Document prepared for UnitedHealthcare / Optum workshop — Snowflake Sales Engineering<br>
+    Updated: April 2026 · Theme: Value-Based Care · Duration: approximately 2 hours
+  </div>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-m3-explore')">← Free Exploration</button>
+    <button class="step-nav-btn hidden">→</button>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+  const STEP_ORDER = [
+    'step-overview','step-naming','step-m1-marketplace',
+    'step-m1-create-sv','step-m1-update-sv','step-m2-s2',
+    'step-m2-overview','step-m1-s2','step-m1-s4',
+    'step-m3-context','step-m3-s1','step-m3-test','step-m3-explore',
+    'step-takeaways'
+  ];
+
+  const visited = new Set(['step-overview']);
+
+  function showStep(id) {
+    document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-step').forEach(el => el.classList.remove('active'));
+
+    const content = document.getElementById(id);
+    if (content) content.classList.add('active');
+
+    visited.add(id);
+
+    document.querySelectorAll('.nav-step').forEach(el => {
+      const onclick = el.getAttribute('onclick') || '';
+      if (onclick.includes("'" + id + "'")) {
+        el.classList.add('active');
+      }
+      const elId = (onclick.match(/'([^']+)'/) || [])[1];
+      if (elId && visited.has(elId) && elId !== id) {
+        el.classList.add('done');
+      }
+    });
+
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return false;
+  }
+
+  function updateProgress() {
+    const total = STEP_ORDER.length;
+    const done = STEP_ORDER.filter(s => visited.has(s)).length;
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+  }
+
+  function toggleModule(btn) {
+    const steps = btn.nextElementSibling;
+    const isOpen = steps.classList.contains('open');
+    steps.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block-wrap').querySelector('pre code');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy';
+      }, 2000);
+    });
+  }
+
+  function copyPrompt(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      const orig = btn.innerHTML;
+      btn.innerHTML = btn.innerHTML.replace(/Copy.*$/, 'Copied!');
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = orig;
+      }, 2000);
+    });
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
