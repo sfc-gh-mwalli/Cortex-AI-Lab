@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UHG VBC AI Hands-On Lab · Snowflake Quickstart</title>
+  <title>Value-Based Care AI Hands-On Lab · Snowflake Quickstart</title>
   <style>
     :root {
       --sf-blue: #29B5E8;
@@ -310,12 +310,11 @@
     </svg>
     <span class="logo-text">Snowflake</span>
     <span class="logo-sep">/</span>
-    <span class="lab-title">UHG Value-Based Care AI — Hands-On Lab</span>
+    <span class="lab-title">Value-Based Care AI — Hands-On Lab</span>
   </a>
   <div class="header-badges">
     <span class="badge badge-time">⏱ approximately 2 hrs</span>
-    <span class="badge badge-level">✦ Intermediate</span>
-    <span style="color:#4A6680; font-size:11px; font-weight:600; letter-spacing:.5px; margin-left:4px;">v9</span>
+    <span style="color:#4A6680; font-size:11px; font-weight:600; letter-spacing:.5px; margin-left:4px;">Updated Jun 8, 2026 · 1:28 PM EDT</span>
   </div>
 </header>
 
@@ -435,21 +434,21 @@
 <div id="step-overview" class="step-content active">
   <div class="step-header">
     <div class="section-heading first"><span class="dot"></span>Lab Overview</div>
-    <h1>UHG Value-Based Care AI Hands-On Lab</h1>
+    <h1>Value-Based Care AI Hands-On Lab</h1>
     <div class="step-meta">
       <span class="step-meta-item">⏱ approximately 2 hours</span>
-      <span class="step-meta-item">🏥 Optum / UHG Data Science &amp; Engineering</span>
+      <span class="step-meta-item">🏥 Healthcare · Data Science &amp; Engineering</span>
     </div>
   </div>
   <div class="timing-pill">⏱ ~5 min · orientation</div>
 
   <div class="callout callout-warn">
     <span class="callout-icon">🔑</span>
-    <div><strong>Your Snowflake account:</strong> Each participant has a dedicated Snowflake account assigned at registration. Your login credentials are available on the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/instructions" style="color:var(--sf-blue-dark)">lab instructions page</a>. Log in before proceeding.</div>
+    <div><strong>Your Snowflake account:</strong> Use the special signup link you should have received from your Snowflake account team to create a <strong>free Snowflake trial account</strong> <strong>with Cortex AI features enabled</strong>. Complete signup and log in before proceeding.</div>
   </div>
 
   <h2>The Narrative</h2>
-  <p>Optum manages care for millions of members under value-based care contracts — ACOs, bundled payments, quality bonus programs. Success in VBC depends on answering two types of questions at scale:</p>
+  <p>Healthcare organizations managing value-based care contracts — ACOs, bundled payments, quality bonus programs — must answer two types of questions at scale:</p>
   <ol>
     <li><strong>Analytical questions over structured data</strong> — <em>"Which patient populations are driving the highest total cost of care? Where are we seeing avoidable ED utilization?"</em> These answers live in claims, encounters, and clinical measures.</li>
     <li><strong>Clinical questions over unstructured data</strong> — <em>"What does this patient's care history show about gaps in their chronic disease management?"</em> These answers live in clinical notes and care plans.</li>
@@ -475,6 +474,12 @@
       <div class="card-num">Module 3 · ~30 min</div>
       <div class="card-title">Cortex Agents</div>
       <div class="card-time">Care intelligence agent across both tools</div>
+    </div>
+    <div class="module-card" onclick="showStep('step-m1-s2')">
+      <div class="card-icon">🛡️</div>
+      <div class="card-num">Within Module 2</div>
+      <div class="card-title">AI Functions</div>
+      <div class="card-time">Auto-detect &amp; redact PII in-flight with AI_REDACT</div>
     </div>
   </div>
 
@@ -514,7 +519,7 @@
   <div class="callout callout-warn">
     <span class="callout-icon">🔑</span>
     <div>
-      <strong>Before proceeding — log in to your Snowflake account.</strong> Your login link, username, and password are available on the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/instructions" target="_blank" style="color:var(--sf-blue-dark)">lab instructions page</a>. Once you are logged in, come back here and continue.
+      <strong>Before proceeding — create your free Snowflake trial account.</strong> Use the special signup link you should have received from your Snowflake account team to create a <strong>free Snowflake trial account</strong> <strong>with Cortex AI features enabled</strong>. Once you have signed up and logged in, come back here and continue.
       <br><br>
       <strong>Having trouble accessing your account?</strong> If you are attending <strong>in person</strong>, ask one of the Snowflake lab assistants for help. If you are attending <strong>remotely</strong>, post in the meeting chat and someone will assist you.
     </div>
@@ -641,7 +646,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>In a clinical context this matters enormously. A care manager searching for <em>"patient with poorly controlled blood sugar missing labs"</em> should surface notes that mention HbA1c, A1C, glycemic index, or endocrinology follow-up — none of which contain the search phrase. Cortex Search handles this automatically because it understands the meaning behind words, not just the words themselves.</p>
 
   <h2>What We're Doing in This Lab</h2>
-  <p>We have a dataset of <strong>1,500 AI-generated clinical notes</strong> in SOAP format (Subjective, Objective, Assessment, Plan) — synthetic patient records produced from the Synthea dataset. These notes are in a CSV file called <code>Clinical_Notes_RAW.csv</code>, available on the <strong>Lab Instructions</strong> landing page (linked from the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/register" target="_blank">lab registration page</a>).</p>
+  <p>We have a dataset of <strong>1,500 AI-generated clinical notes</strong> in SOAP format (Subjective, Objective, Assessment, Plan) — synthetic patient records produced from the Synthea dataset. These notes are in a CSV file called <code>Clinical_Notes_RAW.csv</code> — <a href="assets/Clinical_Notes_RAW.csv" download style="color:var(--sf-blue)">download it here</a>.</p>
   <p>In this module we will:</p>
   <ol>
     <li>Load <code>Clinical_Notes_RAW.csv</code> into a Snowflake table in <code>VBC_LAB.CARE_ANALYTICS</code></li>
@@ -681,14 +686,14 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <div class="callout callout-info">
     <span class="callout-icon">📥</span>
-    <div>Both <code>02_enriched_loading_demo.ipynb</code> and <code>Clinical_Notes_RAW.csv</code> are available on the <strong>Lab Instructions</strong> landing page, linked from the <a href="https://go.dataops.live/uhg-april-snowcamp-cortex/register" target="_blank" style="color:var(--sf-blue)">lab registration page</a>. Download both before starting the steps below.</div>
+    <div>Download both files before starting the steps below: <a href="assets/02_enriched_loading_demo.ipynb" download style="color:var(--sf-blue)"><code>02_enriched_loading_demo.ipynb</code></a> and <a href="assets/Clinical_Notes_RAW.csv" download style="color:var(--sf-blue)"><code>Clinical_Notes_RAW.csv</code></a>.</div>
   </div>
 
   <h2>Part 1 — Upload the Notebook to Your Workspace</h2>
   <ol>
     <li>In Snowsight, navigate to <strong>Projects</strong> in the left sidebar and open your <strong>snowday</strong> workspace.</li>
     <li>Click <strong>Add new</strong> and select <strong>Upload Files</strong> from the dropdown.</li>
-    <li>In the file picker, navigate to your local Snowday folder and select <code>02_enriched_loading_demo.ipynb</code>.</li>
+    <li>In the file picker, navigate to the folder where you downloaded the files and select <code>02_enriched_loading_demo.ipynb</code>.</li>
     <li>Once uploaded, click the notebook name in the file list to open it.</li>
   </ol>
 
@@ -953,14 +958,17 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <div class="section-heading"><span class="dot"></span>1. Add Relationships</div>
-  <p>Autopilot likely didn't detect any relationships automatically — but the <strong>Suggestions</strong> panel has already figured them out for you. In the Suggestions panel on the right, expand the <strong>Relationships</strong> section. You should see 12 suggested relationships.</p>
-  <p>For each one:</p>
+  <p>This semantic view needs <strong>12 relationships</strong> total. Autopilot may have already detected and created some of them automatically — check the <strong>Relationships</strong> count on the semantic view to see how many you already have. Whatever is left will appear in the <strong>Suggestions</strong> panel: in the panel on the right, expand the <strong>Relationships</strong> section to see the suggested relationships. (In most cases Autopilot detects none and you'll see all 12 as suggestions — but if it pre-created a few, you'll simply see fewer suggestions, and that's expected.)</p>
+  <p>For each suggested relationship:</p>
   <ol>
     <li>Click <strong>Review</strong> — the <strong>Add relationship</strong> dialog will open in the semantic view editor, pre-filled with the table names, relationship type, and join columns.</li>
     <li>Click <strong>Add</strong> to accept it.</li>
-    <li>Repeat for all 12 relationships. The <strong>Relationships</strong> counter on the semantic view should reach <strong>12</strong> when done.</li>
+    <li>Repeat until the <strong>Relationships</strong> counter on the semantic view reaches <strong>12</strong> (already-detected relationships plus the ones you add from Suggestions should total 12).</li>
   </ol>
-  <p>Click <strong>Save</strong> in the top-right corner. You should see a <strong>Saved semantic view successfully</strong> confirmation.</p>
+  <div class="callout callout-warn">
+    <span class="callout-icon">💾</span>
+    <div><strong>Don't skip this — click Save now.</strong> Click the <strong>Save</strong> button in the top-right corner before continuing. You should see a <strong>Saved semantic view successfully</strong> confirmation. If you skip this, your relationships won't persist and later steps will fail.</div>
+  </div>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
@@ -982,46 +990,65 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
       <div class="code-block-lang"><span class="lang-dot"></span>Cortex Code Prompt</div>
       <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
-    <pre style="white-space: pre-wrap; word-break: break-word;"><code>I need to programmatically create an updated version of my semantic view. Follow these steps:
+    <pre style="white-space: pre-wrap; word-break: break-word;"><code>I need to make some updates to a semantic view. Cortex Code built the following instructions for me, I want you to follow them exactly:
 
-Step 1: Export the original DDL to my workspace
+IMPORTANT: Do not read any DDL or file content into the conversation at any point. All modifications must happen server-side inside SQL REPLACE() calls — reading the DDL into the conversation will fail due to truncation.
 
-Export the DDL for semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV to my workspace named snowday, saving it as create_vbc_analytics_sv_updated.sql. Use this approach:
+1. Run SHOW WORKSPACES IN ACCOUNT. Find the row where NAME = 'snowday'. Record the exact DATABASE_NAME value — it contains a $ character and must be wrapped in double quotes in the URI (step 6).
 
-Create a temporary stage in VBC_LAB.CARE_ANALYTICS
-Use COPY INTO to write the GET_DDL('SEMANTIC VIEW', 'VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV') output to the stage as a single file called create_vbc_analytics_sv_updated.sql with FILE_FORMAT = (TYPE = CSV FIELD_DELIMITER = NONE RECORD_DELIMITER = NONE COMPRESSION = NONE) SINGLE = TRUE
-Use SHOW WORKSPACES IN ACCOUNT to get the correct database, schema, and workspace names. The workspace URI requires quoted identifiers — use the exact values from the output (the database name contains a $)
-Use COPY FILES to copy the file from the stage into the workspace
-Drop the temporary stage
+2. CREATE OR REPLACE TEMPORARY STAGE VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage;
 
-Step 2: Modify the exported file in-place
+3. Export the original DDL unmodified:
+COPY INTO @VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage/create_vbc_analytics_sv_orig.sql
+FROM (SELECT GET_DDL('SEMANTIC VIEW', 'VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV'))
+FILE_FORMAT = (TYPE = CSV FIELD_DELIMITER = NONE RECORD_DELIMITER = NONE COMPRESSION = NONE)
+SINGLE = TRUE;
 
-Read the exported file and make these targeted edits (do NOT reconstruct the file — use the edit tool to make point changes):
-
-Change the view name from VBC_ANALYTICS_SV to VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED
-
-Add these new dimensions in the dimensions section:
-
-After PATIENTS.DEATHDATE: add PATIENTS.PATIENT_INCOME_BAND as CASE WHEN INCOME &lt; 30000 THEN '&lt;30k' WHEN INCOME &gt;= 30000 AND INCOME &lt; 60000 THEN '30-60k' WHEN INCOME &gt;= 60000 AND INCOME &lt; 100000 THEN '60-100k' WHEN INCOME &gt;= 100000 THEN '100k+' ELSE 'Unknown' END comment='Patient income band categorization'
-
-After ENCOUNTERS.ENCOUNTERCLASS, add these two dimensions in order:
-ENCOUNTERS.ENCOUNTER_MONTH as DATE_TRUNC('MONTH', ENCOUNTER_START) comment='Month of encounter'
-ENCOUNTERS.ENCOUNTER_YEAR as YEAR(ENCOUNTER_START) comment='Year of encounter'
-
-Insert a new metrics section between the closing ) of dimensions and the with extension block:
-
-metrics (
-    ENCOUNTERS.TOTAL_COST_OF_CARE as SUM(TOTAL_CLAIM_COST) comment='Total cost of care across all encounters',
-    ENCOUNTERS.PAYER_COVERAGE_RATE as DIV0(SUM(PAYER_COVERAGE), SUM(TOTAL_CLAIM_COST)) comment='Payer coverage rate',
-    ENCOUNTERS.AVG_COST_PER_ENCOUNTER as AVG(TOTAL_CLAIM_COST) comment='Average cost per encounter',
-    ENCOUNTERS.TOTAL_ENCOUNTER_COUNT as COUNT(ENCOUNTER_ID) comment='Total count of encounters',
-    ENCOUNTERS.AVOIDABLE_ED_RATE as DIV0(SUM(CASE WHEN ENCOUNTERCLASS = 'emergency' AND REASONCODE IN ('59621000','15777000','195662009','10509002','444814009','40055000','271737000','427898007','195967001','233604007','82423001','431855005','431856006','162864005') THEN 1 ELSE 0 END), COUNT(ENCOUNTER_ID)) comment='Rate of avoidable ED visits for ambulatory-sensitive conditions relative to total encounters'
+4. Export the modified DDL. Run this SQL exactly as written — do not rewrite or simplify it. (CHAR(10) = newline, CHAR(9) = tab. Single quotes inside string literals are escaped by doubling them: '')
+COPY INTO @VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage/create_vbc_analytics_sv_updated.sql
+FROM (
+  SELECT REPLACE(REPLACE(REPLACE(REPLACE(
+    GET_DDL('SEMANTIC VIEW', 'VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV'),
+    'create or replace semantic view VBC_ANALYTICS_SV',
+    'create or alter semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV'
+  ),
+  'PATIENTS.DEATHDATE as DEATHDATE comment=''The date the patient died.'',' || CHAR(10),
+  'PATIENTS.DEATHDATE as DEATHDATE comment=''The date the patient died.'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'PATIENTS.PATIENT_INCOME_BAND as CASE WHEN INCOME &lt; 30000 THEN ''&lt;30k'' WHEN INCOME &gt;= 30000 AND INCOME &lt; 60000 THEN ''30-60k'' WHEN INCOME &gt;= 60000 AND INCOME &lt; 100000 THEN ''60-100k'' WHEN INCOME &gt;= 100000 THEN ''100k+'' ELSE ''Unknown'' END comment=''Patient income band categorization'',' || CHAR(10)
+  ),
+  'ENCOUNTERS.ENCOUNTERCLASS as ENCOUNTERCLASS comment=''The class of the encounter, such as ambulatory, emergency, inpatient, wellness, or urgentcare.'',' || CHAR(10),
+  'ENCOUNTERS.ENCOUNTERCLASS as ENCOUNTERCLASS comment=''The class of the encounter, such as ambulatory, emergency, inpatient, wellness, or urgentcare.'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.ENCOUNTER_MONTH as DATE_TRUNC(''MONTH'', ENCOUNTER_START) comment=''Month of encounter'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.ENCOUNTER_YEAR as YEAR(ENCOUNTER_START) comment=''Year of encounter'',' || CHAR(10)
+  ),
+  ')' || CHAR(10) || CHAR(9) || 'with extension',
+  ')' || CHAR(10) ||
+  CHAR(9) || 'metrics (' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.TOTAL_COST_OF_CARE as SUM(TOTAL_CLAIM_COST) comment=''Total cost of care across all encounters'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.PAYER_COVERAGE_RATE as DIV0(SUM(PAYER_COVERAGE), SUM(TOTAL_CLAIM_COST)) comment=''Payer coverage rate'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.AVG_COST_PER_ENCOUNTER as AVG(TOTAL_CLAIM_COST) comment=''Average cost per encounter'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.TOTAL_ENCOUNTER_COUNT as COUNT(ENCOUNTER_ID) comment=''Total count of encounters'',' || CHAR(10) ||
+  CHAR(9) || CHAR(9) || 'ENCOUNTERS.AVOIDABLE_ED_RATE as DIV0(SUM(CASE WHEN ENCOUNTERCLASS = ''emergency'' AND REASONCODE IN (''59621000'',''15777000'',''195662009'',''10509002'',''444814009'',''40055000'',''271737000'',''427898007'',''195967001'',''233604007'',''82423001'',''431855005'',''431856006'',''162864005'') THEN 1 ELSE 0 END), COUNT(ENCOUNTER_ID)) comment=''Rate of avoidable ED visits for ambulatory-sensitive conditions relative to total encounters''' || CHAR(10) ||
+  CHAR(9) || ')' || CHAR(10) ||
+  CHAR(9) || 'with extension'
+  )
 )
+FILE_FORMAT = (TYPE = CSV FIELD_DELIMITER = NONE RECORD_DELIMITER = NONE COMPRESSION = NONE)
+SINGLE = TRUE;
+
+5. LIST @VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage;
+Note the actual filenames from the output — Snowflake often appends _0_0_0 (e.g., create_vbc_analytics_sv_orig.sql_0_0_0). Use those exact names in step 6.
+
+6. Copy both files to the workspace. Use the DATABASE_NAME from step 1 wrapped in double quotes. Substitute the actual filenames from step 5:
+COPY FILES INTO 'snow://workspace/"&lt;DATABASE_NAME&gt;"."PUBLIC"."snowday"/versions/live/' FROM @VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage/&lt;orig_filename&gt;;
+COPY FILES INTO 'snow://workspace/"&lt;DATABASE_NAME&gt;"."PUBLIC"."snowday"/versions/live/' FROM @VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage/&lt;updated_filename&gt;;
+
+7. DROP STAGE VBC_LAB.CARE_ANALYTICS.vbc_tmp_stage;
 
 Do not execute the updated DDL.</code></pre>
   </div>
 
-  <p>Cortex Code will make a plan and carry out the requested changes autonomously. During the process it will ask permission before running each command — click to allow each one. At some point it will ask to switch from the Analyst screen over to <strong>Workspaces</strong>. Once in the workspace, open the SQL file — you'll see the changes highlighted as a diff. Use the <strong>Previous / Next</strong> controls at the bottom of the editor to step through each of the 4 changes. When Cortex Code finishes, click the blue <strong>Keep all</strong> button at the bottom right to accept all changes to the file.</p>
+  <p>Cortex Code will make a plan and carry out the steps autonomously. During the process it will ask permission before running each command — click to allow each one. Rather than editing the file inside the conversation (which would truncate the large DDL), it does all the work server-side in SQL: it exports the current semantic view DDL to a temporary stage, applies all the additions in a single <code>COPY INTO</code> using nested <code>REPLACE()</code> calls, and copies both the original (<code>create_vbc_analytics_sv_orig.sql</code>) and the modified (<code>create_vbc_analytics_sv_updated.sql</code>) files into your <strong>snowday</strong> workspace. When it finishes, switch to <strong>Workspaces</strong> and open <code>create_vbc_analytics_sv_updated.sql</code> to review the result.</p>
 
   <div class="callout callout-info" style="display:block; padding:16px 20px;">
     <div style="font-weight:600; margin-bottom:10px;">What we're adding to the semantic view</div>
@@ -1050,8 +1077,8 @@ Do not execute the updated DDL.</code></pre>
     <div>We provided the metrics and dimensions as a text prompt here for reproducibility — but Cortex Code also accepts <strong>images and screenshots</strong>. If you had this list in a screenshot or a photo of a whiteboard, you could have attached it directly and asked Cortex Code to do the same thing. Keep that in mind as you use it throughout the lab.</div>
   </div>
   <ol start="3">
-    <li><strong>Create the updated semantic view using the script created by Cortex Code.</strong> Cortex Code will export the current semantic view DDL to your workspace, modify it in place, and save it as <code>create_vbc_analytics_sv_updated.sql</code> in your <strong>snowday</strong> workspace. Review the final DDL, then run it using the blue <strong>▶ Run</strong> button or <strong>⌘ + Return</strong>. You should see a <strong>Semantic view VBC_ANALYTICS_SV_UPDATED successfully created</strong> confirmation in the results pane. Click the <strong>database icon</strong> at the top of the workspace panel to open the Database Explorer and expand <strong>VBC_LAB → CARE_ANALYTICS → Semantic Views</strong> — you should now see both <code>VBC_ANALYTICS_SV</code> and <code>VBC_ANALYTICS_SV_UPDATED</code>.</li>
-    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV_UPDATED</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables, then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground. Close Cortex Code if it's open to free up screen space.</li>
+    <li><strong>Apply the changes using the script Cortex Code created.</strong> In your <strong>snowday</strong> workspace, open <code>create_vbc_analytics_sv_updated.sql</code>. This is a <code>CREATE OR ALTER SEMANTIC VIEW</code> script — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place (the original DDL was also saved as <code>create_vbc_analytics_sv_orig.sql</code> as a backup). Review the script, then run it using the blue <strong>▶ Run</strong> button or <strong>⌘ + Return</strong>. You should see a <strong>Semantic view VBC_ANALYTICS_SV successfully created</strong> confirmation in the results pane.</li>
+    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables, then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground. Close Cortex Code if it's open to free up screen space.</li>
   </ol>
 
   <div class="step-nav">
@@ -1068,7 +1095,7 @@ Do not execute the updated DDL.</code></pre>
   </div>
   <div class="timing-pill">⏱ ~5 min hands-on</div>
 
-  <p>With <strong>VBC_ANALYTICS_SV_UPDATED</strong> open in Cortex Analyst and the <strong>Playground</strong> tab active on the right, type a question into the prompt box and click <strong>Run</strong>. Try any of these — or ask anything you're curious about:</p>
+  <p>With <strong>VBC_ANALYTICS_SV</strong> open in Cortex Analyst and the <strong>Playground</strong> tab active on the right, type a question into the prompt box and click <strong>Run</strong>. Try any of these — or ask anything you're curious about:</p>
 
   <h2>Question 1 — Cost by Income Band</h2>
   <div class="prompt-block">
@@ -1136,7 +1163,7 @@ Do not execute the updated DDL.</code></pre>
     <li><strong>Tool orchestration</strong> — The agent is given a set of tools (a search service and a semantic view) and decides which to use per question. No if/else routing logic to write.</li>
     <li><strong>Multi-tool synthesis</strong> — For complex questions, the agent calls multiple tools and synthesizes a single coherent answer.</li>
     <li><strong>Guardrails</strong> — Agents are scoped to their tools. Questions outside that scope are declined gracefully.</li>
-    <li><strong>Auditability</strong> — Every tool call and reasoning step can be logged — critical in a regulated environment like UHG.</li>
+    <li><strong>Auditability</strong> — Every tool call and reasoning step can be logged — critical in a regulated environment like healthcare.</li>
   </ul>
 
   <h2>VBC Use Cases</h2>
@@ -1181,20 +1208,20 @@ Do not execute the updated DDL.</code></pre>
     <p>Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:</p>
     <p>Name: VBCCAREAGENT<br>Display name: VBC_CARE_AGENT</p>
     <p>Add two tools:<br>
-    1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED — for structured questions about costs, encounters, utilization, and VBC metrics<br>
+    1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics<br>
     2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives</p>
     <p>Orchestration instructions:<br>
     You are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.</p>
     <p>Response instructions:<br>
     Always cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
     </div>
   </div>
 
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div><strong>Checkpoint:</strong> Cortex Code will confirm the agent was created and list both tools — <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV_UPDATED</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It will also suggest a follow-up test query — you can skip this for now and proceed to the next step.</div>
+    <div><strong>Checkpoint:</strong> Cortex Code will confirm the agent was created and list both tools — <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It will also suggest a follow-up test query — you can skip this for now and proceed to the next step.</div>
   </div>
 
   <h2>Step 2 — Review the Agent in Snowsight</h2>
@@ -1206,7 +1233,7 @@ Do not execute the updated DDL.</code></pre>
     <li>Review the tabs:
       <ul>
         <li><strong>About</strong> — confirm the display name is <code>VBC_CARE_AGENT</code></li>
-        <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCANALYTICS</strong> (Cortex Analyst, bound to <code>VBC_ANALYTICS_SV_UPDATED</code>) and <strong>CLINICALNOTES</strong> (Cortex Search Services, bound to <code>CLINICAL_NOTES_SEARCH</code>)</li>
+        <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCANALYTICS</strong> (Cortex Analyst, bound to <code>VBC_ANALYTICS_SV</code>) and <strong>CLINICALNOTES</strong> (Cortex Search Services, bound to <code>CLINICAL_NOTES_SEARCH</code>)</li>
         <li><strong>Orchestration</strong> — review the orchestration and response instructions that were set by Cortex Code</li>
       </ul>
     </li>
@@ -1427,7 +1454,7 @@ Do not execute the updated DDL.</code></pre>
     <tr><th>Object</th><th>Name</th></tr>
     <tr><td>Table</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES</td></tr>
     <tr><td>Cortex Search Service</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</td></tr>
-    <tr><td>Semantic View</td><td>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV_UPDATED</td></tr>
+    <tr><td>Semantic View</td><td>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</td></tr>
     <tr><td>Cortex Agent</td><td>VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT</td></tr>
   </table>
 
@@ -1457,8 +1484,8 @@ Do not execute the updated DDL.</code></pre>
   </div>
 
   <div style="text-align:center; padding: 32px 0 16px; color: var(--sf-muted); font-size: 13px;">
-    Document prepared for UnitedHealthcare / Optum workshop — Snowflake Sales Engineering<br>
-    Updated: April 2026 · Theme: Value-Based Care · Duration: approximately 2 hours
+    Prepared by Snowflake Sales Engineering<br>
+    Updated: Jun 8, 2026 · 1:28 PM EDT · Theme: Value-Based Care · Duration: approximately 2 hours
   </div>
 
   <div class="step-nav">
