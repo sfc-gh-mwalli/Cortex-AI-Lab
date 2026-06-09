@@ -1184,15 +1184,15 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Average Cost per Encounter</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">AVG(total_claim_cost)</td></tr>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Avoidable ED Rate</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px;">Emergency encounters for ambulatory-sensitive conditions / total encounters</td></tr>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Encounter Count</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">COUNT(encounter_id)</td></tr>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Patient Income Band</td><td style="padding:7px 10px;"><code>PATIENTS</code></td><td style="padding:7px 10px;">&lt;30k, 30-60k, 60-100k, 100k+</td></tr>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Month</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DATE_TRUNC('MONTH', encounter_start)</td></tr>
-        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Year</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">YEAR(encounter_start)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Year</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">YEAR(encounter_start)</td></tr>
+        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Patient Income Band</td><td style="padding:7px 10px;"><code>PATIENTS</code></td><td style="padding:7px 10px;">&lt;30k, 30-60k, 60-100k, 100k+</td></tr>
       </tbody>
     </table>
   </div>
 
   <ol start="5">
-    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables (refer to the table above for which logical table each one belongs to), then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground.</li>
+    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables (refer to the table above for which logical table each one belongs to), then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground.<br><em>Note: <code>ENCOUNTER_MONTH</code> appears under <strong>Time Dimensions</strong> (not the regular Dimensions list) since it's a date-based expression.</em></li>
   </ol>
 
   <div class="step-nav">
