@@ -405,7 +405,7 @@
         <div class="step-num">11</div><div class="step-label">Create the VBC Care Agent</div>
       </a>
       <a class="nav-step" onclick="showStep('step-m3-test')" href="#">
-        <div class="step-num">12</div><div class="step-label">Test in Snowflake Intelligence</div>
+        <div class="step-num">12</div><div class="step-label">Test in Snowflake CoWork</div>
       </a>
       <a class="nav-step" onclick="showStep('step-m3-explore')" href="#">
         <div class="step-num">13</div><div class="step-label">Free Exploration</div>
@@ -1315,7 +1315,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <div class="prompt-block">
     <div class="prompt-label">💬 Paste into Cortex Code</div>
-    <p>Execute the following directly.</p>
+    <p>Execute the following directly:</p>
     <p>Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:</p>
     <p>Name: VBCCAREAGENT<br>Display name: VBC_CARE_AGENT</p>
     <p>Add two tools:<br>
@@ -1325,8 +1325,16 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     You are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.</p>
     <p>Response instructions:<br>
     Always cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.</p>
+    <p>CoWork setup:<br>
+    After creating the agent, register it with Snowflake CoWork so it can be previewed and used:<br>
+    1. Create a Snowflake Intelligence object if one does not already exist:<br>
+    <code>CREATE SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT;</code><br>
+    2. Add the agent to the Intelligence object:<br>
+    <code>ALTER SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT ADD AGENT VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT;</code><br>
+    3. Grant usage on the Intelligence object to the appropriate role:<br>
+    <code>GRANT USAGE ON SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT TO ROLE ACCOUNTADMIN;</code></p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Execute the following directly.\n\nCreate a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Execute the following directly:\n\nCreate a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.\n\nCoWork setup:\nAfter creating the agent, register it with Snowflake CoWork so it can be previewed and used:\n1. Create a Snowflake Intelligence object if one does not already exist:\nCREATE SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT;\n2. Add the agent to the Intelligence object:\nALTER SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT ADD AGENT VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT;\n3. Grant usage on the Intelligence object to the appropriate role:\nGRANT USAGE ON SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT TO ROLE ACCOUNTADMIN;')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
     </div>
   </div>
 
@@ -1357,7 +1365,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <h2>Step 3 — Quick Verification in Agent Chat</h2>
-  <p>Before moving to Snowflake Intelligence, do a quick sanity check using the chat panel on the right side of the agent detail page. This confirms the agent is live and both tools are reachable.</p>
+  <p>Before moving to Snowflake CoWork, do a quick sanity check using the chat panel on the right side of the agent detail page. This confirms the agent is live and both tools are reachable.</p>
 
   <div class="prompt-block">
     <div class="prompt-label">💬 Agent Chat (Snowsight)</div>
@@ -1382,7 +1390,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m3-context')">← Why Agents?</button>
-    <button class="step-nav-btn primary" onclick="showStep('step-m3-test')">Step 2: Test in Snowflake Intelligence →</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-test')">Step 2: Test in Snowflake CoWork →</button>
   </div>
 </div>
 
@@ -1390,18 +1398,18 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 <div id="step-m3-test" class="step-content">
   <div class="step-header">
     <div class="step-tag"><span class="dot"></span>Module 3 · Step 2</div>
-    <h1>Test in Snowflake Intelligence</h1>
+    <h1>Test in Snowflake CoWork <span style="font-size:0.5em; font-weight:400; color:var(--sf-muted);">(formerly Snowflake Intelligence)</span></h1>
   </div>
   <div class="timing-pill">⏱ ~15 min · Slow down here!</div>
 
-  <p>Snowflake Intelligence is the end-user experience built on top of your agent — a polished conversational interface designed for care managers and analysts who don't live in Snowsight. You'll run three questions here to see the agent route, reason, and respond.</p>
+  <p>Snowflake CoWork is the end-user experience built on top of your agent — a polished conversational interface designed for care managers and analysts who don't live in Snowsight. You'll run three questions here to see the agent route, reason, and respond.</p>
 
-  <h2>Open Snowflake Intelligence</h2>
+  <h2>Open Snowflake CoWork</h2>
   <ol>
     <li>In Snowsight, navigate to <strong>AI &amp; ML → Agents → VBCCAREAGENT</strong></li>
-    <li>Click the <strong>Preview in Snowflake Intelligence</strong> button at the top of the agent detail page</li>
+    <li>Click the <strong>Preview in Snowflake CoWork</strong> button at the top of the agent detail page</li>
     <li>A <strong>Sign in to Snowflake</strong> screen will appear — use the same username and password as your Snowflake account</li>
-    <li>After signing in, Snowflake Intelligence opens with <strong>VBC_CARE_AGENT</strong> loaded and ready</li>
+    <li>After signing in, Snowflake CoWork opens with <strong>VBC_CARE_AGENT</strong> loaded and ready</li>
   </ol>
 
   <div class="callout callout-info">
@@ -1412,7 +1420,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <h2>Question 1 — Clinical Notes (Search)</h2>
   <p>This should route to <strong>Cortex Search</strong>. Watch the reasoning trace — you'll see it search ClinicalNotes multiple times before composing its answer.</p>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Snowflake Intelligence</div>
+    <div class="prompt-label">💬 Snowflake CoWork</div>
     <p>Find patients in clinical notes who have documented gaps in diabetes management or missed HbA1c follow-ups.</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Find patients in clinical notes who have documented gaps in diabetes management or missed HbA1c follow-ups.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1426,7 +1434,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <h2>Question 2 — VBC Metrics (Analyst)</h2>
   <p>This should route to <strong>Cortex Analyst</strong>. The agent will query the VBC analytics semantic view and return structured data.</p>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Snowflake Intelligence</div>
+    <div class="prompt-label">💬 Snowflake CoWork</div>
     <p>What is the total cost of care for patients with diabetes diagnoses, and how does their ED utilization rate compare to the overall population?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'What is the total cost of care for patients with diabetes diagnoses, and how does their ED utilization rate compare to the overall population?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1440,7 +1448,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <h2>Question 3 — Both Tools (The Wow Moment)</h2>
   <p>This question requires <em>both</em> tools. Watch the agent decompose it, call each tool in sequence, then synthesize a single answer. Read the full response.</p>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Snowflake Intelligence — Multi-Tool Question</div>
+    <div class="prompt-label">💬 Snowflake CoWork — Multi-Tool Question</div>
     <p>We're seeing high avoidable ED utilization in our diabetic population. What do the clinical notes say about care plan adherence for these patients, and what does the data show about their encounter patterns?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, &quot;We're seeing high avoidable ED utilization in our diabetic population. What do the clinical notes say about care plan adherence for these patients, and what does the data show about their encounter patterns?&quot;)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1472,11 +1480,11 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
   <div class="timing-pill">⏱ ~5 min</div>
 
-  <p>Keep going in Snowflake Intelligence. Think about what a care manager, quality analyst, or program director would actually want to know. Try to push the agent to use both tools in the same answer.</p>
+  <p>Keep going in Snowflake CoWork. Think about what a care manager, quality analyst, or program director would actually want to know. Try to push the agent to use both tools in the same answer.</p>
 
   <h2>Suggested Prompts if You're Stuck</h2>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Snowflake Intelligence — Option A</div>
+    <div class="prompt-label">💬 Snowflake CoWork — Option A</div>
     <p>Which providers have the highest rate of patients with unresolved care plan goals in their notes?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Which providers have the highest rate of patients with unresolved care plan goals in their notes?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1484,7 +1492,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Snowflake Intelligence — Option B</div>
+    <div class="prompt-label">💬 Snowflake CoWork — Option B</div>
     <p>Find clinical notes that mention social determinants of health concerns like housing or food insecurity, and compare the cost profile of those patients to the overall population.</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Find clinical notes that mention social determinants of health concerns like housing or food insecurity, and compare the cost profile of those patients to the overall population.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1492,7 +1500,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Snowflake Intelligence — Option C</div>
+    <div class="prompt-label">💬 Snowflake CoWork — Option C</div>
     <p>What patterns appear in notes for patients who had inpatient admissions within 30 days of an outpatient encounter?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'What patterns appear in notes for patients who had inpatient admissions within 30 days of an outpatient encounter?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1505,7 +1513,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <div class="step-nav">
-    <button class="step-nav-btn" onclick="showStep('step-m3-test')">← Test in Snowflake Intelligence</button>
+    <button class="step-nav-btn" onclick="showStep('step-m3-test')">← Test in Snowflake CoWork</button>
     <button class="step-nav-btn primary" onclick="showStep('step-takeaways')">Key Takeaways →</button>
   </div>
 </div>
@@ -1523,7 +1531,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li><span class="bullet">📊</span><strong>Cortex Analyst + Semantic View</strong> — democratizes VBC analytics. Program managers ask in plain English; governance and consistent definitions stay intact.</li>
     <li><span class="bullet">🔍</span><strong>Cortex Search</strong> — makes clinical documentation conversationally discoverable. Care managers find relevant patient history using natural language, in seconds.</li>
     <li><span class="bullet">🤖</span><strong>Cortex Agent</strong> — bridges clinical notes and structured data. The most complex care management questions can now be answered automatically, across both sources.</li>
-    <li><span class="bullet">🧠</span><strong>Snowflake Intelligence</strong> — surfaces the agent as a polished conversational UI for business users, no SQL required.</li>
+    <li><span class="bullet">🧠</span><strong>Snowflake CoWork</strong> (formerly Snowflake Intelligence) — surfaces the agent as a polished conversational UI for business users, no SQL required.</li>
     <li><span class="bullet">❄️</span><strong>Everything runs inside Snowflake</strong> — no data egress, no separate AI infrastructure, no new security perimeter. Critical for HIPAA compliance.</li>
   </ul>
 

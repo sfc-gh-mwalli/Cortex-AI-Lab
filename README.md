@@ -1,6 +1,6 @@
 # Cortex AI Lab — Value-Based Care Hands-On Lab
 
-A Snowflake hands-on lab guide for building AI-powered analytics on value-based care (VBC) data using Cortex Analyst, Cortex Search, Cortex Agents, Snowflake Intelligence, and Cortex Code.
+A Snowflake hands-on lab guide for building AI-powered analytics on value-based care (VBC) data using Cortex Analyst, Cortex Search, Cortex Agents, Snowflake CoWork (formerly Snowflake Intelligence), and Cortex Code.
 
 ## Live lab guide
 
