@@ -989,9 +989,10 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <ol>
     <li>Copy the SQL using the button below.</li>
     <li>In your <strong>snowday</strong> workspace, click the <strong>+</strong> button to the right of the rightmost open tab and select <strong>SQL file</strong>.</li>
-    <li>Paste the SQL into the new file and run it with <strong>▶ Run</strong>.</li>
+    <li>Rename the new file: click the <strong>···</strong> menu on the tab and choose <strong>Rename</strong>, then name it <code>create_vbc_analytics_sv_updated.sql</code>.</li>
+    <li>Paste the SQL into the file and run it with <strong>▶ Run</strong>.</li>
   </ol>
-  <p>The script uses <code>CREATE OR ALTER</code> — safe to run even if the view already exists from the previous step.</p>
+  <p>The script is a <code>CREATE OR ALTER SEMANTIC VIEW</code> — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place. <code>CREATE OR ALTER</code> is an idempotent DDL command that creates the object if it doesn't exist or updates it to match the new definition if it does — safe to run multiple times without side effects (<a href="https://docs.snowflake.com/en/sql-reference/sql/create-or-alter" target="_blank">docs</a>). You should see a <strong>Semantic view VBC_ANALYTICS_SV successfully created</strong> confirmation in the results pane.</p>
   <div class="code-block-wrap">
     <div class="code-block-header">
       <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
@@ -1190,13 +1191,8 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     </table>
   </div>
 
-  <div class="callout callout-info">
-    <span class="callout-icon">ℹ️</span>
-    <div>We provided the metrics and dimensions as a text prompt here for reproducibility — but Cortex Code also accepts <strong>images and screenshots</strong>. If you had this list in a screenshot or a photo of a whiteboard, you could have attached it directly and asked Cortex Code to do the same thing. Keep that in mind as you use it throughout the lab.</div>
-  </div>
-  <ol start="3">
-    <li><strong>Apply the changes using the script Cortex Code created.</strong> In your <strong>snowday</strong> workspace, open <code>create_vbc_analytics_sv_updated.sql</code>. This is a <code>CREATE OR ALTER SEMANTIC VIEW</code> script — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place (the original DDL was also saved as <code>create_vbc_analytics_sv_orig.sql</code> as a backup). <code>CREATE OR ALTER</code> is an idempotent DDL command that creates the object if it doesn't exist or updates it to match the new definition if it does — safe to run multiple times without side effects (<a href="https://docs.snowflake.com/en/sql-reference/sql/create-or-alter" target="_blank">docs</a>). Review the script, then run it using the blue <strong>▶ Run</strong> button or <strong>⌘ + Return</strong>. You should see a <strong>Semantic view VBC_ANALYTICS_SV successfully created</strong> confirmation in the results pane.</li>
-    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables (refer to the table above for which logical table each one belongs to), then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground. Close Cortex Code if it's open to free up screen space.</li>
+  <ol start="5">
+    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables (refer to the table above for which logical table each one belongs to), then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground.</li>
   </ol>
 
   <div class="step-nav">
