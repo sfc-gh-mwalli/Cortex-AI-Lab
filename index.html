@@ -582,7 +582,7 @@
     <pre><code>USE ROLE ACCOUNTADMIN;
 
 -- Upgrade warehouse to Gen2 Medium for this lab
-ALTER WAREHOUSE DEFAULT_WH SET
+ALTER WAREHOUSE COMPUTE_WH SET
   WAREHOUSE_SIZE = 'MEDIUM',
   GENERATION = '2';
 
@@ -605,7 +605,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>In Snowflake, your <strong>context</strong> tells the platform what role, warehouse, database, and schema to use for everything you do. It's always visible as a status bar at the bottom of the Snowsight editor — for example:</p>
 
   <div style="background:var(--sf-navy); color:#cdd6f4; font-family:monospace; font-size:13px; padding:10px 16px; border-radius:6px; margin:12px 0 20px; display:inline-block;">
-    ACCOUNTADMIN &nbsp;•&nbsp; DEFAULT_WH (Medium) &nbsp;•&nbsp; VBC_LAB &nbsp;•&nbsp; CARE_ANALYTICS
+    ACCOUNTADMIN &nbsp;•&nbsp; COMPUTE_WH (Medium) &nbsp;•&nbsp; VBC_LAB &nbsp;•&nbsp; CARE_ANALYTICS
   </div>
 
   <p>Getting into the habit of checking your context before running any SQL is important — it's one of the most common sources of errors and confusion. If the wrong database or schema is active, objects you create may end up in unexpected places, or queries may fail to find the tables they're looking for.</p>
@@ -613,7 +613,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>Click any component in the context bar to change it. For this lab, always confirm your context is set to:</p>
   <ul>
     <li><strong>Role:</strong> <code>ACCOUNTADMIN</code></li>
-    <li><strong>Warehouse:</strong> <code>DEFAULT_WH</code></li>
+    <li><strong>Warehouse:</strong> <code>COMPUTE_WH</code></li>
     <li><strong>Database:</strong> <code>VBC_LAB</code></li>
     <li><strong>Schema:</strong> <code>CARE_ANALYTICS</code></li>
   </ul>
