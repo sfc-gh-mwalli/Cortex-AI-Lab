@@ -992,7 +992,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li>Rename the new file: click the <strong>···</strong> menu on the tab and choose <strong>Rename</strong>, then name it <code>create_vbc_analytics_sv_updated.sql</code>.</li>
     <li>Paste the SQL into the file and run it with <strong>▶ Run</strong>.</li>
   </ol>
-  <p>The script is a <code>CREATE OR ALTER SEMANTIC VIEW</code> — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place. <code>CREATE OR ALTER</code> is an idempotent DDL command that creates the object if it doesn't exist or updates it to match the new definition if it does — safe to run multiple times without side effects (<a href="https://docs.snowflake.com/en/sql-reference/sql/create-or-alter" target="_blank">docs</a>). You should see a <strong>Semantic view VBC_ANALYTICS_SV successfully created</strong> confirmation in the results pane.</p>
+  <p>The script is a <code>CREATE OR ALTER SEMANTIC VIEW</code> — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place. <code>CREATE OR ALTER</code> is an idempotent DDL command that creates the object if it doesn't exist or updates it to match the new definition if it does — safe to run multiple times without side effects (<a href="https://docs.snowflake.com/en/sql-reference/sql/create-or-alter" target="_blank">docs</a>). You should see a <strong>Statement executed successfully.</strong> confirmation in the results pane.</p>
   <div class="code-block-wrap">
     <div class="code-block-header">
       <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
