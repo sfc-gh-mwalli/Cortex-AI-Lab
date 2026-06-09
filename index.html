@@ -576,7 +576,7 @@
   </ol>
   <div class="code-block-wrap">
     <div class="code-block-header">
-      <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
+      <div class="code-block-lang"><span class="lang-dot"></span>create_vbc_analytics_sv_updated.sql</div>
       <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
     <pre><code>USE ROLE ACCOUNTADMIN;
@@ -997,7 +997,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
       <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
       <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
-    <pre><code style="display:none">create or alter semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV
+    <pre style="max-height:320px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;"><code>create or alter semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV
 	tables (
 		SYNTHEA.SILVER.CONDITIONS comment='The table contains records of medical conditions diagnosed for patients. Each record represents a single condition instance, capturing the condition''s coded classification, associated patient and encounter, the duration of the condition, and the city of the synthetic patient.',
 		SYNTHEA.SILVER.ENCOUNTERS primary key (ENCOUNTER_ID) comment='The table contains records of patient medical encounters, capturing details about individual healthcare visits or interactions. Each record includes information about the involved parties (patient, provider, organization, and payer), the nature and classification of the encounter, associated costs and insurance coverage, and the reason for the visit.',
