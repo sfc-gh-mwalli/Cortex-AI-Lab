@@ -646,7 +646,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>In a clinical context this matters enormously. A care manager searching for <em>"patient with poorly controlled blood sugar missing labs"</em> should surface notes that mention HbA1c, A1C, glycemic index, or endocrinology follow-up — none of which contain the search phrase. Cortex Search handles this automatically because it understands the meaning behind words, not just the words themselves.</p>
 
   <h2>What We're Doing in This Lab</h2>
-  <p>We have a dataset of <strong>1,500 AI-generated clinical notes</strong> in SOAP format (Subjective, Objective, Assessment, Plan) — synthetic patient records produced from the Synthea dataset. These notes are in a CSV file called <code>Clinical_Notes_RAW.csv</code> — <a href="assets/Clinical_Notes_RAW.csv" download style="color:var(--sf-blue)">download it here</a>.</p>
+  <p>We have a dataset of <strong>1,500 AI-generated clinical notes</strong> in SOAP format (Subjective, Objective, Assessment, Plan) — synthetic patient records produced from the Synthea dataset. These notes are in a CSV file called <code>Clinical_Notes_RAW.csv</code>.</p>
   <p>In this module we will:</p>
   <ol>
     <li>Load <code>Clinical_Notes_RAW.csv</code> into a Snowflake table in <code>VBC_LAB.CARE_ANALYTICS</code></li>
@@ -686,16 +686,22 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <div class="callout callout-info">
     <span class="callout-icon">📥</span>
-    <div>Download both files before starting the steps below: <a href="assets/02_enriched_loading_demo.ipynb" download style="color:var(--sf-blue)"><code>02_enriched_loading_demo.ipynb</code></a> and <a href="assets/Clinical_Notes_RAW.csv" download style="color:var(--sf-blue)"><code>Clinical_Notes_RAW.csv</code></a>.</div>
+    <div>Download both files before starting the steps below: <a href="assets/02_enriched_loading_demo.ipynb" download style="color:var(--sf-blue)"><code>02_enriched_loading_demo.ipynb</code></a> and <a href="assets/Clinical_Notes_RAW.csv" download style="color:var(--sf-blue)"><code>Clinical_Notes_RAW.csv</code></a>. <strong>Right-click each link and select "Save Link As"</strong> to download them (clicking directly may open the file in your browser instead).</div>
   </div>
 
-  <h2>Part 1 — Upload the Notebook to Your Workspace</h2>
+  <h2>Part 1 — Upload the Files to Your Workspace</h2>
+  <p>The notebook reads <code>Clinical_Notes_RAW.csv</code> directly from your workspace root, so upload both files now. <strong>Do this before running any cells</strong> — the first SQL cell will fail if the CSV isn't present.</p>
   <ol>
     <li>In Snowsight, navigate to <strong>Projects</strong> in the left sidebar and open your <strong>snowday</strong> workspace.</li>
     <li>Click <strong>Add new</strong> and select <strong>Upload Files</strong> from the dropdown.</li>
-    <li>In the file picker, navigate to the folder where you downloaded the files and select <code>02_enriched_loading_demo.ipynb</code>.</li>
-    <li>Once uploaded, click the notebook name in the file list to open it.</li>
+    <li>In the file picker, navigate to the folder where you downloaded the files and select <strong>both</strong> <code>02_enriched_loading_demo.ipynb</code> and <code>Clinical_Notes_RAW.csv</code>.</li>
+    <li>Confirm both files appear in the workspace file list on the left, then click <code>02_enriched_loading_demo.ipynb</code> to open it.</li>
   </ol>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>Snowsight may automatically open the CSV as a preview tab when you upload it. You can close that tab — it's just a file preview and has no effect on the notebook.</div>
+  </div>
 
   <h2>Part 2 — Connect a Runtime</h2>
   <p>Workspace notebooks run Python inside a dedicated container called a <strong>runtime service</strong>. Your account won't have one yet — you need to create it before running any cells.</p>
@@ -706,19 +712,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li>When it turns green and shows <strong>Connected</strong>, you're ready to proceed.</li>
   </ol>
 
-  <h2>Part 3 — Upload the CSV to Your Workspace</h2>
-  <p>The notebook reads <code>Clinical_Notes_RAW.csv</code> directly from your workspace root. <strong>Do this before running any cells</strong> — the first SQL cell will fail if the file isn't present.</p>
-  <ol>
-    <li>Using the same <strong>Add new → Upload Files</strong> flow, upload <code>Clinical_Notes_RAW.csv</code> to your <strong>snowday</strong> workspace.</li>
-    <li>Confirm the file appears in the workspace file list on the left side of the screen.</li>
-  </ol>
-
-  <div class="callout callout-info">
-    <span class="callout-icon">ℹ️</span>
-    <div>Snowsight may automatically open the CSV as a preview tab when you upload it. You can close that tab — it's just a file preview and has no effect on the notebook.</div>
-  </div>
-
-  <h2>Part 4 — Run the Notebook</h2>
+  <h2>Part 3 — Run the Notebook</h2>
   <p>Run each cell individually using the <strong>Run cell</strong> button on the right side of each cell, or press <strong>Shift + Enter</strong>. Read the markdown text above each cell before running it — the notebook is self-documenting and explains what each step does. Results appear directly below the cell after it executes.</p>
   <p>Two cells take 1–2 minutes each (the AI_COMPLETE quality scan and the final load step). That's expected — an LLM is processing 1,500 rows.</p>
 
