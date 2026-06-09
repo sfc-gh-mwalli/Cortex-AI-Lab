@@ -844,7 +844,13 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li>The search results will show 1 data product — <strong>Synthetic Healthcare Data - Clinical and Claims</strong> by <em>Snowflake Virtual Hands-On Labs</em>. It is free and instantly accessible. Click the listing to open it.</li>
     <li>On the listing detail page, click <strong>Get</strong> in the top-right corner.</li>
     <li><em>(This step may or may not appear — skip it if you are not prompted.)</em> A <strong>Complete your profile to get data products</strong> dialog may appear. If it does, enter your email and click <strong>Save</strong>.</li>
-    <li>A <strong>Get it for Free</strong> dialog will appear. Under <strong>Options → Database name</strong>, clear the default and type <code>Synthea</code>. Leave the roles field empty — ACCOUNTADMIN already has access. Click <strong>Get</strong>.</li>
+    <li>A <strong>Get it for Free</strong> dialog will appear.
+      <div class="callout callout-warn" style="margin: 8px 0 4px;">
+        <span class="callout-icon">⚠️</span>
+        <div><strong>Critical — rename the database before clicking Get.</strong> Click <strong>Options</strong>, clear the default database name, and type <code>Synthea</code>. The lab SQL references the <code>SYNTHEA</code> database throughout and will fail if this name is wrong.</div>
+      </div>
+      Leave the roles field empty — ACCOUNTADMIN already has access. Click <strong>Get</strong>.
+    </li>
     <li>A <strong>Ready to Use</strong> confirmation will appear with a green checkmark and the database name <code>SYNTHEA</code>. Click <strong>Query Data</strong> — this opens the sample worksheet with example queries pre-loaded.</li>
   </ol>
 
