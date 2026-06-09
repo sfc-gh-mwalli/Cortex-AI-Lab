@@ -1061,18 +1061,19 @@ Do not execute the updated DDL.</code></pre>
       <thead>
         <tr style="border-bottom:1px solid var(--sf-border);">
           <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:90px;">Type</th>
-          <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:200px;">Name</th>
+          <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:170px;">Name</th>
+          <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:130px;">Logical Table</th>
           <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600;">Definition</th>
         </tr>
       </thead>
       <tbody>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Cost of Care</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">SUM(total_claim_cost)</td></tr>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Payer Coverage Rate</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DIV0(SUM(payer_coverage), SUM(total_claim_cost))</td></tr>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Average Cost per Encounter</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">AVG(total_claim_cost)</td></tr>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Avoidable ED Rate</td><td style="padding:7px 10px;">Emergency encounters for ambulatory-sensitive conditions / total encounters</td></tr>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Encounter Count</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">COUNT(encounter_id)</td></tr>
-        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Patient Income Band</td><td style="padding:7px 10px;">&lt;30k, 30-60k, 60-100k, 100k+</td></tr>
-        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Month / Year</td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DATE_TRUNC / YEAR(encounter_start)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Cost of Care</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">SUM(total_claim_cost)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Payer Coverage Rate</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DIV0(SUM(payer_coverage), SUM(total_claim_cost))</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Average Cost per Encounter</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">AVG(total_claim_cost)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Avoidable ED Rate</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px;">Emergency encounters for ambulatory-sensitive conditions / total encounters</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Encounter Count</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">COUNT(encounter_id)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Patient Income Band</td><td style="padding:7px 10px;"><code>PATIENTS</code></td><td style="padding:7px 10px;">&lt;30k, 30-60k, 60-100k, 100k+</td></tr>
+        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Month / Year</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DATE_TRUNC / YEAR(encounter_start)</td></tr>
       </tbody>
     </table>
   </div>
@@ -1083,7 +1084,7 @@ Do not execute the updated DDL.</code></pre>
   </div>
   <ol start="3">
     <li><strong>Apply the changes using the script Cortex Code created.</strong> In your <strong>snowday</strong> workspace, open <code>create_vbc_analytics_sv_updated.sql</code>. This is a <code>CREATE OR ALTER SEMANTIC VIEW</code> script — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place (the original DDL was also saved as <code>create_vbc_analytics_sv_orig.sql</code> as a backup). <code>CREATE OR ALTER</code> is an idempotent DDL command that creates the object if it doesn't exist or updates it to match the new definition if it does — safe to run multiple times without side effects (<a href="https://docs.snowflake.com/en/sql-reference/sql/create-or-alter" target="_blank">docs</a>). Review the script, then run it using the blue <strong>▶ Run</strong> button or <strong>⌘ + Return</strong>. You should see a <strong>Semantic view VBC_ANALYTICS_SV successfully created</strong> confirmation in the results pane.</li>
-    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables, then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground. Close Cortex Code if it's open to free up screen space.</li>
+    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables (refer to the table above for which logical table each one belongs to), then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground. Close Cortex Code if it's open to free up screen space.</li>
   </ol>
 
   <div class="step-nav">
