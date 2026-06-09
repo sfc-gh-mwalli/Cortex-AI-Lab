@@ -986,7 +986,12 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li><strong>Metrics</strong> are named calculations — business measures defined once in the semantic view so every query uses the same logic. For example, <em>Average Cost per Encounter</em> is <code>AVG(total_claim_cost)</code>. Without a metric, Cortex Analyst has to guess the formula each time. You can expand <strong>Metrics</strong> in the Suggestions panel to see what Autopilot identified — but for this lab we'll use a specific set of VBC metrics and dimensions, added via the SQL script below.</li>
     <li><strong>Dimensions</strong> are attributes used to slice and filter data. Most dimensions come directly from a column, but <em>expression-based</em> dimensions are derived from logic. For example, <em>Patient Income Band</em> isn't a column in the data — it's a <code>CASE</code> expression that buckets the <code>INCOME</code> value into ranges like <code>&lt;30k</code>, <code>30-60k</code>, etc. These let Cortex Analyst answer questions like "show cost by income band" without any transformation in the query.</li>
   </ul>
-  <p>Copy the SQL below, open a new SQL file in your <strong>snowday</strong> workspace, paste it in, and run it with <strong>▶ Run</strong>. The script uses <code>CREATE OR ALTER</code> — safe to run even if the view already exists from the previous step.</p>
+  <ol>
+    <li>Copy the SQL using the button below.</li>
+    <li>In your <strong>snowday</strong> workspace, click the <strong>+</strong> button to the right of the rightmost open tab and select <strong>SQL file</strong>.</li>
+    <li>Paste the SQL into the new file and run it with <strong>▶ Run</strong>.</li>
+  </ol>
+  <p>The script uses <code>CREATE OR ALTER</code> — safe to run even if the view already exists from the previous step.</p>
   <div class="code-block-wrap">
     <div class="code-block-header">
       <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
@@ -1179,7 +1184,8 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Avoidable ED Rate</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px;">Emergency encounters for ambulatory-sensitive conditions / total encounters</td></tr>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Metric</td><td style="padding:7px 10px;">Total Encounter Count</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">COUNT(encounter_id)</td></tr>
         <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Patient Income Band</td><td style="padding:7px 10px;"><code>PATIENTS</code></td><td style="padding:7px 10px;">&lt;30k, 30-60k, 60-100k, 100k+</td></tr>
-        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Month / Year</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DATE_TRUNC / YEAR(encounter_start)</td></tr>
+        <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Month</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">DATE_TRUNC('MONTH', encounter_start)</td></tr>
+        <tr><td style="padding:7px 10px;">Dimension</td><td style="padding:7px 10px;">Encounter Year</td><td style="padding:7px 10px;"><code>ENCOUNTERS</code></td><td style="padding:7px 10px; font-family:monospace; font-size:12px;">YEAR(encounter_start)</td></tr>
       </tbody>
     </table>
   </div>
