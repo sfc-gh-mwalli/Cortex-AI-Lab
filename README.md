@@ -25,10 +25,14 @@ The guide walks attendees through 14 steps, grouped into setup plus three module
 ├── README.md
 ├── .nojekyll                           # tells GitHub Pages to serve files as-is
 ├── .gitignore
+├── .github/
+│   └── workflows/
+│       └── pages.yml                    # GitHub Pages deploy workflow (auto-stamps the header timestamp)
 ├── images/                             # images used by the guide
 │   └── cortex-code-ui-icon.png
 └── assets/                             # lab asset files attendees download/use
     ├── Clinical_Notes_RAW.csv          # synthetic clinical notes dataset (raw, pre-redaction)
+    ├── Clinical_Notes_CLEAN.csv        # redacted CLINICAL_NOTES table dump — fallback if AI_COMPLETE/AI_REDACT are unavailable
     ├── 02_enriched_loading_demo.ipynb  # PII-redaction + enriched-loading notebook (Module 2)
     ├── vbc_analytics_sv_orig.sql       # Autopilot-generated semantic view DDL (reference)
     └── vbc_analytics_sv_updated.sql    # CREATE OR ALTER semantic view DDL with VBC metrics/dimensions
@@ -36,5 +40,7 @@ The guide walks attendees through 14 steps, grouped into setup plus three module
 
 ## Editing
 
-Edit `index.html`, commit, and `git push` — GitHub Pages automatically redeploys the
-live site within about a minute.
+Edit `index.html`, commit, and `git push` to `main`. The `pages.yml` GitHub
+Actions workflow redeploys the live site within about a minute and automatically
+stamps the header "Updated …" timestamp from the latest commit date (America/New_York),
+so there's no need to edit the date by hand.
