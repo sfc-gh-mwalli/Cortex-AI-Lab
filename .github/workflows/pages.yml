@@ -27,6 +27,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Stamp last-updated timestamp from latest commit
+        run: |
+          TS=$(TZ=America/New_York git log -1 --format=%cd --date='format-local:%b %-d, %Y · %-I:%M %p %Z')
+          echo "Stamping header timestamp: $TS"
+          # Rewrite the visible text inside the "Updated ... </a>" header link.
+          sed -i -E "s#(>Updated )[^<]*(</a>)#\1${TS}\2#" index.html
+          grep -n ">Updated " index.html || (echo "ERROR: timestamp marker not found" && exit 1)
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
