@@ -211,7 +211,7 @@
       border-radius: 4px; font-size: 13px;
     }
 
-    /* prompt blocks (Cortex Code prompts) */
+    /* prompt blocks (CoCo prompts) */
     .prompt-block {
       background: linear-gradient(135deg, #F0F7FF, #F5FFFE);
       border: 1px solid #BEE0F9;
@@ -526,28 +526,28 @@
   </div>
 
   <div class="callout callout-tip" style="align-items:center;">
-    <img src="images/cortex-code-ui-icon.png" alt="Cortex Code" style="width:28px; height:28px; flex-shrink:0; border-radius:5px;">
-    <div><strong>Need help at any point?</strong> Use <strong>Cortex Code</strong> inside Snowflake Snowsight — it's the AI assistant built directly into the platform. Ask it questions, get unstuck on SQL, or have it walk you through any step in this lab.</div>
+    <img src="images/cortex-code-ui-icon.png" alt="CoCo" style="width:28px; height:28px; flex-shrink:0; border-radius:5px;">
+    <div><strong>Need help at any point?</strong> Use <strong>CoCo</strong> <span style="color:var(--sf-muted);">(formerly Cortex Code)</span> inside Snowflake Snowsight — it's the AI assistant built directly into the platform. Ask it questions, get unstuck on SQL, or have it walk you through any step in this lab.</div>
   </div>
 
   <p>Complete the following steps to prepare your environment before starting the lab modules.</p>
 
   <h3>1. Configure AI Model Access</h3>
-  <p>Before anything else, AI model access needs to be enabled at the account level. We want to ensure the lab account is configured with access to all available models — these will be used throughout the lab with <strong>Cortex Code</strong> and <strong>Cortex Agents</strong>. Enabling cross-region inference allows Snowflake to route requests to the best available model endpoint regardless of region.</p>
-  <p>Open Cortex Code by clicking the <img src="images/cortex-code-ui-icon.png" alt="Cortex Code icon" style="height:18px; vertical-align:middle; margin:0 2px;"> icon on the right edge of the Snowsight UI, then paste and send the following prompt:</p>
+  <p>Before anything else, AI model access needs to be enabled at the account level. We want to ensure the lab account can reach all available models — these will be used throughout the lab with <strong>CoCo</strong> and <strong>Cortex Agents</strong>. Enabling cross-region inference allows Snowflake to route requests to the best available model endpoint regardless of region. Model access itself is controlled by role-based access control, and the <strong>ACCOUNTADMIN</strong> role we use in this lab already has access to every model — so cross-region inference is the only setting we need to change.</p>
+  <p>Open CoCo by clicking the <img src="images/cortex-code-ui-icon.png" alt="CoCo icon" style="height:18px; vertical-align:middle; margin:0 2px;"> icon in the lower-right corner of the Snowsight UI, then paste and send the following prompt:</p>
   <div class="code-block-wrap">
     <div class="code-block-header">
-      <div class="code-block-lang"><span class="lang-dot"></span>Cortex Code Prompt</div>
+      <div class="code-block-lang"><span class="lang-dot"></span>CoCo Prompt</div>
       <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
-    <pre style="white-space: pre-wrap; word-break: break-word;"><code>Switch to the ACCOUNTADMIN role, then enable cross-region inference for any region and set the model allowlist to allow all models on this account.</code></pre>
+    <pre style="white-space: pre-wrap; word-break: break-word;"><code>Switch to the ACCOUNTADMIN role, then enable cross-region inference for any region on this account and show me the Cortex AI models available to my role.</code></pre>
   </div>
-  <p>Cortex Code will look up the relevant documentation and then present the SQL commands it needs to run — one to set <code>CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION'</code> and one to set <code>CORTEX_MODELS_ALLOWLIST = 'All'</code>. For each command, a <strong>Run this command?</strong> prompt will appear — click <strong>Yes</strong> to execute it.</p>
-  <p>When complete, you should see a confirmation that all Cortex AI models are now available across any region on your account.</p>
+  <p>CoCo will look up the relevant documentation and then propose the SQL it needs to run — an <code>ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION'</code> statement, followed by a query that lists the models your role can use. Before running each statement, CoCo asks for your approval — approve it when prompted (you can allow it once or for the rest of the chat). If your account already has cross-region inference set to <code>ANY_REGION</code> (newer trial accounts do by default), CoCo will simply confirm it.</p>
+  <p>When complete, you should see a confirmation that cross-region inference is set to <code>ANY_REGION</code>, along with the list of available models.</p>
 
   <div class="callout callout-tip">
     <span class="callout-icon">🔄</span>
-    <div><strong>Refresh your browser now.</strong> Once models are enabled, refresh the page so Cortex Code picks up the updated model list. After refreshing, open Cortex Code and click the <strong>Auto</strong> button at the bottom right of the chat input — you'll see the full list of available models including Claude Opus 4.6, Claude Sonnet 4.6, OpenAI GPT 5.4, and others. Leaving it on <strong>Auto</strong> lets Cortex Code select the best model for each task automatically.</div>
+    <div><strong>Refresh your browser now.</strong> Once cross-region inference is enabled, refresh the page so CoCo picks up the updated model list. After refreshing, open CoCo and click the model selector at the bottom right of the message box (it shows <strong>Auto</strong> by default). The menu lists the <strong>Auto</strong>, <strong>Auto Intelligent</strong>, and <strong>Auto Efficient</strong> options first, followed by the individual model families available to you. Leaving it on <strong>Auto</strong> lets CoCo select the best model for each task automatically.</div>
   </div>
 
   <h3>2. Create a Workspace</h3>
@@ -555,12 +555,12 @@
     <li>In the left sidebar, under <strong>Work with data</strong>, click <strong>Projects</strong>. The <strong>Workspaces</strong> panel opens.</li>
     <li>At the top-right of the Workspaces panel header (just right of the <strong>Workspaces</strong> / <strong>Databases</strong> tabs, next to the search icon), click the <strong>+</strong> button — hovering shows the tooltip <strong>Create workspace</strong>. A <strong>Create new</strong> menu appears with three options.<br><em>Note: this is <strong>not</strong> the <strong>+ Add new</strong> button below the tabs (that adds files inside a workspace) or the <strong>+</strong> in the far-left icon rail.</em></li>
     <li>Click <strong>Private workspace</strong>.</li>
-    <li>In the <strong>Create workspace</strong> dialog, enter <code>snowday</code> as the workspace name.</li>
+    <li>In the <strong>Create workspace</strong> dialog, enter <code>snowcamp</code> as the workspace name.</li>
     <li>Click <strong>Create</strong>. Your new workspace will open automatically.</li>
   </ol>
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div>A Workspace is the primary IDE inside Snowsight. It's a unified environment for working across SQL, Python, notebooks, Streamlit apps, agents, dbt projects, and more — and Snowflake is actively expanding the object types it supports. We'll use the <code>snowday</code> workspace as our home base throughout this lab.</div>
+    <div>A Workspace is the primary IDE inside Snowsight. It's a unified environment for working across SQL, Python, notebooks, Streamlit apps, agents, dbt projects, and more — and Snowflake is actively expanding the object types it supports. We'll use the <code>snowcamp</code> workspace as our home base throughout this lab.</div>
   </div>
 
   <h3>3. Create a Database &amp; Schema</h3>
@@ -570,7 +570,7 @@
     <div>For the purposes of this lab we'll be using the <strong>ACCOUNTADMIN</strong> role for all tasks. This simplifies permissions so you can focus on building — no role-switching required.</div>
   </div>
   <ol>
-    <li>In the <strong>snowday</strong> workspace panel, click <strong>+ Add new</strong>.</li>
+    <li>In the <strong>snowcamp</strong> workspace panel, click <strong>+ Add new</strong>.</li>
     <li>From the menu, select <strong>SQL File</strong>.</li>
     <li>Name the file <code>Setup.sql</code> and press <strong>Enter</strong>.</li>
     <li>Paste the following SQL into the file, then run it by clicking the <strong>▶ dropdown</strong> at the top of the editor and selecting <strong>Run all</strong> (or press <strong>⌘ + Shift + Return</strong>):</li>
@@ -693,7 +693,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <h2>Part 1 — Upload the Files to Your Workspace</h2>
   <p>The notebook reads <code>Clinical_Notes_RAW.csv</code> directly from your workspace root, so upload both files now. <strong>Do this before running any cells</strong> — the first SQL cell will fail if the CSV isn't present.</p>
   <ol>
-    <li>In Snowsight, navigate to <strong>Projects</strong> in the left sidebar and open your <strong>snowday</strong> workspace.</li>
+    <li>In Snowsight, navigate to <strong>Projects</strong> in the left sidebar and open your <strong>snowcamp</strong> workspace.</li>
     <li>Click <strong>Add new</strong> and select <strong>Upload Files</strong> from the dropdown.</li>
     <li>In the file picker, navigate to the folder where you downloaded the files and select <strong>both</strong> <code>02_enriched_loading_demo.ipynb</code> and <code>Clinical_Notes_RAW.csv</code>.</li>
     <li>Confirm both files appear in the workspace file list on the left, then click <code>02_enriched_loading_demo.ipynb</code> to open it.</li>
@@ -708,7 +708,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>Workspace notebooks run Python inside a dedicated container called a <strong>runtime service</strong>. Your account won't have one yet — you need to create it before running any cells.</p>
   <ol>
     <li>In the notebook toolbar, click <strong>Connect</strong> (top left, next to the Run all button).</li>
-    <li>A dialog appears showing service configuration — leave all defaults as-is (CPU, Python 3.12, v2.4) and click <strong>Create and connect</strong>.</li>
+    <li>A dialog appears showing the service configuration (Python version, Snowflake Container Runtime version, compute pool, and idle timeout) — leave all defaults as-is and click <strong>Create and connect</strong>.</li>
     <li>The button will switch to <strong>Connecting...</strong> and gray out. Wait 1–2 minutes for the runtime to start.</li>
     <li>When it turns green and shows <strong>Connected</strong>, you're ready to proceed.</li>
   </ol>
@@ -725,7 +725,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>If something goes wrong, click the <strong>▾</strong> chevron next to the <strong>Connected</strong> button to access kernel controls:</p>
   <ul>
     <li><strong>Restart kernel</strong> — Clears all variables but keeps packages. Use this if a cell gets stuck or produces an unexpected error mid-run.</li>
-    <li><strong>Shut down kernel</strong> — Fully stops the runtime. Use this for a completely clean start; you'll need to reconnect afterward.</li>
+    <li><strong>Shut down kernel</strong> — Stops the kernel and clears all variables (installed packages are kept). Use this for a clean start; run the cells again from the top afterward. Note that this does <strong>not</strong> stop the notebook service — see the end of this step for how to suspend it.</li>
   </ul>
 
   <h2>What the Notebook Does</h2>
@@ -742,7 +742,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em> — a clinical term that doesn't appear verbatim in any note. If the results come back about Cystic Fibrosis (CF) patients, semantic search is working correctly.</div>
   </div>
 
-  <p>Once the notebook finishes, free up the compute it was using before moving on: click the <strong>▾</strong> chevron next to the <strong>Connected</strong> button and select <strong>Shut down kernel</strong>, then close the notebook tab.</p>
+  <p>Once the notebook finishes, free up the compute it was using before moving on. Shutting down the kernel only clears memory — the notebook service keeps running (and consuming credits) until it's suspended. Click the <strong>Connected</strong> dropdown, hover over your service name, and click <strong>Suspend</strong> (the pause icon), then close the notebook tab.</p>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m2-overview')">← Cortex Search Overview</button>
@@ -879,23 +879,27 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>Semantic views power <strong>Cortex Analyst</strong>, Snowflake's natural language query engine. Once a semantic view is in place, users can ask plain-language questions and get accurate SQL-backed answers — because the semantic layer already knows what the data means.</p>
 
   <div class="section-heading"><span class="dot"></span>Create the Semantic View with Autopilot</div>
+  <p>Semantic views are now a native object type inside <strong>Workspaces</strong>. You create them with <strong>Semantic View Autopilot</strong>, an AI-assisted wizard, and refine them in <strong>Semantic Studio</strong>, the semantic view editor built into Workspaces.</p>
   <ol>
     <li>If the left navigation panel is collapsed, click the <strong>→ Show navigation</strong> arrow on the left edge of the screen to expand it.</li>
-    <li>In the left sidebar, hover over <strong>AI &amp; ML</strong>. In the flyout, under <strong>Cortex AI</strong>, click <strong>Analyst</strong>.</li>
-    <li>On the Cortex Analyst page, click <strong>Create with Autopilot</strong> in the top-right corner.</li>
-    <li>A <strong>Provide context</strong> screen appears. You can optionally upload example SQL queries or a Tableau data source to improve how Autopilot generates the semantic view — but for this lab, click <strong>Skip</strong>.</li>
-    <li>On the <strong>Name your semantic view</strong> screen:
+    <!-- VERIFY: docs now say "select Workspaces" in the nav menu; confirm whether Projects is still the entry (also Section 2.2 and Step 8) -->
+    <li>In the left sidebar, under <strong>Work with data</strong>, click <strong>Projects</strong> and open your <strong>snowcamp</strong> workspace.</li>
+    <li>In the workspace panel, click <strong>+ Add new</strong> and select <strong>Semantic View</strong>. This opens the Autopilot wizard.</li>
+    <!-- VERIFY: label of the wizard's opening option screen / the non-CoCo option -->
+    <li>The wizard offers a few ways to get started, including building the view conversationally with CoCo. For this lab, choose the standard step-by-step wizard (not CoCo) so everyone ends up with the same result.</li>
+    <li>Fill in the first screen:
       <ul>
-        <li>Set the name to <code>VBC_ANALYTICS_SV</code></li>
-        <li>Leave <strong>Semantic view</strong> selected — it is the recommended option and the native Snowflake object type</li>
-        <li>Confirm the schema is set to <code>VBC_LAB.CARE_ANALYTICS</code></li>
+        <li><strong>Location:</strong> <code>VBC_LAB.CARE_ANALYTICS</code></li>
+        <li><strong>Name:</strong> <code>VBC_ANALYTICS_SV</code></li>
+        <li><strong>Description:</strong> <code>Value-based care analytics across patients, encounters, conditions, medications, observations, procedures, providers, and payers.</code></li>
       </ul>
     </li>
     <li>Click <strong>Next</strong>.</li>
+    <li>A <strong>Provide context</strong> step appears. You can optionally add example SQL queries, or upload a Tableau file, Power BI file, or YAML specification to improve what Autopilot generates — but for this lab, skip it.</li>
   </ol>
 
   <div class="section-heading"><span class="dot"></span>Select Tables</div>
-  <p>The next screen shows all tables available across your databases. Navigate to <strong>SYNTHEA → SILVER</strong> and select the following 8 tables — these cover the core clinical and financial data needed to answer Value Based Care questions around cost, utilization, quality, risk, and provider performance.</p>
+  <p>The <strong>Select tables</strong> step shows the tables available across your databases. Navigate to <strong>SYNTHEA → SILVER</strong> and select the following 8 tables — these cover the core clinical and financial data needed to answer Value Based Care questions around cost, utilization, quality, risk, and provider performance.</p>
   <ul>
     <li><code>CONDITIONS</code></li>
     <li><code>ENCOUNTERS</code></li>
@@ -906,7 +910,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li><code>PROCEDURES</code></li>
     <li><code>PROVIDERS</code></li>
   </ul>
-  <p>You should see <strong>Selected 8</strong> in the tab at the top of the table list. Click <strong>Next</strong>.</p>
+  <p>Confirm all 8 tables are selected, then click <strong>Next</strong>.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
@@ -914,23 +918,21 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <div class="section-heading"><span class="dot"></span>Select Columns</div>
-  <p>The next screen lists all columns across the 8 selected tables. Click <strong>Select all</strong> — we'll include all 127 columns. Two options at the bottom of the screen are already checked; leave them both on:</p>
+  <p>The <strong>Select columns</strong> step lists all columns across the 8 selected tables. Click <strong>Select all</strong> — we'll include all 127 columns. Leave both of these options on:</p>
   <ul>
     <li><strong>Add sample values</strong> — pulls a few real values from each column so Cortex Analyst can give better answers to natural language questions</li>
-    <li><strong>Add descriptions</strong> — uses AI to generate sensible descriptions for each column, saving you from writing them manually</li>
+    <li><strong>Add descriptions</strong> — uses AI to generate sensible descriptions for each table and column, saving you from writing them manually</li>
   </ul>
-  <p>Click <strong>Create</strong>.</p>
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>Snowflake recommends keeping semantic views to around 50 columns or fewer for performance. We're deliberately including all 127 here so the view can answer the full range of VBC questions in this lab — in production, start narrower and add columns as real questions demand them.</div>
+  </div>
+  <p>Click <strong>Create and save</strong>, then click <strong>Save and run</strong>.</p>
 
   <div class="section-heading"><span class="dot"></span>Generating the Semantic View</div>
-  <p>Autopilot will begin building your semantic view. Click <strong>Show details</strong> to watch progress. The process runs through four stages:</p>
-  <ul>
-    <li><strong>Discovering logical tables</strong> — identifies the 8 tables and creates the base structure</li>
-    <li><strong>Identifying dimensions and metrics</strong> — classifies columns into dimensions, facts, and metrics</li>
-    <li><strong>Building table relationships</strong> — attempts to infer joins between tables</li>
-    <li><strong>Adding descriptions</strong> — generates natural language descriptions and aliases for all 8 tables and 127 columns</li>
-  </ul>
-  <p>Generation is complete when <strong>Generation completed</strong> appears with a full green progress bar and a <strong>Your semantic view is ready</strong> dialog. You may see a warning — that's expected and fine. There should be no errors.</p>
-  <p>Click the <strong>X</strong> in the top-right corner of the <strong>Your semantic view is ready</strong> card to dismiss it, then scroll down to see the <strong>Logical tables</strong> section. Each of the 8 tables will be listed with its auto-generated dimensions, time dimensions, and facts.</p>
+  <!-- VERIFY: progress stage names, completion message, and what the editor shows when done -->
+  <p>Autopilot begins building your semantic view, and you can watch its progress on the semantic view page — it works through discovering the logical tables, identifying dimensions, facts, and metrics, inferring table relationships, and adding descriptions for all 8 tables and 127 columns. This takes a few minutes.</p>
+  <p>When generation completes, the semantic view opens in <strong>Semantic Studio</strong>. You may see a warning — that's expected and fine. There should be no errors. Take a moment to review the <strong>logical tables</strong>: each of the 8 tables is listed with its auto-generated dimensions, time dimensions, and facts. Cortex Analyst also generates improvement suggestions in the background after creation, which can take several minutes to appear.</p>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m1-marketplace')">← Get Marketplace Data</button>
@@ -950,13 +952,13 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>The Autopilot-generated semantic view is a solid starting point, but it needs a few refinements before it's ready for production questions:</p>
   <ul>
     <li><strong>Add relationships</strong> — define the table join logic using the Suggestions panel in the UI</li>
-    <li><strong>Add metrics and dimensions</strong> — define VBC-specific measures and expression-based dimensions using Cortex Code</li>
+    <li><strong>Add metrics and dimensions</strong> — define VBC-specific measures and expression-based dimensions using CoCo</li>
   </ul>
   <p>The <strong>Suggestions</strong> and <strong>Playground</strong> tabs are visible on the right side of the page.</p>
 
   <div class="callout callout-tip">
     <span class="callout-icon">💡</span>
-    <div>If Cortex Code is open on the right side of your screen, consider closing it for now by clicking the <strong>→|</strong> arrow at the top right. This frees up screen space while you work in the Cortex Analyst UI.</div>
+    <div>If CoCo is open on the right side of your screen, consider closing it for now by clicking the <strong>→|</strong> arrow at the top right. This frees up screen space while you work in the Cortex Analyst UI.</div>
   </div>
 
   <div class="section-heading"><span class="dot"></span>1. Add Relationships</div>
@@ -985,7 +987,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </ul>
   <ol>
     <li>Copy the SQL using the button below.</li>
-    <li>In your <strong>snowday</strong> workspace, click the <strong>+</strong> button to the right of the rightmost open tab and select <strong>SQL file</strong>.</li>
+    <li>In your <strong>snowcamp</strong> workspace, click the <strong>+</strong> button to the right of the rightmost open tab and select <strong>SQL file</strong>.</li>
     <li>Rename the new file: click the <strong>···</strong> menu on the tab and choose <strong>Rename</strong>, then name it <code>create_vbc_analytics_sv_updated.sql</code>.</li>
     <li>Paste the SQL into the file and run it with <strong>▶ Run</strong>.</li>
   </ol>
@@ -1299,23 +1301,23 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
   <div class="timing-pill">⏱ ~5 min</div>
 
-  <p>You'll create a Cortex Agent using Cortex Code, then navigate to the Agent UI in Snowsight to review what was built. The agent will have two tools: structured VBC analytics via Cortex Analyst, and unstructured clinical notes via Cortex Search.</p>
+  <p>You'll create a Cortex Agent using CoCo, then navigate to the Agent UI in Snowsight to review what was built. The agent will have two tools: structured VBC analytics via Cortex Analyst, and unstructured clinical notes via Cortex Search.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">📖</span>
     <div>This step follows the patterns from the <a href="https://www.snowflake.com/en/developers/guides/best-practices-to-building-cortex-agents/" target="_blank" style="color:var(--sf-blue)">Snowflake Cortex Agents Best Practices Guide</a>. Worth bookmarking for production agent development.</div>
   </div>
 
-  <h2>Step 1 — Create the Agent with Cortex Code</h2>
-  <p>Open a <strong>new Cortex Code chat</strong> in Snowsight and paste the prompt below. Cortex Code will create the agent, configure both tools, and set the orchestration and response instructions.</p>
+  <h2>Step 1 — Create the Agent with CoCo <span style="font-size:0.6em; font-weight:400; color:var(--sf-muted);">(formerly Cortex Code)</span></h2>
+  <p>Open a <strong>new CoCo chat</strong> in Snowsight and paste the prompt below. CoCo will create the agent, configure both tools, and set the orchestration and response instructions.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">💡</span>
-    <div>Start a fresh chat — don't paste this into an existing conversation. A clean context helps Cortex Code focus entirely on the agent creation task.</div>
+    <div>Start a fresh chat — don't paste this into an existing conversation. A clean context helps CoCo focus entirely on the agent creation task.</div>
   </div>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Paste into Cortex Code</div>
+    <div class="prompt-label">💬 Paste into CoCo</div>
     <p>Execute the following directly:</p>
     <p>Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:</p>
     <p>Name: VBCCAREAGENT<br>Display name: VBC_CARE_AGENT</p>
@@ -1341,11 +1343,11 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div><strong>Checkpoint:</strong> Cortex Code will confirm the agent was created and list both tools — <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It will also suggest a follow-up test query — you can skip this for now and proceed to the next step.</div>
+    <div><strong>Checkpoint:</strong> CoCo will confirm the agent was created and list both tools — <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It will also suggest a follow-up test query — you can skip this for now and proceed to the next step.</div>
   </div>
 
   <h2>Step 2 — Review the Agent in Snowsight</h2>
-  <p>After Cortex Code confirms creation, navigate to the Agent UI to review what was built:</p>
+  <p>After CoCo confirms creation, navigate to the Agent UI to review what was built:</p>
   <ol>
     <li>In the Snowsight left nav, go to <strong>AI &amp; ML → Agents</strong></li>
     <li>Click on <strong>VBCCAREAGENT</strong></li>
@@ -1354,7 +1356,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
       <ul>
         <li><strong>About</strong> — confirm the display name is <code>VBC_CARE_AGENT</code></li>
         <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCANALYTICS</strong> (Cortex Analyst, bound to <code>VBC_ANALYTICS_SV</code>) and <strong>CLINICALNOTES</strong> (Cortex Search Services, bound to <code>CLINICAL_NOTES_SEARCH</code>)</li>
-        <li><strong>Orchestration</strong> — review the orchestration and response instructions that were set by Cortex Code</li>
+        <li><strong>Orchestration</strong> — review the orchestration and response instructions that were set by CoCo</li>
       </ul>
     </li>
     <li>Click <strong>Cancel</strong> when done — no changes needed</li>
@@ -1555,6 +1557,9 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
       <ul style="margin:0; padding-left:18px; font-size:14px; line-height:1.9;">
         <li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview" target="_blank" style="color:var(--sf-blue)">Cortex Search Overview</a></li>
         <li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst" target="_blank" style="color:var(--sf-blue)">Cortex Analyst Overview</a></li>
+        <li><a href="https://docs.snowflake.com/en/user-guide/views-semantic/autopilot" target="_blank" style="color:var(--sf-blue)">Semantic View Autopilot</a></li>
+        <li><a href="https://docs.snowflake.com/en/user-guide/views-semantic/semantic-studio" target="_blank" style="color:var(--sf-blue)">Semantic Studio</a></li>
+        <li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/snowflake-cowork" target="_blank" style="color:var(--sf-blue)">Snowflake CoWork Overview</a></li>
         <li><a href="https://www.snowflake.com/en/developers/guides/getting-started-with-cortex-agent-evaluations/" target="_blank" style="color:var(--sf-blue)">Cortex Agent Evaluations Guide</a></li>
         <li><a href="https://www.snowflake.com/en/developers/guides/best-practices-to-building-cortex-agents/" target="_blank" style="color:var(--sf-blue)">Best Practices to Building Cortex Agents</a></li>
         <li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql" target="_blank" style="color:var(--sf-blue)">Cortex AI Functions (AISQL) Overview</a></li>
@@ -1584,9 +1589,9 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <div style="background: linear-gradient(135deg,#EEF6FF,#F0FDF4); border: 1px solid #93C5FD; border-radius: 10px; padding: 18px;">
       <div style="font-size:22px; margin-bottom:8px">🖥️</div>
       <div style="font-weight:700; color:var(--sf-navy); margin-bottom:6px">Option A: Streamlit UI on SPCS</div>
-      <p style="font-size:13.5px; margin-bottom:10px">Use Cortex Code to build a Streamlit app that lets users chat with your agent, deployed to Snowpark Container Services.</p>
+      <p style="font-size:13.5px; margin-bottom:10px">Use CoCo to build a Streamlit app that lets users chat with your agent, deployed to Snowpark Container Services.</p>
       <div class="prompt-block" style="margin:0 0 10px 0">
-        <div class="prompt-label">💬 Cortex Code Prompt</div>
+        <div class="prompt-label">💬 CoCo Prompt</div>
         <p style="font-size:13px">Build a Streamlit app that provides a chat interface for VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT. Users should be able to type a question, submit it to the agent, and see the response displayed in the app. Deploy it to Snowpark Container Services.</p>
       </div>
       <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/developer-guide/streamlit/app-development/runtime-environments" target="_blank" style="color:var(--sf-blue)">📄 Streamlit runtime environments →</a></p>
