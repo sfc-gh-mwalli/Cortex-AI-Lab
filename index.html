@@ -172,6 +172,7 @@
     .callout-info { background: #EEF6FF; border: 1px solid #BEE0F9; color: #1A497C; }
     .callout-warn { background: #FFFBEB; border: 1px solid #FCD34D; color: #78350F; }
     .callout-tip  { background: #ECFDF5; border: 1px solid #6EE7B7; color: #065F46; }
+    mark.key-action { background: #FEF3C7; color: inherit; padding: 1px 4px; border-radius: 3px; box-shadow: inset 0 -2px 0 #FCD34D; }
     .callout-wow  { background: linear-gradient(135deg,#EEF6FF,#F0FDF4); border: 1px solid #93C5FD; color: #1E3A5F; }
 
     /* code blocks */
@@ -766,10 +767,10 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li>In the notebook toolbar, click <strong>Connect</strong> (top left, next to the Run all button).</li>
     <li>The <strong>Connect your notebook</strong> dialog opens. Keep the defaults for everything except the idle timeout:
       <ul>
-        <li><strong>Service name</strong> — filled in for you as <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>. Note it; you'll look for this name if you suspend the service at the end of the step.</li>
+        <li><strong>Service name</strong> — filled in for you as <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>. Note it; this is the service you'll find under <strong>Manage service</strong> if you ever need to suspend it.</li>
         <li><strong>Artifact repositories</strong> — <code>SNOWFLAKE.SNOWPARK.PYPI_SHARED_REPOSITORY</code>, which is where any extra Python packages come from. This notebook doesn't need any.</li>
         <li><strong>Enable distributed compute</strong> — leave it off.</li>
-        <li><strong>Service settings</strong> — collapsed, this shows a summary of the runtime version, CPU, Python version, compute pool (<code>SYSTEM_COMPUTE_POOL_CPU</code>) and idle timeout, which defaults to <strong>24 hours</strong>. Click <strong>Service settings</strong> to expand it, open the <strong>Idle timeout</strong> dropdown and select <strong>1 hour</strong>. Leave the other fields as they are.</li>
+        <li><strong>Service settings</strong> — collapsed, this shows a summary of the runtime version, CPU, Python version, compute pool (<code>SYSTEM_COMPUTE_POOL_CPU</code>) and idle timeout, which defaults to <strong>24 hours</strong>. <mark class="key-action">Click <strong>Service settings</strong> to expand it, open the <strong>Idle timeout</strong> dropdown and select <strong>1 hour</strong>. Leave the other fields as they are.</mark></li>
       </ul>
     </li>
     <li>Click <strong>Create and connect</strong>.</li>
@@ -803,7 +804,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>If something goes wrong, click the <strong>▾</strong> chevron next to the <strong>Connected</strong> button to access kernel controls:</p>
   <ul>
     <li><strong>Restart kernel</strong> — Clears all variables but keeps packages. Use this if a cell gets stuck or produces an unexpected error mid-run.</li>
-    <li><strong>Shut down kernel</strong> — Stops the kernel and clears all variables (installed packages are kept). Use this for a clean start; run the cells again from the top afterward. Note that this does <strong>not</strong> stop the notebook service or its compute charges — see the end of this step for how to suspend it.</li>
+    <li><strong>Shut down kernel</strong> — Stops the kernel and clears all variables (installed packages are kept). Use this for a clean start; run the cells again from the top afterward. Note that this does <strong>not</strong> stop the notebook service or its compute charges — see the end of this step for when the service stops.</li>
   </ul>
 
   <h2>What the Notebook Does</h2>
@@ -821,19 +822,11 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em>. Mucoviscidosis is an older name for cystic fibrosis, and the word doesn't appear in any note. If the results are about cystic fibrosis (CF) patients, semantic search is working.</div>
   </div>
 
-  <h2>Part 4 — Suspend the Notebook Service</h2>
-  <p>Your notebook service, and the compute pool node it occupies, keep running and billing until the service is suspended. Shutting down the kernel, closing the notebook tab or closing your browser doesn't stop it. Nothing in the rest of the lab needs the notebook, so you can stop it now. It suspends in one of two ways:</p>
-  <ul>
-    <li><strong>Automatically</strong> — one hour after your last cell finished, because of the idle timeout you set in Part 2. With the 24-hour default, it would have kept running for a day.</li>
-    <li><strong>Manually</strong> — the quickest way to stop the charges, and what we recommend once you're done:
-      <ol>
-        <li>Click the <strong>▾</strong> chevron next to <strong>Connected</strong> and select <strong>Manage service</strong>. This opens the <strong>Services &amp; jobs</strong> page under <strong>Monitoring</strong>.</li>
-        <li>Find <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code> in the list, click the <strong>⋮</strong> menu at the end of its row, and select <strong>Suspend</strong>. (<strong>Drop</strong> deletes the service entirely; you don't need to do that.)</li>
-        <li>Wait for its status to change to <strong>Suspended</strong>.</li>
-      </ol>
-    </li>
-  </ul>
-  <p>Suspending disconnects the notebook and clears the kernel's memory: variables, cell results and any packages you installed. It doesn't touch the objects the notebook created in Snowflake. <code>CLINICAL_NOTES</code>, <code>CLINICAL_NOTES_SEARCH</code>, <code>NOTES_STAGE</code> and <code>NOTES_CSV</code> all stay in place, and the search service keeps answering queries for the rest of the lab. If you want to use the notebook again later, open it and click <strong>Connect</strong> or run a cell; the service resumes in a few minutes, and you'll need to run the cells again from the top.</p>
+  <h2>Part 4 — When the Notebook Service Stops</h2>
+  <p>Your notebook service, and the compute pool node it occupies, keep running and billing until the service is suspended. Shutting down the kernel, closing the notebook tab or closing your browser doesn't stop it.</p>
+  <p><strong>For this lab, leave the service running.</strong> You may want to come back to the notebook later, and a suspended service takes another 3–5 minutes to start again. You don't need to do anything to stop the charges: because you set the idle timeout to 1 hour in Part 2, the service suspends itself one hour after your last cell finishes. With the 24-hour default, it would have kept running for a day.</p>
+  <p>Outside the lab, when you know you're done with a notebook, you can suspend its service yourself instead of waiting for the timeout. Click the <strong>▾</strong> chevron next to <strong>Connected</strong> and select <strong>Manage service</strong>, which opens <strong>Monitoring » Services &amp; jobs</strong>. Then click the <strong>⋮</strong> menu at the end of the service's row and select <strong>Suspend</strong>. (<strong>Drop</strong> deletes the service entirely.)</p>
+  <p>Whichever way the service suspends, it disconnects the notebook and clears the kernel's memory: variables, cell results and any packages you installed. It doesn't touch the objects the notebook created in Snowflake. <code>CLINICAL_NOTES</code>, <code>CLINICAL_NOTES_SEARCH</code>, <code>NOTES_STAGE</code> and <code>NOTES_CSV</code> all stay in place, and the search service keeps answering queries for the rest of the lab. To use the notebook again after it has suspended, open it and click <strong>Connect</strong> or run a cell; the service resumes in a few minutes, and you'll need to run the cells again from the top.</p>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m2-overview')">← Cortex Search Overview</button>
@@ -854,7 +847,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <h2>Navigate to Your Search Service</h2>
   <ol>
-    <li>In the Snowsight left sidebar, click <strong>AI &amp; ML</strong>, then select <strong>Cortex Search</strong>.</li>
+    <li>In the Snowsight left sidebar, click <strong>AI &amp; ML</strong>, then select <strong>Search</strong> (under <strong>Cortex AI</strong>).</li>
     <li>In the list of services, confirm <code>CLINICAL_NOTES_SEARCH</code> appears with both <strong>Indexing</strong> and <strong>Serving</strong> showing <strong>ACTIVE</strong> and 1,510 rows.</li>
     <li>Click <strong>CLINICAL_NOTES_SEARCH</strong> to open its detail page.</li>
   </ol>
