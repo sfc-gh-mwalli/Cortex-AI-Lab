@@ -764,18 +764,32 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>Workspace notebooks run Python inside a dedicated container called a <strong>runtime service</strong>. Your account won't have one yet — you need to create it before running any cells.</p>
   <ol>
     <li>In the notebook toolbar, click <strong>Connect</strong> (top left, next to the Run all button).</li>
-    <li>The <strong>Connect your notebook</strong> dialog opens. Leave every setting at its default:
+    <li>The <strong>Connect your notebook</strong> dialog opens. Keep the defaults for everything except the idle timeout:
       <ul>
-        <li><strong>Service name</strong> — filled in for you as <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>. Note it; you'll suspend this service at the end of the step.</li>
+        <li><strong>Service name</strong> — filled in for you as <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>. Note it; you'll look for this name if you suspend the service at the end of the step.</li>
         <li><strong>Artifact repositories</strong> — <code>SNOWFLAKE.SNOWPARK.PYPI_SHARED_REPOSITORY</code>, which is where any extra Python packages come from. This notebook doesn't need any.</li>
         <li><strong>Enable distributed compute</strong> — leave it off.</li>
-        <li><strong>Service settings</strong> — a summary of the runtime version, CPU, Python version, compute pool (<code>SYSTEM_COMPUTE_POOL_CPU</code>) and idle timeout. The 24-hour idle timeout is why you suspend the service when you're done instead of leaving it running.</li>
+        <li><strong>Service settings</strong> — collapsed, this shows a summary of the runtime version, CPU, Python version, compute pool (<code>SYSTEM_COMPUTE_POOL_CPU</code>) and idle timeout, which defaults to <strong>24 hours</strong>. Click <strong>Service settings</strong> to expand it, open the <strong>Idle timeout</strong> dropdown and select <strong>1 hour</strong>. Leave the other fields as they are.</li>
       </ul>
     </li>
     <li>Click <strong>Create and connect</strong>.</li>
-    <li>The button will switch to <strong>Connecting...</strong> and gray out. The runtime usually takes 3–5 minutes to start, so use the time to read Part 3 below.</li>
+    <li>The button will switch to <strong>Connecting...</strong> and gray out. The runtime usually takes 3–5 minutes to start, so use the time to read the next section and Part 3 below.</li>
     <li>When it turns green and shows <strong>Connected</strong>, you're ready to proceed.</li>
   </ol>
+
+  <h3>While You Wait — How Notebook Compute Works</h3>
+  <p>The service you just created is a container that Snowflake manages for you on <strong>Snowpark Container Services</strong>. A notebook draws on two kinds of compute, billed separately:</p>
+  <ul>
+    <li><strong>A compute pool</strong> runs the Python kernel. A compute pool is a group of virtual machines (nodes) that runs container workloads, much as a warehouse runs SQL. Your service takes one node on <code>SYSTEM_COMPUTE_POOL_CPU</code>, and the pool bills for as long as the service is running, whether or not a cell is executing.</li>
+    <li><strong>Your warehouse</strong> (<code>COMPUTE_WH</code>, which the notebook's first cell selects) runs the SQL cells, including the Cortex AI Function calls. It bills only while those queries run.</li>
+  </ul>
+  <p>Every account comes with two Snowflake-managed pools, <code>SYSTEM_COMPUTE_POOL_CPU</code> and <code>SYSTEM_COMPUTE_POOL_GPU</code>, and several features run on them:</p>
+  <ul>
+    <li><strong>Notebooks</strong> — each notebook service belongs to one user and occupies one node. Every notebook you connect to the same service shares that node.</li>
+    <li><strong>Streamlit apps on the container runtime</strong> — each app runs as a long-lived service, and three apps share a node on <code>SYSTEM_COMPUTE_POOL_CPU</code>. An app with no viewers for three days stops on its own. Apps on the warehouse runtime use a warehouse instead of a pool.</li>
+    <li><strong>Other container workloads</strong> — model serving, ML jobs and your own Snowpark Container Services apps also run on compute pools.</li>
+  </ul>
+  <p>Stopping the charges happens in two layers. The notebook service suspends when it reaches its idle timeout, which starts counting once every running cell has finished, or when you suspend it yourself. Once nothing on the pool is running, the pool suspends itself after its own auto-suspend period and stops billing. That's why you set the timeout to 1 hour: it's long enough that the service won't stop while you're still reading results or re-running cells, and short enough that a forgotten service doesn't keep the pool running for a day.</p>
 
   <h2>Part 3 — Run the Notebook</h2>
   <p>Run each cell individually using the <strong>Run cell</strong> button on the right side of each cell, or press <strong>Shift + Enter</strong>. Read the markdown text above each cell before running it — the notebook is self-documenting and explains what each step does. Results appear directly below the cell after it executes.</p>
@@ -789,7 +803,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>If something goes wrong, click the <strong>▾</strong> chevron next to the <strong>Connected</strong> button to access kernel controls:</p>
   <ul>
     <li><strong>Restart kernel</strong> — Clears all variables but keeps packages. Use this if a cell gets stuck or produces an unexpected error mid-run.</li>
-    <li><strong>Shut down kernel</strong> — Stops the kernel and clears all variables (installed packages are kept). Use this for a clean start; run the cells again from the top afterward. Note that this does <strong>not</strong> stop the notebook service — see the end of this step for how to suspend it.</li>
+    <li><strong>Shut down kernel</strong> — Stops the kernel and clears all variables (installed packages are kept). Use this for a clean start; run the cells again from the top afterward. Note that this does <strong>not</strong> stop the notebook service or its compute charges — see the end of this step for how to suspend it.</li>
   </ul>
 
   <h2>What the Notebook Does</h2>
@@ -807,7 +821,19 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em>. Mucoviscidosis is an older name for cystic fibrosis, and the word doesn't appear in any note. If the results are about cystic fibrosis (CF) patients, semantic search is working.</div>
   </div>
 
-  <p>Once the notebook finishes, free up the compute it was using before moving on. Shutting down the kernel only clears memory — the notebook service keeps running (and consuming credits) until it's suspended. Click the <strong>Connected</strong> dropdown, hover over your service name (<code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>, from the Connect dialog), and click <strong>Suspend</strong> (the pause icon), then close the notebook tab.</p>
+  <h2>Part 4 — Suspend the Notebook Service</h2>
+  <p>Your notebook service, and the compute pool node it occupies, keep running and billing until the service is suspended. Shutting down the kernel, closing the notebook tab or closing your browser doesn't stop it. Nothing in the rest of the lab needs the notebook, so you can stop it now. It suspends in one of two ways:</p>
+  <ul>
+    <li><strong>Automatically</strong> — one hour after your last cell finished, because of the idle timeout you set in Part 2. With the 24-hour default, it would have kept running for a day.</li>
+    <li><strong>Manually</strong> — the quickest way to stop the charges, and what we recommend once you're done:
+      <ol>
+        <li>Click the <strong>▾</strong> chevron next to <strong>Connected</strong> and select <strong>Manage service</strong>. This opens the <strong>Services &amp; jobs</strong> page under <strong>Monitoring</strong>.</li>
+        <li>Find <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code> in the list, click the <strong>⋮</strong> menu at the end of its row, and select <strong>Suspend</strong>. (<strong>Drop</strong> deletes the service entirely; you don't need to do that.)</li>
+        <li>Wait for its status to change to <strong>Suspended</strong>.</li>
+      </ol>
+    </li>
+  </ul>
+  <p>Suspending disconnects the notebook and clears the kernel's memory: variables, cell results and any packages you installed. It doesn't touch the objects the notebook created in Snowflake. <code>CLINICAL_NOTES</code>, <code>CLINICAL_NOTES_SEARCH</code>, <code>NOTES_STAGE</code> and <code>NOTES_CSV</code> all stay in place, and the search service keeps answering queries for the rest of the lab. If you want to use the notebook again later, open it and click <strong>Connect</strong> or run a cell; the service resumes in a few minutes, and you'll need to run the cells again from the top.</p>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m2-overview')">← Cortex Search Overview</button>
@@ -1683,7 +1709,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <tr><td>File format and stage</td><td>VBC_LAB.CARE_ANALYTICS.NOTES_CSV, VBC_LAB.CARE_ANALYTICS.NOTES_STAGE</td></tr>
     <tr><td>Table</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES</td></tr>
     <tr><td>Cortex Search Service</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</td></tr>
-    <tr><td>Notebook service</td><td>&lt;YOUR_USERNAME&gt;_SERVICE_1, created in Step 8 and suspended at the end of that step</td></tr>
+    <tr><td>Notebook service</td><td>&lt;YOUR_USERNAME&gt;_SERVICE_1, created in Step 8 on SYSTEM_COMPUTE_POOL_CPU, with a 1-hour idle timeout</td></tr>
     <tr><td>Cortex Agent</td><td>VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT</td></tr>
     <tr><td>Snowflake CoWork object</td><td>SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT</td></tr>
   </table>
@@ -1698,6 +1724,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
         <div class="prompt-label">💬 CoCo Prompt</div>
         <p style="font-size:13px">Build a Streamlit app that provides a chat interface for VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT. Users should be able to type a question, submit it to the agent, and see the response displayed in the app. Deploy it to Snowpark Container Services.</p>
       </div>
+      <p style="font-size:12.5px; margin-bottom:8px">On the container runtime, the app runs on a compute pool and bills while its server is running, which continues until three days pass with no viewers. Drop it when you no longer need it (see <em>How Notebook Compute Works</em> in Step 8).</p>
       <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/developer-guide/streamlit/app-development/runtime-environments" target="_blank" style="color:var(--sf-blue)">📄 Streamlit runtime environments →</a></p>
     </div>
     <div style="background: linear-gradient(135deg,#F5F3FF,#EFF6FF); border: 1px solid #C4B5FD; border-radius: 10px; padding: 18px;">
