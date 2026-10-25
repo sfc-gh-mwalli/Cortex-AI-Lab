@@ -426,6 +426,23 @@
       </a>
     </div>
   </div>
+
+  <!-- Additional Lab Activities -->
+  <div class="nav-section">
+    <div class="nav-module-btn open" onclick="toggleModule(this)">
+      <span>Additional Lab Activities</span><span class="chevron">▶</span>
+    </div>
+    <div class="nav-steps open">
+      <a class="nav-step" onclick="showStep('step-extra-nextjs')" href="#">
+        <div class="step-num">A</div>
+        <div class="step-label">Build a Next.js App</div>
+      </a>
+      <a class="nav-step" onclick="showStep('step-extra-postgres')" href="#">
+        <div class="step-num">B</div>
+        <div class="step-label">Build with Snowflake Postgres</div>
+      </a>
+    </div>
+  </div>
 </nav>
 
 <!-- ══════════════════ MAIN CONTENT ══════════════════ -->
@@ -1730,30 +1747,9 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <tr><td>Snowflake CoWork object</td><td>SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT</td></tr>
   </table>
 
-  <h2>Bonus Extensions — If There's Extra Time</h2>
-  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0 24px;">
-    <div style="background: linear-gradient(135deg,#EEF6FF,#F0FDF4); border: 1px solid #93C5FD; border-radius: 10px; padding: 18px;">
-      <div style="font-size:22px; margin-bottom:8px">🖥️</div>
-      <div style="font-weight:700; color:var(--sf-navy); margin-bottom:6px">Option A: Streamlit UI on SPCS</div>
-      <p style="font-size:13.5px; margin-bottom:10px">Use CoCo to build a Streamlit app that lets users chat with your agent, deployed to Snowpark Container Services.</p>
-      <div class="prompt-block" style="margin:0 0 10px 0">
-        <div class="prompt-label">💬 CoCo Prompt</div>
-        <p style="font-size:13px">Build a Streamlit app that provides a chat interface for VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT. Users should be able to type a question, submit it to the agent, and see the response displayed in the app. Deploy it to Snowpark Container Services.</p>
-      </div>
-      <p style="font-size:12.5px; margin-bottom:8px">On the container runtime, the app runs on a compute pool and bills while its server is running, which continues until three days pass with no viewers. Drop it when you no longer need it (see <em>How Notebook Compute Works</em> in Step 8).</p>
-      <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/developer-guide/streamlit/app-development/runtime-environments" target="_blank" style="color:var(--sf-blue)">📄 Streamlit runtime environments →</a></p>
-    </div>
-    <div style="background: linear-gradient(135deg,#F5F3FF,#EFF6FF); border: 1px solid #C4B5FD; border-radius: 10px; padding: 18px;">
-      <div style="font-size:22px; margin-bottom:8px">📚</div>
-      <div style="font-weight:700; color:var(--sf-navy); margin-bottom:6px">Option B: PubMed Knowledge Extension</div>
-      <p style="font-size:13.5px; margin-bottom:10px">Add peer-reviewed medical literature as a third tool — RAG as a reusable data product from Marketplace.</p>
-      <ol style="font-size:13px; padding-left:18px; margin:0 0 10px 0">
-        <li>Search for <strong>PubMed Knowledge Extension</strong> in Snowflake Marketplace and install it</li>
-        <li>Add it as a third tool to VBCCAREAGENT — it's already a search index, no additional setup required</li>
-        <li>Ask: <em>"What does the evidence say about care management for reducing hospital readmissions in patients with COPD?"</em></li>
-      </ol>
-      <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-knowledge-extensions/cke-overview" target="_blank" style="color:var(--sf-blue)">📄 Cortex Knowledge Extensions overview →</a></p>
-    </div>
+  <div class="callout callout-tip">
+    <span class="callout-icon">🚀</span>
+    <div><strong>Keep building after class.</strong> Two more activities are in the left navigation under <strong>Additional Lab Activities</strong>: build a Next.js app with CoCo, and build an app on Snowflake Postgres whose data is mirrored into Snowflake for analysis.</div>
   </div>
 
   <div style="text-align:center; padding: 32px 0 16px; color: var(--sf-muted); font-size: 13px;">
@@ -1763,6 +1759,110 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m3-explore')">← Free Exploration</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-extra-nextjs')">Additional Lab Activities →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── ADDITIONAL ACTIVITY A ─────────────────── -->
+<div id="step-extra-nextjs" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Additional Lab Activity A</div>
+    <h1>Build a Next.js App with CoCo</h1>
+  </div>
+  <div class="timing-pill">⏱ On your own, after class</div>
+
+  <p>Build a small web app on the semantic view you created in Module 1. CoCo in Snowsight writes the app, and Snowflake runs it on <strong>Snowflake App Runtime</strong> at its own URL, behind Snowflake sign-in.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>Next.js apps in Workspaces are in preview, so screens and options may change.</div>
+  </div>
+
+  <h2>What to Do</h2>
+  <ol>
+    <li>Open the <code>snowcamp</code> workspace and choose <strong>+ Add new → Next.js App</strong>.</li>
+    <li>Open a new CoCo chat and paste the prompt below.</li>
+    <li>Preview the app and check that it shows real figures from your data.</li>
+    <li>Ask CoCo for one change, for example a filter by encounter year.</li>
+    <li>Deploy the app and open its URL.</li>
+    <li>Suspend the app when you're done (see below).</li>
+  </ol>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Paste into CoCo</div>
+    <p>Build a one-page Value-Based Care cost dashboard in the Next.js app I just added to this workspace. Get all data from the semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV, not sample data. Show three KPI tiles (total cost of care, average cost per encounter and payer coverage rate), a bar chart of total cost of care by encounter class, and a table of the same three figures by encounter year. Keep the design simple and easy to read.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Build a one-page Value-Based Care cost dashboard in the Next.js app I just added to this workspace. Get all data from the semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV, not sample data. Show three KPI tiles (total cost of care, average cost per encounter and payer coverage rate), a bar chart of total cost of care by encounter class, and a table of the same three figures by encounter year. Keep the design simple and easy to read.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Good to Know</h2>
+  <ul>
+    <li>The deployed app runs as an <em>Application Service</em> at a <code>*.snowflakecomputing.app</code> URL that stays the same when you redeploy.</li>
+    <li>It keeps running, and billing, until you suspend it. Auto-suspend is off by default. Ask CoCo to suspend it, or run <code>ALTER APPLICATION SERVICE &lt;database&gt;.&lt;schema&gt;.&lt;app_name&gt; SUSPEND;</code></li>
+    <li>If something breaks, paste the error message into CoCo and ask it to fix it.</li>
+  </ul>
+  <p style="font-size:13px"><a href="https://docs.snowflake.com/en/developer-guide/snowflake-app-runtime/getting-started" target="_blank" style="color:var(--sf-blue)">📄 Getting started with Snowflake App Runtime →</a><br>
+  <a href="https://docs.snowflake.com/en/developer-guide/snowflake-app-runtime/scale-and-suspend" target="_blank" style="color:var(--sf-blue)">📄 Scale and suspend Snowflake App Runtime apps →</a></p>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-takeaways')">← Key Takeaways</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-extra-postgres')">Activity B →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── ADDITIONAL ACTIVITY B ─────────────────── -->
+<div id="step-extra-postgres" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Additional Lab Activity B</div>
+    <h1>Build with Snowflake Postgres</h1>
+  </div>
+  <div class="timing-pill">⏱ On your own, after class</div>
+
+  <p>Build a transactional app on <strong>Snowflake Postgres</strong>, then use <strong>data mirroring</strong> to copy its data into Snowflake for analysis, with no ETL pipeline to build. The scenario: care managers call patients to close care gaps, such as a missed annual wellness visit, and record each attempt. Closing care gaps raises the quality scores that many value-based contracts tie payments to.</p>
+  <p><strong>The flow:</strong> Next.js app → Postgres → mirror → Snowflake tables → dynamic tables → semantic view → agent or reporting app.</p>
+
+  <h2>What to Do</h2>
+  <ol>
+    <li><strong>Create a Postgres instance.</strong> In the left nav, select <strong>Postgres</strong>, then <strong>Create</strong>. Name it <code>VBC_CARE_PG</code> and choose a STANDARD size; mirroring doesn't support BURSTABLE. Save the credentials it shows you, because they're shown only once.</li>
+    <li><strong>Build the app.</strong> Add a Next.js App to your workspace and give CoCo prompt 1. Then use the app to log some contact attempts and close a few tasks.</li>
+    <li><strong>Mirror the data.</strong> Open your instance, select <strong>Manage</strong> and set up mirroring: mirror name <code>vbc_care_mirror</code>, source database <code>postgres</code>, destination database <code>VBC_CARE_MIRROR</code>, and a short refresh interval such as 1 minute.</li>
+    <li><strong>Transform and summarize.</strong> Give CoCo prompt 2.</li>
+    <li><strong>Add a semantic view.</strong> Choose <strong>+ Add new → Semantic view → Create with CoCo</strong>, as in Step 4, and build <code>CARE_OUTREACH_SV</code> on the two new dynamic tables.</li>
+    <li><strong>Ask questions.</strong> Ask CoCo to add <code>CARE_OUTREACH_SV</code> to VBCCAREAGENT as a third tool, or build a reporting app on it as in Activity A. Then try: <em>"Which care gaps have the lowest closure rate, and how many attempts does it take to reach a patient?"</em></li>
+  </ol>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Prompt 1 — Build the app</div>
+    <p>Build a Next.js app in this workspace for care managers who call patients to close care gaps. Store the data in my Snowflake Postgres instance VBC_CARE_PG, in the postgres database, in a schema named care_mgmt. Create tables for patients, outreach tasks (one per care gap, such as an annual wellness visit, an A1c test or a follow-up after discharge) and contact attempts. Give every table a primary key, and do not use SQL reserved words as column names. Load about 200 synthetic patients and 500 open tasks. Add pages to list open tasks, log a contact attempt and close a task. Keep the database password out of the source code.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Build a Next.js app in this workspace for care managers who call patients to close care gaps. Store the data in my Snowflake Postgres instance VBC_CARE_PG, in the postgres database, in a schema named care_mgmt. Create tables for patients, outreach tasks (one per care gap, such as an annual wellness visit, an A1c test or a follow-up after discharge) and contact attempts. Give every table a primary key, and do not use SQL reserved words as column names. Load about 200 synthetic patients and 500 open tasks. Add pages to list open tasks, log a contact attempt and close a task. Keep the database password out of the source code.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Prompt 2 — Transform and summarize</div>
+    <p>My mirror copied the care_mgmt tables into the database VBC_CARE_MIRROR. Create two dynamic tables in VBC_LAB.CARE_ANALYTICS using warehouse COMPUTE_WH and a 5-minute target lag. OUTREACH_TASK_FACTS: one row per outreach task, with the care gap, days open, number of contact attempts, whether the patient was reached and whether the task is closed. OUTREACH_DAILY_SUMMARY: one row per day and care gap, with tasks opened, tasks closed, closure rate, average days to close and the share of contact attempts that reached the patient.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'My mirror copied the care_mgmt tables into the database VBC_CARE_MIRROR. Create two dynamic tables in VBC_LAB.CARE_ANALYTICS using warehouse COMPUTE_WH and a 5-minute target lag. OUTREACH_TASK_FACTS: one row per outreach task, with the care gap, days open, number of contact attempts, whether the patient was reached and whether the task is closed. OUTREACH_DAILY_SUMMARY: one row per day and care gap, with tasks opened, tasks closed, closure rate, average days to close and the share of contact attempts that reached the patient.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <h2>Good to Know</h2>
+  <ul>
+    <li><strong>Network access:</strong> a new instance accepts no connections until you attach a network policy with a Postgres ingress rule. Ask CoCo to set up access for your app, and don't open the instance to <code>0.0.0.0/0</code>.</li>
+    <li><strong>Primary keys:</strong> a table without one is mirrored insert-only, and Postgres then rejects updates and deletes on it, so closing a task would fail.</li>
+    <li><strong>The destination database must not already exist.</strong> The mirror creates it.</li>
+    <li><strong>When changes appear:</strong> mirrored tables update on the refresh interval (10 minutes by default). Each table's <code>$live</code> view, for example <code>&lt;table&gt;$live</code>, shows changes within about 30 seconds.</li>
+    <li><strong>Cost:</strong> the instance bills until you suspend it, and storage is still billed while it's suspended. The mirror runs on serverless compute at each refresh, and the dynamic tables use <code>COMPUTE_WH</code>. When you're done, ask CoCo to suspend the mirror and the dynamic tables, then suspend the instance from <strong>Postgres → VBC_CARE_PG → Manage → Suspend</strong>.</li>
+  </ul>
+  <p style="font-size:13px"><a href="https://docs.snowflake.com/en/user-guide/snowflake-postgres/about" target="_blank" style="color:var(--sf-blue)">📄 Snowflake Postgres →</a><br>
+  <a href="https://docs.snowflake.com/en/user-guide/snowflake-postgres/postgres-network" target="_blank" style="color:var(--sf-blue)">📄 Snowflake Postgres networking →</a><br>
+  <a href="https://docs.snowflake.com/en/user-guide/snowflake-postgres/postgres-data-mirroring" target="_blank" style="color:var(--sf-blue)">📄 Data mirroring →</a><br>
+  <a href="https://docs.snowflake.com/en/user-guide/snowflake-postgres/postgres-data-mirroring-create" target="_blank" style="color:var(--sf-blue)">📄 Create a mirror →</a></p>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-extra-nextjs')">← Activity A</button>
     <button class="step-nav-btn hidden">→</button>
   </div>
 </div>
