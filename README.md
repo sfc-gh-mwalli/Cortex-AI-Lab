@@ -14,7 +14,7 @@ The guide walks attendees through 14 steps, grouped into setup plus three module
 
 - **Setup** — create a trial account, enable cross-region inference with CoCo, create the `snowcamp` workspace, database, and schema, and get the Synthea dataset from the Marketplace.
 - **Module 1 · Cortex Analyst** — build a semantic view in Workspaces with Semantic View Autopilot (**Add new → Semantic View**), refine it in Semantic Studio (relationships from Suggestions, then VBC metrics and dimensions added by a CoCo prompt, with a finished YAML file as a fallback), publish it, and ask natural-language questions.
-- **Module 2 · Cortex Search** — load 1,500 clinical notes through a notebook that uses `AI_COMPLETE` and `AI_REDACT` to scan and redact PII in-flight, then build and query a Cortex Search service.
+- **Module 2 · Cortex Search** — load 1,510 clinical notes through a notebook that uses `AI_COMPLETE` and `AI_REDACT` to scan and redact PII in-flight, then build and query a Cortex Search service.
 - **Module 3 · Cortex Agents** — create an agent with CoCo using Cortex Analyst and Cortex Search tools, register it with Snowflake CoWork, and test multi-tool reasoning.
 
 ## Repository layout
