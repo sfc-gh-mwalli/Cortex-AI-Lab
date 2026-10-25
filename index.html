@@ -784,10 +784,11 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li><strong>A compute pool</strong> runs the Python kernel. A compute pool is a group of virtual machines (nodes) that runs container workloads, much as a warehouse runs SQL. Your service takes one node on <code>SYSTEM_COMPUTE_POOL_CPU</code>, and the pool bills for as long as the service is running, whether or not a cell is executing.</li>
     <li><strong>Your warehouse</strong> (<code>COMPUTE_WH</code>, which the notebook's first cell selects) runs the SQL cells, including the Cortex AI Function calls. It bills only while those queries run.</li>
   </ul>
-  <p>Every account comes with two Snowflake-managed pools, <code>SYSTEM_COMPUTE_POOL_CPU</code> and <code>SYSTEM_COMPUTE_POOL_GPU</code>, and several features run on them:</p>
+  <p>Notebooks aren't the only feature that runs on compute pools. Every account comes with two Snowflake-managed pools, <code>SYSTEM_COMPUTE_POOL_CPU</code> and <code>SYSTEM_COMPUTE_POOL_GPU</code>, and Snowflake runs dedicated pools for some features:</p>
   <ul>
     <li><strong>Notebooks</strong> — each notebook service belongs to one user and occupies one node. Every notebook you connect to the same service shares that node.</li>
     <li><strong>Streamlit apps on the container runtime</strong> — each app runs as a long-lived service, and three apps share a node on <code>SYSTEM_COMPUTE_POOL_CPU</code>. An app with no viewers for three days stops on its own. Apps on the warehouse runtime use a warehouse instead of a pool.</li>
+    <li><strong>Next.js apps (Snowflake App Runtime)</strong> — a newer way to build full web applications that run inside Snowflake, next to your data. Where Streamlit suits Python dashboards and analyst tools, a Next.js app suits custom pages, forms and multi-step workflows built with React and the wider JavaScript ecosystem. You describe the app to Cortex Code, which scaffolds the project, connects it to your tables and deploys it to a live URL that signs users in through Snowflake. Queries can run as the signed-in user, so row access and masking policies still apply. Each app runs as an <em>Application Service</em> on a Snowflake-managed pool that every App Runtime app in the account shares, billed separately as <code>SNOWFLAKE_APP_RUNTIME</code>. An app keeps running, and billing, until you suspend it, unless you give it an auto-suspend period. App Runtime isn't available on trial accounts, so you can't deploy one in this lab account.</li>
     <li><strong>Other container workloads</strong> — model serving, ML jobs and your own Snowpark Container Services apps also run on compute pools.</li>
   </ul>
   <p>Stopping the charges happens in two layers. The notebook service suspends when it reaches its idle timeout, which starts counting once every running cell has finished, or when you suspend it yourself. Once nothing on the pool is running, the pool suspends itself after its own auto-suspend period and stops billing. That's why you set the timeout to 1 hour: it's long enough that the service won't stop while you're still reading results or re-running cells, and short enough that a forgotten service doesn't keep the pool running for a day.</p>
@@ -1464,7 +1465,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   <h2>Part 2 — Review the Agent in Snowsight</h2>
   <p>After CoCo confirms the agent was created, open it in Snowsight:</p>
   <ol>
-    <li>In the Snowsight left nav, go to <strong>AI &amp; ML → Agents</strong></li>
+    <li>In the Snowsight left nav, go to <strong>AI &amp; ML → Agent Studio</strong></li>
     <li>Click on <strong>VBCCAREAGENT</strong></li>
     <li>Click the <strong>Edit</strong> button in the top right — this opens the full configuration view</li>
     <li>Review the tabs:
@@ -1524,7 +1525,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <h2>Open Snowflake CoWork</h2>
   <ol>
-    <li>In Snowsight, navigate to <strong>AI &amp; ML → Agents → VBCCAREAGENT</strong></li>
+    <li>In Snowsight, navigate to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong></li>
     <li>Click the <strong>Preview in Snowflake CoWork</strong> button at the top of the agent detail page</li>
     <li>A <strong>Sign in to Snowflake</strong> screen will appear — use the same username and password as your Snowflake account</li>
     <li>After signing in, Snowflake CoWork opens with <strong>VBC_CARE_AGENT</strong> loaded and ready</li>
@@ -1629,7 +1630,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="callout callout-tip">
     <span class="callout-icon">🚀</span>
-    <div><strong>Fast finisher bonus:</strong> Change how the agent answers. In Snowsight, go to <strong>AI &amp; ML → Agents → VBCCAREAGENT</strong>, click <strong>Edit</strong>, and open <strong>Orchestration</strong>. Add a line to the response instructions, for example: <em>"For every finding from the clinical notes, say how many notes support it."</em> Click <strong>Save</strong>, then ask one of your earlier questions again in Snowflake CoWork. How does the answer change?</div>
+    <div><strong>Fast finisher bonus:</strong> Change how the agent answers. In Snowsight, go to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong>, click <strong>Edit</strong>, and open <strong>Orchestration</strong>. Add a line to the response instructions, for example: <em>"For every finding from the clinical notes, say how many notes support it."</em> Click <strong>Save</strong>, then ask one of your earlier questions again in Snowflake CoWork. How does the answer change?</div>
   </div>
 
   <div class="step-nav">
