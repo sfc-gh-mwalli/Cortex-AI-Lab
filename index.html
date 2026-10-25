@@ -1592,17 +1592,17 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   <p>This question needs <em>both</em> tools. Watch the agent split it into parts, call each tool, then combine the results into one answer. Read the full response.</p>
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork — Multi-Tool Question</div>
-    <p>We want to reduce avoidable hospital use for lung cancer patients on chemotherapy. What do the clinical notes say is keeping them in the hospital, and what does the data show about their inpatient and emergency encounters and costs?</p>
+    <p>We want to reduce avoidable hospital use for lung cancer patients on chemotherapy. What complications, such as uncontrolled pain or kidney problems, do the clinical notes document during their hospital stays, and what does the data show about their inpatient and emergency encounters and costs?</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'We want to reduce avoidable hospital use for lung cancer patients on chemotherapy. What do the clinical notes say is keeping them in the hospital, and what does the data show about their inpatient and emergency encounters and costs?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'We want to reduce avoidable hospital use for lung cancer patients on chemotherapy. What complications, such as uncontrolled pain or kidney problems, do the clinical notes document during their hospital stays, and what does the data show about their inpatient and emergency encounters and costs?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
 
   <div class="callout callout-wow">
     <span class="callout-icon">⭐</span>
     <div>This is what makes an agent different from a search bar or a dashboard. The agent:<br><br>
-    <strong>1.</strong> Splits the question into two parts: why these patients are in the hospital, and what their encounters and costs look like<br>
-    <strong>2.</strong> Searches <strong>ClinicalNotes</strong> for notes about lung cancer patients' hospital stays and chemotherapy side effects<br>
+    <strong>1.</strong> Splits the question into two parts: what complications the notes document during hospital stays, and what these patients' encounters and costs look like<br>
+    <strong>2.</strong> Searches <strong>ClinicalNotes</strong> for complications such as uncontrolled pain and kidney problems during lung cancer patients' hospital stays<br>
     <strong>3.</strong> Queries <strong>VBCAnalytics</strong> for inpatient and emergency encounters and costs for those patients<br>
     <strong>4.</strong> Combines both results into one answer that cites both sources<br><br>
     Cortex Analyst only wrote the SQL in step 3. Planning the steps, choosing the tools, and writing the answer were the agent's work, and you didn't write any routing logic or joins between the two systems.
