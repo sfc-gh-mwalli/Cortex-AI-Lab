@@ -764,7 +764,15 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>Workspace notebooks run Python inside a dedicated container called a <strong>runtime service</strong>. Your account won't have one yet — you need to create it before running any cells.</p>
   <ol>
     <li>In the notebook toolbar, click <strong>Connect</strong> (top left, next to the Run all button).</li>
-    <li>A dialog appears showing the service configuration (Python version, Snowflake Container Runtime version, compute pool, and idle timeout) — leave all defaults as-is and click <strong>Create and connect</strong>.</li>
+    <li>The <strong>Connect your notebook</strong> dialog opens. Leave every setting at its default:
+      <ul>
+        <li><strong>Service name</strong> — filled in for you as <code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>. Note it; you'll suspend this service at the end of the step.</li>
+        <li><strong>Artifact repositories</strong> — <code>SNOWFLAKE.SNOWPARK.PYPI_SHARED_REPOSITORY</code>, which is where any extra Python packages come from. This notebook doesn't need any.</li>
+        <li><strong>Enable distributed compute</strong> — leave it off.</li>
+        <li><strong>Service settings</strong> — a summary of the runtime version, CPU, Python version, compute pool (<code>SYSTEM_COMPUTE_POOL_CPU</code>) and idle timeout. The 24-hour idle timeout is why you suspend the service when you're done instead of leaving it running.</li>
+      </ul>
+    </li>
+    <li>Click <strong>Create and connect</strong>.</li>
     <li>The button will switch to <strong>Connecting...</strong> and gray out. Wait 1–2 minutes for the runtime to start.</li>
     <li>When it turns green and shows <strong>Connected</strong>, you're ready to proceed.</li>
   </ol>
@@ -799,7 +807,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em>. Mucoviscidosis is an older name for cystic fibrosis, and the word doesn't appear in any note. If the results are about cystic fibrosis (CF) patients, semantic search is working.</div>
   </div>
 
-  <p>Once the notebook finishes, free up the compute it was using before moving on. Shutting down the kernel only clears memory — the notebook service keeps running (and consuming credits) until it's suspended. Click the <strong>Connected</strong> dropdown, hover over your service name, and click <strong>Suspend</strong> (the pause icon), then close the notebook tab.</p>
+  <p>Once the notebook finishes, free up the compute it was using before moving on. Shutting down the kernel only clears memory — the notebook service keeps running (and consuming credits) until it's suspended. Click the <strong>Connected</strong> dropdown, hover over your service name (<code>&lt;YOUR_USERNAME&gt;_SERVICE_1</code>, from the Connect dialog), and click <strong>Suspend</strong> (the pause icon), then close the notebook tab.</p>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m2-overview')">← Cortex Search Overview</button>
@@ -1675,7 +1683,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <tr><td>File format and stage</td><td>VBC_LAB.CARE_ANALYTICS.NOTES_CSV, VBC_LAB.CARE_ANALYTICS.NOTES_STAGE</td></tr>
     <tr><td>Table</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES</td></tr>
     <tr><td>Cortex Search Service</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</td></tr>
-    <tr><td>Notebook service</td><td>The runtime service you created in Step 8 (suspended at the end of that step)</td></tr>
+    <tr><td>Notebook service</td><td>&lt;YOUR_USERNAME&gt;_SERVICE_1, created in Step 8 and suspended at the end of that step</td></tr>
     <tr><td>Cortex Agent</td><td>VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT</td></tr>
     <tr><td>Snowflake CoWork object</td><td>SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT</td></tr>
   </table>
