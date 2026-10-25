@@ -13,7 +13,7 @@ The guide is a single static page (`index.html`) served via GitHub Pages.
 The guide walks attendees through 14 steps, grouped into setup plus three modules, all built on the Synthea synthetic healthcare dataset (no PHI):
 
 - **Setup** — create a trial account, enable cross-region inference with CoCo, create the `snowcamp` workspace, database, and schema, and get the Synthea dataset from the Marketplace.
-- **Module 1 · Cortex Analyst** — build a semantic view in Workspaces with Semantic View Autopilot (**Add new → Semantic View**), refine it with VBC metrics and dimensions via a `CREATE OR ALTER SEMANTIC VIEW` script, and ask natural-language questions.
+- **Module 1 · Cortex Analyst** — build a semantic view in Workspaces with Semantic View Autopilot (**Add new → Semantic View**), refine it in Semantic Studio (relationships from Suggestions, then VBC metrics and dimensions added by a CoCo prompt, with a finished YAML file as a fallback), publish it, and ask natural-language questions.
 - **Module 2 · Cortex Search** — load 1,500 clinical notes through a notebook that uses `AI_COMPLETE` and `AI_REDACT` to scan and redact PII in-flight, then build and query a Cortex Search service.
 - **Module 3 · Cortex Agents** — create an agent with CoCo using Cortex Analyst and Cortex Search tools, register it with Snowflake CoWork, and test multi-tool reasoning.
 
@@ -35,7 +35,7 @@ The guide walks attendees through 14 steps, grouped into setup plus three module
     ├── Clinical_Notes_CLEAN.csv        # redacted CLINICAL_NOTES table dump — fallback if AI_COMPLETE/AI_REDACT are unavailable
     ├── 02_enriched_loading_demo.ipynb  # PII-redaction + enriched-loading notebook (Module 2)
     ├── vbc_analytics_sv_orig.sql       # Autopilot-generated semantic view DDL (reference)
-    └── vbc_analytics_sv_updated.sql    # CREATE OR ALTER semantic view DDL with VBC metrics/dimensions
+    └── VBC_ANALYTICS_SV.sv.yaml        # Finished semantic view YAML (fallback for the CoCo metrics/dimensions step)
 ```
 
 ## Editing

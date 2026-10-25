@@ -521,7 +521,7 @@
     <div>
       <strong>Before proceeding — create your free Snowflake trial account.</strong> Use the special signup link you should have received from your Snowflake account team to create a <strong>free Snowflake trial account</strong> <strong>with Cortex AI features enabled</strong>. Once you have signed up and logged in, come back here and continue.
       <br><br>
-      <strong>Having trouble accessing your account?</strong> If you are attending <strong>in person</strong>, ask one of the Snowflake lab assistants for help. If you are attending <strong>remotely</strong>, post in the meeting chat and someone will assist you.
+      <strong>Having trouble accessing your account?</strong> If you are attending <strong>in person</strong>, ask one of the Snowflake lab assistants for help. If you are attending <strong>remotely</strong>, refer to the Snowcamp welcome email for information on getting support with the lab.
     </div>
   </div>
 
@@ -533,21 +533,33 @@
   <p>Complete the following steps to prepare your environment before starting the lab modules.</p>
 
   <h3>1. Configure AI Model Access</h3>
-  <p>Before anything else, AI model access needs to be enabled at the account level. We want to ensure the lab account can reach all available models — these will be used throughout the lab with <strong>CoCo</strong> and <strong>Cortex Agents</strong>. Enabling cross-region inference allows Snowflake to route requests to the best available model endpoint regardless of region. Model access itself is controlled by role-based access control, and the <strong>ACCOUNTADMIN</strong> role we use in this lab already has access to every model — so cross-region inference is the only setting we need to change.</p>
+  <p>Before anything else, AI model access needs to be enabled at the account level. We want to ensure the lab account can reach all available models — these will be used throughout the lab with <strong>CoCo</strong> and <strong>Cortex Agents</strong>. Enabling cross-region inference allows Snowflake to route requests to the best available model endpoint regardless of region. Model access itself is controlled by role-based access control, and the <strong>ACCOUNTADMIN</strong> role we use in this lab already has access to every model — so cross-region inference is the only setting we need to check. Many newer trial accounts already have it turned on, so we'll ask CoCo to check it first and change it only if needed.</p>
   <p>Open CoCo by clicking the <img src="images/cortex-code-ui-icon.png" alt="CoCo icon" style="height:18px; vertical-align:middle; margin:0 2px;"> icon in the lower-right corner of the Snowsight UI, then paste and send the following prompt:</p>
   <div class="code-block-wrap">
     <div class="code-block-header">
       <div class="code-block-lang"><span class="lang-dot"></span>CoCo Prompt</div>
       <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
-    <pre style="white-space: pre-wrap; word-break: break-word;"><code>Switch to the ACCOUNTADMIN role, then enable cross-region inference for any region on this account and show me the Cortex AI models available to my role.</code></pre>
+    <pre style="white-space: pre-wrap; word-break: break-word;"><code>Switch to the ACCOUNTADMIN role and check the current CORTEX_ENABLED_CROSS_REGION setting on this account. If it isn't already ANY_REGION, change it to ANY_REGION. Then show me the Cortex AI models available to my role.</code></pre>
   </div>
-  <p>CoCo will look up the relevant documentation and then propose the SQL it needs to run — an <code>ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION'</code> statement, followed by a query that lists the models your role can use. Before running each statement, CoCo asks for your approval — approve it when prompted (you can allow it once or for the rest of the chat). If your account already has cross-region inference set to <code>ANY_REGION</code> (newer trial accounts do by default), CoCo will simply confirm it.</p>
+  <p>CoCo will propose the SQL it needs to run — a <code>USE ROLE ACCOUNTADMIN</code> statement, a <code>SHOW PARAMETERS</code> query to check the current setting, and a query that lists the models your role can use. Only if the setting isn't already <code>ANY_REGION</code> will it also propose <code>ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION'</code>. In many trial accounts it's already set, and CoCo will tell you no change is needed.</p>
+  <div class="section-heading"><span class="dot"></span>Approving CoCo's actions</div>
+  <p>By default, CoCo asks for your permission before it runs anything. Each time, it shows you the SQL it wants to run along with a prompt such as <strong>Run this USE ROLE statement?</strong> and two buttons:</p>
+  <ul>
+    <li><strong>Allow</strong> — runs the statement. The <strong>˅</strong> arrow next to it offers <strong>Allow once</strong>, <strong>Allow &hellip; in this chat</strong>, and <strong>Always allow &hellip;</strong> for that type of statement.</li>
+    <li><strong>Skip</strong> — declines the statement without running it.</li>
+  </ul>
+  <p>For this first prompt, click <strong>Allow</strong> each time CoCo asks — expect a few approvals (switching role, checking the setting, changing it if needed, and listing the models).</p>
   <p>When complete, you should see a confirmation that cross-region inference is set to <code>ANY_REGION</code>, along with the list of available models.</p>
 
   <div class="callout callout-tip">
     <span class="callout-icon">🔄</span>
-    <div><strong>Refresh your browser now.</strong> Once cross-region inference is enabled, refresh the page so CoCo picks up the updated model list. After refreshing, open CoCo and click the model selector at the bottom right of the message box (it shows <strong>Auto</strong> by default). The menu lists the <strong>Auto</strong>, <strong>Auto Intelligent</strong>, and <strong>Auto Efficient</strong> options first, followed by the individual model families available to you. Leaving it on <strong>Auto</strong> lets CoCo select the best model for each task automatically.</div>
+    <div><strong>Refresh your browser now if the setting was changed.</strong> If CoCo had to change cross-region inference to <code>ANY_REGION</code>, refresh the page so CoCo picks up the updated model list (if it was already set, you can skip the refresh). Then open CoCo and click the model selector at the bottom right of the message box (it shows <strong>Auto (Balanced)</strong> by default). The menu lists the <strong>Auto</strong> options first, followed by the individual model families available to you. Leaving it on the default <strong>Auto</strong> setting lets CoCo select the best model for each task automatically.</div>
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚡</span>
+    <div><strong>Switch CoCo to Bypass approvals for the rest of the lab.</strong> CoCo will run a lot of SQL for you in the steps ahead, and approving every statement slows things down. Click the <strong>approvals selector</strong> (the shield icon) at the bottom of the CoCo message box and change it from <strong>Default approvals</strong> (<em>CoCo asks you to approve</em>) to <strong>Bypass approvals</strong> (<em>All tool calls are auto-approved</em>). You only need to do this once — the setting stays on for new chats and after a browser refresh. This is fine for a disposable trial account like the one you're using today — in your own production accounts, keep <strong>Default approvals</strong> on so you review everything CoCo runs.</div>
   </div>
 
   <h3>2. Create a Workspace</h3>
@@ -563,8 +575,28 @@
     <div>A Workspace is the primary IDE inside Snowsight. It's a unified environment for working across SQL, Python, notebooks, Streamlit apps, agents, dbt projects, and more — and Snowflake is actively expanding the object types it supports. We'll use the <code>snowcamp</code> workspace as our home base throughout this lab.</div>
   </div>
 
-  <h3>3. Create a Database &amp; Schema</h3>
-  <p>Next, create a SQL file in your workspace and run the setup script to create your personal database and schema.</p>
+  <h3>3. Set Up Your Warehouse, Database &amp; Schema</h3>
+  <p>Next, create a SQL file in your workspace and run the setup script. It converts your trial account's <code>COMPUTE_WH</code> warehouse to an <strong>Adaptive</strong> warehouse and creates your personal database and schema.</p>
+
+  <div class="section-heading"><span class="dot"></span>About Snowflake warehouse types</div>
+  <p>A <strong>virtual warehouse</strong> is the compute that runs your queries. Snowflake offers several warehouse types — you'll see them in the <strong>Type</strong> dropdown when you create or edit a warehouse:</p>
+  <ul>
+    <li><strong>Adaptive</strong> <em>(Recommended)</em> — Snowflake automatically scales compute to the needs of each query. You don't choose a size, configure multi-cluster settings, tune Query Acceleration, or manage suspend/resume — Snowflake handles it. Converting an existing warehouse to Adaptive is an online operation with no downtime.</li>
+    <li><strong>Standard (Gen2)</strong> — the next generation of standard warehouses, with new hardware and software optimizations for workloads that need more performance. You pick a fixed size (X-Small, Small, Medium, …) and manage scaling yourself.</li>
+    <li><strong>Standard (Gen1)</strong> — Snowflake's original standard virtual warehouses, also sized and scaled by you.</li>
+    <li><strong>Snowpark-optimized</strong> — warehouses with a larger memory and cache per node, often used for memory-intensive Snowpark and machine learning operations.</li>
+  </ul>
+  <p>Snowflake also offers <strong>Interactive</strong> warehouses for very low-latency dashboards and applications, which are created separately and aren't used in this lab.</p>
+
+  <div class="section-heading"><span class="dot"></span>Adaptive warehouse settings</div>
+  <p>Instead of a size, an Adaptive warehouse has two optional settings. Our setup script sets both:</p>
+  <ul>
+    <li><strong>Max query performance level</strong> (<code>MAX_QUERY_PERFORMANCE_LEVEL</code>) — the upper bound of performance for any <em>individual</em> query, expressed in familiar t-shirt sizes (X-Small through 4X-Large). Snowflake only scales a query up to this level when it's confident that will make it faster; simple queries may use less. We'll cap it at <strong>LARGE</strong> (the default is X-Large).</li>
+    <li><strong>Query throughput multiplier</strong> (<code>QUERY_THROUGHPUT_MULTIPLIER</code>) — controls how many queries, and how much total work, the warehouse can run <em>at the same time</em>. Higher values reduce queuing but allow higher spend at any given moment. Valid values are <code>0</code> (unlimited) or any whole number of <code>2</code> or more. We'll use <strong>2</strong>, the default and lowest finite value.</li>
+  </ul>
+  <p>Together, these let you balance speed against spend without picking a warehouse size. You can learn more in the <a href="https://docs.snowflake.com/en/user-guide/warehouses-adaptive" target="_blank" rel="noopener">Adaptive Compute documentation</a>.</p>
+
+  <div class="section-heading"><span class="dot"></span>Run the setup script</div>
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
     <div>For the purposes of this lab we'll be using the <strong>ACCOUNTADMIN</strong> role for all tasks. This simplifies permissions so you can focus on building — no role-switching required.</div>
@@ -582,10 +614,11 @@
     </div>
     <pre><code>USE ROLE ACCOUNTADMIN;
 
--- Upgrade warehouse to Gen2 Medium for this lab
+-- Convert the warehouse to an Adaptive warehouse for this lab
 ALTER WAREHOUSE COMPUTE_WH SET
-  WAREHOUSE_SIZE = 'MEDIUM',
-  GENERATION = '2';
+  WAREHOUSE_TYPE = 'ADAPTIVE'
+  MAX_QUERY_PERFORMANCE_LEVEL = LARGE
+  QUERY_THROUGHPUT_MULTIPLIER = 2;
 
 -- Create your personal lab database and schema
 CREATE DATABASE IF NOT EXISTS VBC_LAB
@@ -602,11 +635,27 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <div>The last statement — <code>SHOW SCHEMAS IN DATABASE VBC_LAB</code> — returns a results table at the bottom of the editor. You should see 3 rows: <code>CARE_ANALYTICS</code>, <code>INFORMATION_SCHEMA</code>, and <code>PUBLIC</code>. If <code>CARE_ANALYTICS</code> is listed with <code>VBC_LAB</code> as the database and <code>ACCOUNTADMIN</code> as the owner, the setup ran successfully.</div>
   </div>
 
+  <div class="section-heading"><span class="dot"></span>See your warehouse in Snowsight</div>
+  <p>You can view and change warehouse settings in the Snowsight UI as well as with SQL. To see the change you just made, we'll open the Warehouses page in a new browser tab so your workspace stays open in this one.</p>
+  <div class="callout callout-wow">
+    <span class="callout-icon">💡</span>
+    <div><strong>Pro tip: open Snowsight pages in a new tab.</strong> Right-click any item in the left sidebar and choose <strong>Open Link in New Tab</strong>. This lets you jump to a different area of Snowsight — warehouses, the catalog, Marketplace, admin settings — without navigating away from your workspace. When you're done, you can close the new tab or leave it open for later.</div>
+  </div>
+  <ol>
+    <li>In the left sidebar, under <strong>Manage</strong>, hover over <strong>Compute</strong>. In the menu that appears, <strong>right-click Warehouses</strong> and choose <strong>Open Link in New Tab</strong>, then switch to the new tab.</li>
+    <li>Click <strong>COMPUTE_WH</strong> in the list. The details panel should show its type as <strong>Adaptive</strong>, with a query throughput multiplier of <code>2</code> and a max query performance level of <code>Large</code>.</li>
+    <li>To see where these settings are changed, click the <strong>···</strong> menu at the top right of the warehouse page and choose <strong>Edit</strong>. In the <strong>Edit</strong> dialog, the <strong>Type</strong> dropdown shows <strong>Adaptive</strong>, and expanding <strong>Advanced options</strong> shows <strong>Query throughput multiplier</strong> = <code>2</code> and <strong>Max query performance level</strong> = <code>Large</code>.</li>
+  </ol>
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>There's no need to change anything here — the setup script already configured it. When you're done looking, click <strong>Cancel</strong>, then switch back to your original browser tab — your <strong>snowcamp</strong> workspace is still open there. You can close the Warehouses tab or leave it open.</div>
+  </div>
+
   <h3>4. About Setting Your Context in Snowflake</h3>
   <p>In Snowflake, your <strong>context</strong> tells the platform what role, warehouse, database, and schema to use for everything you do. When editing a SQL file, it's shown in the toolbar at the top-right of the editor — for example:</p>
 
   <div style="background:var(--sf-navy); color:#cdd6f4; font-family:monospace; font-size:13px; padding:10px 16px; border-radius:6px; margin:12px 0 20px; display:inline-block;">
-    ACCOUNTADMIN &nbsp;•&nbsp; COMPUTE_WH (Medium) &nbsp;•&nbsp; VBC_LAB &nbsp;•&nbsp; CARE_ANALYTICS
+    ACCOUNTADMIN &nbsp;•&nbsp; COMPUTE_WH &nbsp;•&nbsp; VBC_LAB &nbsp;•&nbsp; CARE_ANALYTICS
   </div>
 
   <p>Getting into the habit of checking your context before running any SQL is important — it's one of the most common sources of errors and confusion. If the wrong database or schema is active, objects you create may end up in unexpected places, or queries may fail to find the tables they're looking for.</p>
@@ -848,17 +897,31 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
       </div>
       Leave the roles field empty — ACCOUNTADMIN already has access. Click <strong>Get</strong>.
     </li>
-    <li>A <strong>Ready to Use</strong> confirmation will appear with a green checkmark and the database name <code>SYNTHEA</code>. Click <strong>Query Data</strong> — this opens an <strong>Untitled.sql</strong> file in your workspace with a couple of sample queries you can run to confirm the data loaded correctly.</li>
+    <li>A <strong>Ready to Use</strong> confirmation will appear with a green checkmark and the database name <code>SYNTHEA</code>. Click <strong>Query Data</strong> — this opens a new browser tab with an <strong>Untitled.sql</strong> file containing a couple of sample queries you can run to confirm the data loaded correctly.
+      <div class="callout callout-info" style="margin: 8px 0 4px;">
+        <span class="callout-icon">ℹ️</span>
+        <div>This file opens in your default <strong>My Workspace</strong>, not in <code>snowcamp</code> — that's expected. CoCo may also give the file a descriptive name based on the queries (for example, <code>encounters_by_year_and_city.sql</code>) and show a notification when it does. We'll close it at the end of this step.</div>
+      </div>
+    </li>
   </ol>
 
   <div class="section-heading"><span class="dot"></span>Explore the Synthea Dataset</div>
   <p>The sample queries reference <code>SILVER.&lt;TABLE&gt;</code> — run a couple to confirm the data loaded correctly. To run a query, place your cursor inside it and click the <strong>▶ Run</strong> button, or press <strong>⌘ + Return</strong> (Mac) / <strong>Ctrl + Enter</strong> (Windows). To run all at once, use <strong>▶ dropdown → Run all</strong> or <strong>⌘ + Shift + Return</strong>.</p>
-  <p>Click the <strong>database icon</strong> at the top of the workspace panel to open the Database Explorer. Expand <code>SYNTHEA</code>, then expand <code>SILVER</code>, then expand <strong>Tables</strong> — you should see 18 tables including <code>PATIENTS</code>, <code>ENCOUNTERS</code>, <code>CONDITIONS</code>, <code>MEDICATIONS</code>, <code>OBSERVATIONS</code>, <code>CLAIMS</code>, and more. When done, close the <strong>Untitled.sql</strong> and <strong>setup.sql</strong> tabs.</p>
+  <p>Click the <strong>database icon</strong> at the top of the workspace panel to open the Database Explorer. Expand <code>SYNTHEA</code>, then expand <code>SILVER</code>, then expand <strong>Tables</strong> — you should see 18 tables including <code>PATIENTS</code>, <code>ENCOUNTERS</code>, <code>CONDITIONS</code>, <code>MEDICATIONS</code>, <code>OBSERVATIONS</code>, <code>CLAIMS</code>, and more.</p>
 
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
     <div>If the queries return results, the <code>SYNTHEA</code> database is live and ready. You're all set to start building on top of it.</div>
   </div>
+
+  <div class="section-heading"><span class="dot"></span>Return to the snowcamp workspace</div>
+  <p>Before moving on, tidy up so you're back in the <code>snowcamp</code> workspace for the rest of the lab:</p>
+  <ol>
+    <li>Close the sample query file in the editor (it may now have a new name, such as <code>encounters_by_year_and_city.sql</code>). Closing the editor tab doesn't delete it — the file stays in My Workspace if you want it later.</li>
+    <li>Close this browser tab and switch back to your original tab. It's probably still showing the Marketplace listing.</li>
+    <li>In the left sidebar, under <strong>Work with data</strong>, click <strong>Projects</strong>. If the Workspaces panel shows <strong>My Workspace</strong>, click the workspace dropdown at the top of the panel (<strong>My Workspace ∨</strong>) and select <strong>snowcamp</strong>.</li>
+    <li>Close the <strong>Setup.sql</strong> editor tab.</li>
+  </ol>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-naming')">← Lab Setup</button>
@@ -882,24 +945,22 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <p>Semantic views are now a native object type inside <strong>Workspaces</strong>. You create them with <strong>Semantic View Autopilot</strong>, an AI-assisted wizard, and refine them in <strong>Semantic Studio</strong>, the semantic view editor built into Workspaces.</p>
   <ol>
     <li>If the left navigation panel is collapsed, click the <strong>→ Show navigation</strong> arrow on the left edge of the screen to expand it.</li>
-    <!-- VERIFY: docs now say "select Workspaces" in the nav menu; confirm whether Projects is still the entry (also Section 2.2 and Step 8) -->
-    <li>In the left sidebar, under <strong>Work with data</strong>, click <strong>Projects</strong> and open your <strong>snowcamp</strong> workspace.</li>
-    <li>In the workspace panel, click <strong>+ Add new</strong> and select <strong>Semantic View</strong>. This opens the Autopilot wizard.</li>
-    <!-- VERIFY: label of the wizard's opening option screen / the non-CoCo option -->
-    <li>The wizard offers a few ways to get started, including building the view conversationally with CoCo. For this lab, choose the standard step-by-step wizard (not CoCo) so everyone ends up with the same result.</li>
-    <li>Fill in the first screen:
+    <li>In the left sidebar, under <strong>Work with data</strong>, click <strong>Projects</strong> and confirm the workspace dropdown at the top of the Workspaces panel shows <strong>snowcamp</strong>.</li>
+    <li>Click <strong>+ Add new</strong> and select <strong>Semantic view</strong>. A new file named <code>Untitled.sv.yaml</code> appears in the file list with <strong>Untitled</strong> highlighted.</li>
+    <li>Type <code>VBC_ANALYTICS_SV</code> to replace <strong>Untitled</strong> (keep the <code>.sv.yaml</code> extension) and press <strong>Enter</strong>. The file <code>VBC_ANALYTICS_SV.sv.yaml</code> opens in the editor.</li>
+    <li>The editor offers three ways to build the semantic view:
       <ul>
-        <li><strong>Location:</strong> <code>VBC_LAB.CARE_ANALYTICS</code></li>
-        <li><strong>Name:</strong> <code>VBC_ANALYTICS_SV</code></li>
-        <li><strong>Description:</strong> <code>Value-based care analytics across patients, encounters, conditions, medications, observations, procedures, providers, and payers.</code></li>
+        <li><strong>Create with CoCo</strong> <em>(Recommended)</em> — CoCo discovers your schema and generates the semantic view conversationally.</li>
+        <li><strong>Create with Autopilot</strong> — step-by-step setup for tables, columns, and context, with no YAML required.</li>
+        <li><strong>Start blank</strong> — an empty semantic view where you write or paste YAML directly.</li>
       </ul>
+      For this lab, click <strong>Create with Autopilot</strong> so everyone ends up with the same result. The <strong>Create semantic view</strong> wizard opens, with its four steps listed on the left.
     </li>
-    <li>Click <strong>Next</strong>.</li>
-    <li>A <strong>Provide context</strong> step appears. You can optionally add example SQL queries, or upload a Tableau file, Power BI file, or YAML specification to improve what Autopilot generates — but for this lab, skip it.</li>
+    <li>On the <strong>Provide context</strong> step, you can optionally give Autopilot example SQL queries, a Tableau data source, Power BI files, or an Ossie model to improve what it generates. For this lab, click <strong>Skip</strong> at the bottom right.</li>
   </ol>
 
   <div class="section-heading"><span class="dot"></span>Select Tables</div>
-  <p>The <strong>Select tables</strong> step shows the tables available across your databases. Navigate to <strong>SYNTHEA → SILVER</strong> and select the following 8 tables — these cover the core clinical and financial data needed to answer Value Based Care questions around cost, utilization, quality, risk, and provider performance.</p>
+  <p>The <strong>Select tables</strong> step shows the databases you can access. Expand <strong>SYNTHEA → SILVER → 18 Tables</strong> and check the following 8 tables — these cover the core clinical and financial data needed to answer Value Based Care questions around cost, utilization, quality, risk, and provider performance.</p>
   <ul>
     <li><code>CONDITIONS</code></li>
     <li><code>ENCOUNTERS</code></li>
@@ -910,7 +971,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li><code>PROCEDURES</code></li>
     <li><code>PROVIDERS</code></li>
   </ul>
-  <p>Confirm all 8 tables are selected, then click <strong>Next</strong>.</p>
+  <p>The <strong>Selected</strong> tab at the top should show <strong>8</strong>. (Click the preview icon next to any table to see sample rows in the <strong>Data preview</strong> pane.) Click <strong>Next</strong>.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
@@ -918,7 +979,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
 
   <div class="section-heading"><span class="dot"></span>Select Columns</div>
-  <p>The <strong>Select columns</strong> step lists all columns across the 8 selected tables. Click <strong>Select all</strong> — we'll include all 127 columns. Leave both of these options on:</p>
+  <p>The <strong>Select columns</strong> step lists the columns from each of the 8 selected tables. All columns are selected by default — confirm the header reads <strong>Columns (127 selected)</strong> (if not, click <strong>Select all</strong>). Leave both of these options checked:</p>
   <ul>
     <li><strong>Add sample values</strong> — pulls a few real values from each column so Cortex Analyst can give better answers to natural language questions</li>
     <li><strong>Add descriptions</strong> — uses AI to generate sensible descriptions for each table and column, saving you from writing them manually</li>
@@ -927,12 +988,34 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <span class="callout-icon">ℹ️</span>
     <div>Snowflake recommends keeping semantic views to around 50 columns or fewer for performance. We're deliberately including all 127 here so the view can answer the full range of VBC questions in this lab — in production, start narrower and add columns as real questions demand them.</div>
   </div>
-  <p>Click <strong>Create and save</strong>, then click <strong>Save and run</strong>.</p>
+  <p>Click <strong>Next</strong>.</p>
+
+  <div class="section-heading"><span class="dot"></span>Name Your Semantic View</div>
+  <p>On the final step, confirm the settings:</p>
+  <ul>
+    <li><strong>Name:</strong> <code>VBC_ANALYTICS_SV</code> (filled in from the file name)</li>
+    <li><strong>Target name:</strong> leave as <code>default</code> (we'll explain what a target is in Step 5)</li>
+    <li><strong>Choose where to store the semantic view:</strong> <code>VBC_LAB</code> / <code>CARE_ANALYTICS</code> — click it to change the database and schema if it shows something else</li>
+  </ul>
+  <p>Click <strong>Publish</strong>.</p>
 
   <div class="section-heading"><span class="dot"></span>Generating the Semantic View</div>
-  <!-- VERIFY: progress stage names, completion message, and what the editor shows when done -->
-  <p>Autopilot begins building your semantic view, and you can watch its progress on the semantic view page — it works through discovering the logical tables, identifying dimensions, facts, and metrics, inferring table relationships, and adding descriptions for all 8 tables and 127 columns. This takes a few minutes.</p>
-  <p>When generation completes, the semantic view opens in <strong>Semantic Studio</strong>. You may see a warning — that's expected and fine. There should be no errors. Take a moment to review the <strong>logical tables</strong>: each of the 8 tables is listed with its auto-generated dimensions, time dimensions, and facts. Cortex Analyst also generates improvement suggestions in the background after creation, which can take several minutes to appear.</p>
+  <p>Autopilot starts building your semantic view and shows its progress as it works through each stage. This takes a few minutes. When it's done, you'll see <strong>Your semantic view is ready</strong> and <strong>Generation completed</strong>. Click <strong>Show details</strong> to see what Autopilot did (your counts may differ slightly):</p>
+  <ul>
+    <li><strong>Discovered 8 tables</strong></li>
+    <li><strong>Generated 99 dimensions, 0 metrics, and 17 facts</strong></li>
+    <li><strong>No relationships detected</strong> — you'll add them in the next step</li>
+    <li><strong>No verified queries</strong> — expected, since we skipped <strong>Provide context</strong></li>
+    <li><strong>Added sample values and descriptions</strong> for 8 tables and 126 columns</li>
+    <li><strong>Published to <code>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</code></strong> — this first version is already live as a semantic view object</li>
+  </ul>
+  <p>The semantic view is now open in <strong>Semantic Studio</strong> as the file <code>VBC_ANALYTICS_SV.sv.yaml</code>. Take a quick tour:</p>
+  <ul>
+    <li><strong>Top bar</strong> — a <strong>Visual</strong> / <strong>YAML</strong> toggle switches between the form-based editor and the raw YAML file. On the right are the <strong>Pull</strong>, <strong>Publish changes</strong>, and <strong>Share</strong> buttons (more on these in Step 5).</li>
+    <li><strong>Editor</strong> — in Visual view, the semantic view is organized into <strong>Custom instructions</strong>, <strong>Variables</strong> (0), <strong>Logical tables</strong> (8), <strong>Verified queries</strong> (0), and <strong>Relationships</strong> (0). Expand any logical table to see its auto-generated dimensions, time dimensions, and facts.</li>
+    <li><strong>Right panel</strong> — a target dropdown (showing <strong>default</strong>) and four tabs: <strong>Suggestions</strong>, <strong>Playground</strong>, <strong>Monitoring</strong>, and <strong>Evaluations</strong>. Suggestions are generated in the background after creation and can take several minutes to appear — you should eventually see <strong>17</strong>: 5 metrics and 12 relationships.</li>
+    <li><strong>Footer</strong> — error and warning counts plus the validation status. You should see <strong>0</strong> errors and <strong>Valid semantic view</strong>; a warning is expected and fine.</li>
+  </ul>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m1-marketplace')">← Get Marketplace Data</button>
@@ -954,218 +1037,60 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     <li><strong>Add relationships</strong> — define the table join logic using the Suggestions panel in the UI</li>
     <li><strong>Add metrics and dimensions</strong> — define VBC-specific measures and expression-based dimensions using CoCo</li>
   </ul>
-  <p>The <strong>Suggestions</strong> and <strong>Playground</strong> tabs are visible on the right side of the page.</p>
+  <p>You'll work in the <strong>Visual</strong> view of the editor and the <strong>Suggestions</strong> tab in the right panel.</p>
 
   <div class="callout callout-tip">
     <span class="callout-icon">💡</span>
-    <div>If CoCo is open on the right side of your screen, consider closing it for now by clicking the <strong>→|</strong> arrow at the top right. This frees up screen space while you work in the Cortex Analyst UI.</div>
+    <div>If CoCo is open on the right side of your screen, consider closing it for now by clicking the <strong>→|</strong> arrow at the top right. This frees up screen space while you work in Semantic Studio. You'll reopen it for part 2.</div>
+  </div>
+
+  <div class="callout callout-wow">
+    <span class="callout-icon">💡</span>
+    <div><strong>Pro tip: collapse panels to make room.</strong> Semantic Studio packs a lot onto one screen, and you can hide panels you aren't using:
+      <ul>
+        <li><strong>Semantic Studio panel (right side)</strong> — click the <strong>→|</strong> arrow at the top right of the panel, next to the target dropdown. It shrinks to a slim icon rail whose icons match the four tabs: <strong>Suggestions</strong> (lightbulb), <strong>Playground</strong> (chat bubble), <strong>Monitoring</strong>, and <strong>Evaluations</strong>. Click the <strong>|←</strong> arrow at the top of the rail to expand it again. This is especially handy in part 2, when CoCo is open on the right as well.</li>
+        <li><strong>Workspace navigation panel (left side)</strong> — click the <strong>|←</strong> arrow at the bottom left of the file explorer to hide your workspace files and give the editor the full width. To bring it back, click the small <strong>&gt;</strong> arrow on the left edge of the editor.</li>
+      </ul>
+    </div>
   </div>
 
   <div class="section-heading"><span class="dot"></span>1. Add Relationships</div>
-  <p>This semantic view needs <strong>12 relationships</strong> total. Autopilot may have already detected and created some of them automatically — check the <strong>Relationships</strong> count on the semantic view to see how many you already have. Whatever is left will appear in the <strong>Suggestions</strong> panel: in the panel on the right, expand the <strong>Relationships</strong> section to see the suggested relationships. (In most cases Autopilot detects none and you'll see all 12 as suggestions — but if it pre-created a few, you'll simply see fewer suggestions, and that's expected.)</p>
+  <p>This semantic view needs <strong>12 relationships</strong> total. In the right panel's <strong>Suggestions</strong> tab, expand <strong>Relationships</strong> to see the suggested relationships. In most cases Autopilot detects none on its own and you'll see all 12 as suggestions. If it did pre-create a few, the <strong>Relationships</strong> section of the editor will show them and you'll simply see fewer suggestions — that's expected.</p>
   <p>For each suggested relationship:</p>
   <ol>
-    <li>Click <strong>Review</strong> — the <strong>Add relationship</strong> dialog will open in the semantic view editor, pre-filled with the table names, relationship type, and join columns.</li>
-    <li>Click <strong>Add</strong> to accept it.</li>
-    <li>Repeat until the <strong>Relationships</strong> counter on the semantic view reaches <strong>12</strong> (already-detected relationships plus the ones you add from Suggestions should total 12).</li>
+    <li>Click <strong>Review</strong> — an <strong>Add relationship</strong> form opens inline in the editor, pre-filled with the table names, relationship type, and join columns.</li>
+    <li>Click the <strong>✓</strong> checkmark to save it.</li>
+    <li>Repeat until the <strong>Relationships</strong> section of the editor shows <strong>12</strong>. As you go, the Suggestions count drops (from 17 to 5 — the 5 left over are metric suggestions, which we aren't using), and a dot appears on the <strong>Publish changes</strong> button to show you have unpublished edits.</li>
+  </ol>
+
+  <div class="section-heading"><span class="dot"></span>Publish Your Changes</div>
+  <p>Your relationships so far exist only in the <code>VBC_ANALYTICS_SV.sv.yaml</code> file in your workspace. The live semantic view — the object that Cortex Analyst and your agent will query — doesn't change until you <strong>publish</strong>.</p>
+  <ol>
+    <li>Click <strong>Publish changes</strong> at the top right. In the <strong>Publish changes to…</strong> popover, the <strong>default</strong> target is checked and marked <strong>Out of sync</strong>, meaning your file has changes the live semantic view doesn't. Click <strong>Publish</strong>.</li>
+    <li>The <strong>Review publish changes</strong> dialog opens. It shows an <strong>Overwrite warning</strong> (<em>This will overwrite the semantic view object with your local file</em>) and a diff of <strong>Workspace changes compared with target</strong> — the green lines are the relationships you just added. Click <strong>Publish</strong>.</li>
+    <li>When publishing finishes, the dot on <strong>Publish changes</strong> goes away — the file and the live semantic view are back in sync.</li>
   </ol>
   <div class="callout callout-warn">
-    <span class="callout-icon">💾</span>
-    <div><strong>Don't skip this — click Save now.</strong> Click the <strong>Save</strong> button in the top-right corner before continuing. You should see a <strong>Saved semantic view successfully</strong> confirmation. If you skip this, your relationships won't persist and later steps will fail.</div>
+    <span class="callout-icon">🚀</span>
+    <div><strong>Don't skip publishing.</strong> If you leave the edits unpublished, the live semantic view won't have the relationships and later steps will fail.</div>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🎯</span>
+    <div><strong>What is a target?</strong> A target is a destination that your semantic view file publishes to — a specific semantic view object, identified by database, schema, and name. When Autopilot created your view, it registered a target named <code>default</code> that points at <code>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</code> (that's the <strong>Target name</strong> you left as <code>default</code> in Step 4). Semantic Studio tracks targets in the auto-managed <code>cortex-project.yaml</code> project file in your workspace, so you don't need to edit it. Separating the file from its targets lets you keep one definition and publish it to more than one place — for example, add a dev and a prod copy in different schemas with <strong>+ Publish to new target…</strong>, then check whichever targets you want to update each time you publish.</div>
   </div>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
-    <div>You may see <strong>1 warning</strong> after saving. Click it to review — it's a suggestion about query history and is safe to ignore for this lab.</div>
+    <div>The editor footer may show <strong>1 warning</strong>. Click it to review — it's safe to ignore for this lab.</div>
   </div>
 
   <div class="section-heading"><span class="dot"></span>2. Add Metrics and Dimensions</div>
   <p>Beyond what Autopilot generates, we need two types of additions for this lab:</p>
   <ul>
-    <li><strong>Metrics</strong> are named calculations — business measures defined once in the semantic view so every query uses the same logic. For example, <em>Average Cost per Encounter</em> is <code>AVG(total_claim_cost)</code>. Without a metric, Cortex Analyst has to guess the formula each time. You can expand <strong>Metrics</strong> in the Suggestions panel to see what Autopilot identified — but for this lab we'll use a specific set of VBC metrics and dimensions, added via the SQL script below.</li>
+    <li><strong>Metrics</strong> are named calculations — business measures defined once in the semantic view so every query uses the same logic. For example, <em>Average Cost per Encounter</em> is <code>AVG(total_claim_cost)</code>. Without a metric, Cortex Analyst has to guess the formula each time. Autopilot suggested a few metrics in the Suggestions panel, but for this lab we'll add a specific set of VBC metrics instead.</li>
     <li><strong>Dimensions</strong> are attributes used to slice and filter data. Most dimensions come directly from a column, but <em>expression-based</em> dimensions are derived from logic. For example, <em>Patient Income Band</em> isn't a column in the data — it's a <code>CASE</code> expression that buckets the <code>INCOME</code> value into ranges like <code>&lt;30k</code>, <code>30-60k</code>, etc. These let Cortex Analyst answer questions like "show cost by income band" without any transformation in the query.</li>
   </ul>
-  <ol>
-    <li>Copy the SQL using the button below.</li>
-    <li>In your <strong>snowcamp</strong> workspace, click the <strong>+</strong> button to the right of the rightmost open tab and select <strong>SQL file</strong>.</li>
-    <li>Rename the new file: click the <strong>···</strong> menu on the tab and choose <strong>Rename</strong>, then name it <code>create_vbc_analytics_sv_updated.sql</code>.</li>
-    <li>Paste the SQL into the file and run it with <strong>▶ Run</strong>.</li>
-  </ol>
-  <p>The script is a <code>CREATE OR ALTER SEMANTIC VIEW</code> — it adds the new dimensions and metrics to your existing <code>VBC_ANALYTICS_SV</code> in place. <code>CREATE OR ALTER</code> is an idempotent DDL command that creates the object if it doesn't exist or updates it to match the new definition if it does — safe to run multiple times without side effects (<a href="https://docs.snowflake.com/en/sql-reference/sql/create-or-alter" target="_blank">docs</a>). You should see a <strong>Statement executed successfully.</strong> confirmation in the results pane.</p>
-  <div class="code-block-wrap">
-    <div class="code-block-header">
-      <div class="code-block-lang"><span class="lang-dot"></span>SQL</div>
-      <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
-    </div>
-    <pre style="max-height:320px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;"><code>create or alter semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV
-	tables (
-		SYNTHEA.SILVER.CONDITIONS comment='The table contains records of medical conditions diagnosed for patients. Each record represents a single condition instance, capturing the condition''s coded classification, associated patient and encounter, the duration of the condition, and the city of the synthetic patient.',
-		SYNTHEA.SILVER.ENCOUNTERS primary key (ENCOUNTER_ID) comment='The table contains records of patient medical encounters, capturing details about individual healthcare visits or interactions. Each record includes information about the involved parties (patient, provider, organization, and payer), the nature and classification of the encounter, associated costs and insurance coverage, and the reason for the visit.',
-		SYNTHEA.SILVER.MEDICATIONS comment='The table contains records of medication prescriptions associated with patient encounters. Each record represents a single medication course and includes details about the medication itself, associated costs and payer coverage, the reason for prescribing, and the geographic location of the patient.',
-		SYNTHEA.SILVER.OBSERVATIONS comment='The table contains records of clinical observations captured during patient encounters. Each record represents a single observation and includes details about the patient, the associated encounter, and the nature of the observation such as its category, coded description, measured value, and units of measurement.',
-		SYNTHEA.SILVER.PATIENTS primary key (PATIENT_ID) comment='The table contains records of individual patients, including personal identifying information and demographic details. Each record represents a single patient and covers attributes such as biographical dates, identity documents, name components, and demographic characteristics including marital status, race, ethnicity, gender, and geographic information.',
-		SYNTHEA.SILVER.PAYERS primary key (PAYER_ID) comment='The table contains records of health insurance payers, including their contact and location details. Each record represents a single payer and includes financial summaries such as revenue, covered and uncovered amounts, and utilization metrics across encounters, medications, procedures, and immunizations, as well as customer counts and average quality of life scores.',
-		SYNTHEA.SILVER.PROCEDURES comment='The table contains records of medical procedures performed on patients. Each record represents a single procedure and includes details about the associated patient and encounter, the procedure type and description, cost information, and the reason for the procedure, scoped to a specific city.',
-		SYNTHEA.SILVER.PROVIDERS primary key (PROVIDER_ID) comment='The table contains records of healthcare providers and their associated attributes. Each record represents an individual provider and includes details about their identity, demographics, medical speciality, geographic location, and affiliated organization, along with aggregate counts of encounters and procedures.'
-	)
-	relationships (
-		CONDITIONS_TO_ENCOUNTERS as CONDITIONS(ENCOUNTER_ID) references ENCOUNTERS(ENCOUNTER_ID),
-		CONDITIONS_TO_PATIENTS as CONDITIONS(PATIENT_ID) references PATIENTS(PATIENT_ID),
-		ENCOUNTERS_TO_PATIENTS as ENCOUNTERS(PATIENT_ID) references PATIENTS(PATIENT_ID),
-		ENCOUNTERS_TO_PAYERS as ENCOUNTERS(PAYER_ID) references PAYERS(PAYER_ID),
-		ENCOUNTERS_TO_PROVIDERS as ENCOUNTERS(PROVIDER_ID) references PROVIDERS(PROVIDER_ID),
-		MEDICATIONS_TO_ENCOUNTERS as MEDICATIONS(ENCOUNTER_ID) references ENCOUNTERS(ENCOUNTER_ID),
-		MEDICATIONS_TO_PATIENTS as MEDICATIONS(PATIENT_ID) references PATIENTS(PATIENT_ID),
-		MEDICATIONS_TO_PAYERS as MEDICATIONS(PAYER_ID) references PAYERS(PAYER_ID),
-		OBSERVATIONS_TO_ENCOUNTERS as OBSERVATIONS(ENCOUNTER_ID) references ENCOUNTERS(ENCOUNTER_ID),
-		OBSERVATIONS_TO_PATIENTS as OBSERVATIONS(PATIENT_ID) references PATIENTS(PATIENT_ID),
-		PROCEDURES_TO_ENCOUNTERS as PROCEDURES(ENCOUNTER_ID) references ENCOUNTERS(ENCOUNTER_ID),
-		PROCEDURES_TO_PATIENTS as PROCEDURES(PATIENT_ID) references PATIENTS(PATIENT_ID)
-	)
-	facts (
-		ENCOUNTERS.BASE_ENCOUNTER_COST as BASE_ENCOUNTER_COST comment='The base cost of the encounter, not including any line item costs related to medications, immunizations, procedures, or other services.' sample_values ('183.23', '69.38', '112.97'),
-		ENCOUNTERS.PAYER_COVERAGE as PAYER_COVERAGE comment='The amount of cost covered by the Payer.' sample_values ('731.68', '3436.72', '759.42'),
-		ENCOUNTERS.TOTAL_CLAIM_COST as TOTAL_CLAIM_COST comment='The total cost of the encounter, including all line items.' sample_values ('41309.94', '2738.36', '904.92'),
-		MEDICATIONS.BASE_COST as BASE_COST comment='The line item cost of the medication.' sample_values ('1.47', '0.73', '0.99'),
-		MEDICATIONS.PAYER_COVERAGE as PAYER_COVERAGE comment='The amount covered or reimbursed by the Payer.' sample_values ('408.20', '64.62', '183.46'),
-		MEDICATIONS.TOTALCOST as TOTALCOST comment='The total cost of the prescription, including all dispenses.' sample_values ('1.11', '8386.56', '7.68'),
-		PATIENTS.HEALTHCARE_COVERAGE as HEALTHCARE_COVERAGE comment='The total lifetime cost of healthcare services that were covered by Payers (i.e. what the insurance company paid).' sample_values ('803376.48', '599541.28', '673725.25'),
-		PATIENTS.HEALTHCARE_EXPENSES as HEALTHCARE_EXPENSES comment='The total lifetime cost of healthcare to the patient (i.e. what the patient paid).' sample_values ('38010.04', '14409.81', '1422104.61'),
-		PATIENTS.LAT as LAT comment='Latitude of Patient address.' sample_values ('40.436537891992480', '40.464558951571960', '40.470892304824260'),
-		PATIENTS.LON as LON comment='Longitude of Patient address.' sample_values ('-87.58418148560617', '-87.59906561377016', '-87.75167330498918'),
-		PAYERS.AMOUNT_COVERED as AMOUNT_COVERED comment='The monetary amount paid to Organizations during the entire simulation.' sample_values ('396788738.40', '23970274422.24', '2050104327.31'),
-		PAYERS.AMOUNT_UNCOVERED as AMOUNT_UNCOVERED comment='The monetary amount not paid to Organizations during the entire simulation, and covered out of pocket by patients.' sample_values ('2840318033.55', '72640882.24', '1743702849.19'),
-		PAYERS.QOLS_AVG as QOLS_AVG comment='The average Quality of Life Scores (QOLS) for all patients enrolled with this Payer during the entire simulation.' sample_values ('0.90799848608661420', '0.85600658044812520', '0.93837731612506100'),
-		PAYERS.REVENUE as REVENUE comment='The monetary revenue of the Payer during the entire simulation.' sample_values ('2718479175.30', '144143118.53', '93451732.97'),
-		PROCEDURES.BASE_COST as BASE_COST comment='The line item cost of the procedure.' sample_values ('398.63', '6857.81', '434.05'),
-		PROVIDERS.LAT as LAT comment='Latitude of Provider address.' sample_values ('41.520484800000000', '42.329843000000000', '42.281043200000000'),
-		PROVIDERS.LON as LON comment='Longitude of Provider address.' sample_values ('-81.49950460000000', '-81.58649390000000', '-81.57577590000000')
-	)
-	dimensions (
-		CONDITIONS._SYSTEM as "SYSTEM" comment='Coding system for the code' sample_values ('http://snomed.info/sct', 'SNOMED-CT'),
-		CONDITIONS.CODE as CODE comment='Diagnosis code from SNOMED-CT' sample_values ('278588009', '266934004', '161744009'),
-		CONDITIONS.CONDITION_ID as CONDITION_ID comment='CONDITIONS primary key' sample_values ('1001639', '1011952', '1004384'),
-		CONDITIONS.DESCRIPTION as DESCRIPTION comment='Description of the condition.' sample_values ('Facial laceration', 'Preeclampsia', 'Idiopathic atrophic hypothyroidism (disorder)'),
-		CONDITIONS.ENCOUNTER_ID as ENCOUNTER_ID comment='Foreign key to Primary key in Encounters table' sample_values ('32162737', '61134156', '32119054'),
-		CONDITIONS.PATIENT_ID as PATIENT_ID comment='Foreign key to primary key in Patietns table.' sample_values ('1562014', '1561862', '1687728'),
-		CONDITIONS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('PITTSBURGH', 'AUSTIN', 'BOSTON'),
-		CONDITIONS.CONDITION_START as CONDITION_START comment='The date the condition was diagnosed.' sample_values ('2013-08-25', '1946-02-17', '2024-10-09'),
-		CONDITIONS.CONDITION_STOP as CONDITION_STOP comment='The date the condition resolved, if applicable.' sample_values ('2005-12-06', '2022-02-06', '1990-11-26'),
-		ENCOUNTERS.CODE as CODE comment='Encounter code from SNOMED-CT.' sample_values ('394701000', '439708006', '50849002'),
-		ENCOUNTERS.DESCRIPTION as DESCRIPTION comment='Description of the type of encounter.' sample_values ('Hospital admission (procedure)', 'Administration of vaccine to produce active immunity (procedure)', 'Outpatient procedure'),
-		ENCOUNTERS.ENCOUNTER_ID as ENCOUNTER_ID comment='Primary key for table Encounters.' sample_values ('64338156', '57222869', '30346807'),
-		ENCOUNTERS.ENCOUNTERCLASS as ENCOUNTERCLASS comment='The class of the encounter, such as ambulatory, emergency, inpatient, wellness, or urgentcare.' sample_values ('urgentcare', 'ambulatory', 'virtual'),
-		ENCOUNTERS.ENCOUNTER_MONTH as DATE_TRUNC('MONTH', ENCOUNTER_START) comment='Month of encounter',
-		ENCOUNTERS.ENCOUNTER_YEAR as YEAR(ENCOUNTER_START) comment='Year of encounter',
-		ENCOUNTERS.ORGANIZATION_ID as ORGANIZATION_ID comment='Foreign key to primary key in Organizations table.' sample_values ('1001307', '1002705', '1002715'),
-		ENCOUNTERS.PATIENT_ID as PATIENT_ID comment='Foreign key to primary key in Patietns table.' sample_values ('1257836', '2352804', '1332205'),
-		ENCOUNTERS.PAYER_ID as PAYER_ID comment='Foreign key to primary key in Payers table.' sample_values ('1000075', '1000071', '1000058'),
-		ENCOUNTERS.PROVIDER_ID as PROVIDER_ID comment='Foreign key to primary key in Providers table.' sample_values ('3057620', '3057956', '3060472'),
-		ENCOUNTERS.REASONCODE as REASONCODE comment='Diagnosis code from SNOMED-CT, only if this encounter targeted a specific condition.' sample_values ('72892002', '444814009'),
-		ENCOUNTERS.REASONDESCRIPTION as REASONDESCRIPTION comment='Description of the reason code.' sample_values ('Fracture of clavicle', 'Gout', 'Loss of teeth (disorder)'),
-		ENCOUNTERS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('DETROIT', 'CHICAGO', 'MIAMI'),
-		ENCOUNTERS.ENCOUNTER_START as ENCOUNTER_START comment='The date and time the encounter started.' sample_values ('2014-05-03T10:45:20.000Z', '1997-11-07T15:43:52.000Z', '2006-12-31T01:14:36.000Z'),
-		ENCOUNTERS.ENCOUNTER_STOP as ENCOUNTER_STOP comment='The date and time the encounter concluded.' sample_values ('2008-11-30T08:05:44.000Z', '2022-06-24T08:15:08.000Z', '2020-08-13T13:23:07.000Z'),
-		MEDICATIONS.CODE as CODE comment='Medication code from RxNorm.' sample_values ('1361048', '106892', '617310'),
-		MEDICATIONS.DESCRIPTION as DESCRIPTION comment='Description of the medication.' sample_values ('Vitamin B12 5 MG/ML Injectable Solution', 'budesonide 0.25 MG/ML Inhalation Suspension', 'zidovudine 300 MG Oral Tablet'),
-		MEDICATIONS.DISPENSES as DISPENSES comment='The number of times the prescription was filled.' sample_values ('156', '1', '4'),
-		MEDICATIONS.ENCOUNTER_ID as ENCOUNTER_ID comment='Primary key for table Encounters.' sample_values ('48350202', '47704552', '57265181'),
-		MEDICATIONS.MEDICATION_ID as MEDICATION_ID comment='MEDICATIONS primary key' sample_values ('33916019', '33916156', '33811282'),
-		MEDICATIONS.PATIENT_ID as PATIENT_ID comment='Foreign key to primary key in Patients table.' sample_values ('1101676', '1698226', '2414261'),
-		MEDICATIONS.PAYER_ID as PAYER_ID comment='Foreign key to primary key in Payers table.' sample_values ('1000076', '1000002', '1000007'),
-		MEDICATIONS.REASONCODE as REASONCODE comment='Diagnosis code from SNOMED-CT specifying why this medication was prescribed.' sample_values ('10509002', '45816000', '67811000119102'),
-		MEDICATIONS.REASONDESCRIPTION as REASONDESCRIPTION comment='Description of the reason code.' sample_values ('Hyperlipidemia (disorder)', 'Anemia (disorder)'),
-		MEDICATIONS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('CLEVELAND', 'MIAMI', 'SAN FRANCISCO'),
-		MEDICATIONS.MED_START as MED_START comment='The date and time the medication was prescribed.' sample_values ('2023-02-23T01:49:13.000Z', '1971-06-05T17:59:37.000Z', '2024-02-29T08:15:34.000Z'),
-		MEDICATIONS.MED_STOP as MED_STOP comment='The date and time the prescription ended, if applicable.' sample_values ('2022-08-02T10:55:29.000Z', '2010-09-16T13:46:56.000Z', '2020-09-15T15:31:14.000Z'),
-		OBSERVATIONS._TYPE as "TYPE" comment='The datatype of Value: text or numeric' sample_values ('numeric', 'n'),
-		OBSERVATIONS.CATEGORY as CATEGORY comment='Observation category.' sample_values ('laboratory', 'social-history', 'survey'),
-		OBSERVATIONS.CODE as CODE comment='Observation or Lab code from LOINC' sample_values ('QALY', '72514-3', '8302-2'),
-		OBSERVATIONS.DESCRIPTION as DESCRIPTION comment='Description of the observation or lab.' sample_values ('Has lack of transportation kept you from medical appointments  meetings  work  or from getting things needed for daily living', 'MCH [Entitic mass] by Automated count', 'Platelets [#/volume] in Blood by Automated count'),
-		OBSERVATIONS.ENCOUNTER_ID as ENCOUNTER_ID comment='Primary key for table Encounters.' sample_values ('51387011', '7020231', '63759902'),
-		OBSERVATIONS.OBSERVATION_ID as OBSERVATION_ID comment='OBSERVATIONS primary key' sample_values ('391752298', '123132740', '391752219'),
-		OBSERVATIONS.PATIENT_ID as PATIENT_ID comment='Foreign key to primary key in Patietns table.' sample_values ('1367823', '2010149', '2010154'),
-		OBSERVATIONS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('DETROIT', 'TAMPA', 'BOSTON'),
-		OBSERVATIONS.UNITS as UNITS comment='The units of measure for the value.' sample_values ('{nominal}', 'mg/dL'),
-		OBSERVATIONS.VALUE as VALUE comment='The recorded value of the observation.' sample_values ('3.1', '119.0', 'No'),
-		OBSERVATIONS.OBSERVATION_DATE as OBSERVATION_DATE comment='The date and time the observation was performed.' sample_values ('2004-04-13T03:56:03.000Z', '1994-08-17T00:08:24.000Z', '2018-06-10T20:23:38.000Z'),
-		PATIENTS.ADDRESS as ADDRESS comment='Patient street address without commas or newlines.' sample_values ('353 Turner Corner Suite 45', '100 Kerluke Crossroad', '211 Walter Arcade Suite 26'),
-		PATIENTS.BIRTHPLACE as BIRTHPLACE comment='Name of the town where the patient was born.' sample_values ('Washington  District of Columbia  US', 'Cantho  Cần Thơ  VN', 'Juarez  Chihuahua  MX'),
-		PATIENTS.CITY as CITY comment='Patient address city.' sample_values ('Cleveland', 'Boston', 'Nashville'),
-		PATIENTS.COUNTY as COUNTY comment='Patient address county.' sample_values ('Hillsborough County', 'Miami-Dade County', 'Davidson County'),
-		PATIENTS.DRIVERS as DRIVERS comment='Patient Drivers License identifier.' sample_values ('S99940149', 'S99914096', 'S99928370'),
-		PATIENTS.ETHNICITY as ETHNICITY comment='Description of the patient primary ethnicity.' sample_values ('nonhispanic', 'hispanic'),
-		PATIENTS.FIPS as FIPS comment='Patient FIPS county code.' sample_values ('42003', '26163', '12057'),
-		PATIENTS.FIRST as FIRST comment='First name of the patient.' sample_values ('Laquanda', 'Darcel', 'Chong'),
-		PATIENTS.GENDER as GENDER comment='Gender. M is male, F is female.' sample_values ('M', 'F'),
-		PATIENTS.INCOME as INCOME comment='Annual income for the Patient' sample_values ('15585', '51628', '113432'),
-		PATIENTS.LAST as LAST comment='Last or surname of the patient.' sample_values ('Farías', 'Saavedra', 'Bechtelar'),
-		PATIENTS.MAIDEN as MAIDEN comment='Maiden name of the patient.' sample_values ('Kuhlman', 'Ramos', 'Ponce'),
-		PATIENTS.MARITAL as MARITAL comment='Marital Status. M is married, S is single. Currently no support for divorce (D) or widowing (W)' sample_values ('M', 'S', 'W'),
-		PATIENTS.MIDDLE as MIDDLE comment='Middle name of the patient.' sample_values ('Grazyna', 'Cyrus', 'Megan'),
-		PATIENTS.PASSPORT as PASSPORT comment='Patient Passport identifier.' sample_values ('X81175090X', 'X84098667X', 'X82179671X'),
-		PATIENTS.PATIENT_ID as PATIENT_ID comment='Primary key for PATIENTS table.' sample_values ('1664916', '1008856', '1008735'),
-		PATIENTS.PREFIX as PREFIX comment='Name prefix, such as Mr., Mrs., Dr., etc.' sample_values ('Mrs.', 'Mr.', 'Ms.'),
-		PATIENTS.RACE as RACE comment='Description of the patient primary race.' sample_values ('asian', 'white', 'native'),
-		PATIENTS.SSN as SSN comment='Patient Social Security identifier.' sample_values ('999-46-4912', '999-92-5546', '999-51-4306'),
-		PATIENTS.STATE as STATE comment='Patient address state.' sample_values ('District of Columbia', 'Texas', 'Illinois'),
-		PATIENTS.SUFFIX as SUFFIX comment='Name suffix, such as PhD, MD, JD, etc.' sample_values ('PhD', 'JD'),
-		PATIENTS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('PITTSBURGH', 'SALT LAKE CITY', 'CLEVELAND'),
-		PATIENTS.ZIP as ZIP comment='Patient zip code.' sample_values ('15207', '33603', '60640'),
-		PATIENTS.BIRTHDATE as BIRTHDATE comment='The date the patient was born.' sample_values ('1969-06-11', '2006-02-13', '1970-01-28'),
-		PATIENTS.DEATHDATE as DEATHDATE comment='The date the patient died.' sample_values ('1990-02-10', '2018-02-21', '1991-07-02'),
-		PATIENTS.PATIENT_INCOME_BAND as CASE WHEN INCOME &lt; 30000 THEN '&lt;30k' WHEN INCOME >= 30000 AND INCOME &lt; 60000 THEN '30-60k' WHEN INCOME >= 60000 AND INCOME &lt; 100000 THEN '60-100k' WHEN INCOME >= 100000 THEN '100k+' ELSE 'Unknown' END comment='Patient income band categorization',
-		PAYERS.ADDRESS as ADDRESS comment='Payer street address without commas or newlines.',
-		PAYERS.CITY as CITY comment='Street address city.',
-		PAYERS.COVERED_ENCOUNTERS as COVERED_ENCOUNTERS comment='The number of Encounters paid for by this Payer.' sample_values ('226678', '1528389', '37187314'),
-		PAYERS.COVERED_IMMUNIZATIONS as COVERED_IMMUNIZATIONS comment='The number of Immunizations paid for by this Payer.' sample_values ('177420', '727359', '11589261'),
-		PAYERS.COVERED_MEDICATIONS as COVERED_MEDICATIONS comment='The number of Medications paid for by this Payer.' sample_values ('19665387', '10734473', '15676029'),
-		PAYERS.COVERED_PROCEDURES as COVERED_PROCEDURES comment='The number of Procedures paid for by this Payer.' sample_values ('25668470', '765553', '444422'),
-		PAYERS.MEMBER_MONTHS as MEMBER_MONTHS comment='The total number of months that patients were enrolled with this Payer during the simulation and paid monthly premiums (if any).' sample_values ('108916092', '5287344', '2945796'),
-		PAYERS.NAME as NAME comment='Name of the Payer.' sample_values ('Medicare', 'Medicaid', 'Dual Eligible'),
-		PAYERS.PAYER_ID as PAYER_ID comment='Primary key for PAYERS table.' sample_values ('1000001', '1000034', '1000068'),
-		PAYERS.PHONE as PHONE comment='Payer phone number.',
-		PAYERS.STATE_HEADQUARTERED as STATE_HEADQUARTERED comment='Street address state abbreviation.',
-		PAYERS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('AUSTIN', 'BOSTON', 'CHICAGO'),
-		PAYERS.UNCOVERED_ENCOUNTERS as UNCOVERED_ENCOUNTERS comment='The number of Encounters not paid for by this Payer, and paid out of pocket by patients.' sample_values ('0', '4544829', '2482316'),
-		PAYERS.UNCOVERED_IMMUNIZATIONS as UNCOVERED_IMMUNIZATIONS comment='The number of Immunizations not paid for by this Payer, and paid out of pocket by patients.' sample_values ('1581686', '4694416', '0'),
-		PAYERS.UNCOVERED_MEDICATIONS as UNCOVERED_MEDICATIONS comment='The number of Medications not paid for by this Payer, and paid out of pocket by patients.' sample_values ('2076169', '0', '10070328'),
-		PAYERS.UNCOVERED_PROCEDURES as UNCOVERED_PROCEDURES comment='The number of Procedures not paid for by this Payer, and paid out of pocket by patients.' sample_values ('37562172', '5406616', '9882160'),
-		PAYERS.UNIQUE_CUSTOMERS as UNIQUE_CUSTOMERS comment='The number of unique patients enrolled with this Payer during the simulation.' sample_values ('24492', '23593', '2034'),
-		PAYERS.ZIP as ZIP comment='Street address zip or postal code.',
-		PROCEDURES.CODE as CODE comment='Procedure code from SNOMED-CT' sample_values ('430193006', '447759004', '281789004'),
-		PROCEDURES.DESCRIPTION as DESCRIPTION comment='Description of the procedure.' sample_values ('Take blood sample', 'Dental X-ray bitewing (procedure)', 'Manual pelvic examination (procedure)'),
-		PROCEDURES.ENCOUNTER_ID as ENCOUNTER_ID comment='Primary key for table Encounters.' sample_values ('42461525', '42143143', '17467043'),
-		PROCEDURES.PATIENT_ID as PATIENT_ID comment='Foreign key to primary key in Patietns table.' sample_values ('1586698', '1998794', '1586721'),
-		PROCEDURES.PROCEDURE_ID as PROCEDURE_ID comment='PROCEDURES primary key' sample_values ('118208231', '118208429', '30345854'),
-		PROCEDURES.REASONCODE as REASONCODE comment='The medical reason or diagnosis code associated with why a procedure was performed.' sample_values ('46177005', '431857002', '65966004'),
-		PROCEDURES.REASONDESCRIPTION as REASONDESCRIPTION comment='Description of the reason code.' sample_values ('Gingivitis (disorder)', 'Sleep disorder (disorder)', 'Laceration of thigh'),
-		PROCEDURES.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('SAN FRANCISCO', 'BOSTON', 'CHICAGO'),
-		PROCEDURES.PROC_START as PROC_START comment='The date and time the procedure was performed.' sample_values ('2020-04-19T05:18:13.000Z', '2021-08-09T13:26:04.000Z', '2022-09-14T19:21:46.000Z'),
-		PROCEDURES.PROC_STOP as PROC_STOP comment='The date and time the procedure was completed, if applicable.' sample_values ('2023-01-28T09:14:06.000Z', '2005-12-20T00:15:12.000Z', '2023-02-05T22:40:59.000Z'),
-		PROVIDERS.ADDRESS as ADDRESS comment='Provider street address without commas or newlines.' sample_values ('5001 MAYFIELD RD  SUITE 105', '19530 BAGLEY RD', '12300 MCCRACKEN ROAD'),
-		PROVIDERS.CITY as CITY comment='Street address city.' sample_values ('MAYFIELD HTS', 'BEACHWOOD', 'MIDDLEBURG HEIGHTS'),
-		PROVIDERS.ENCOUNTERS as ENCOUNTERS comment='The number of Encounters performed by this provider.' sample_values ('307734', '2578', '1555'),
-		PROVIDERS.GENDER as GENDER comment='Gender. M is male, F is female.' sample_values ('F', 'M'),
-		PROVIDERS.NAME as NAME comment='First and last name of the Provider.' sample_values ('Lena Schowalter', 'Sun Kulas', 'Twyla Marquardt'),
-		PROVIDERS.ORGANIZATION_ID as ORGANIZATION_ID comment='Foreign key to primary key in ORGANIZATIONS table.' sample_values ('1000362', '1000317', '1000202'),
-		PROVIDERS.PROCEDURES as PROCEDURES comment='The number of Procedures performed by this provider.' sample_values ('0'),
-		PROVIDERS.PROVIDER_ID as PROVIDER_ID comment='Primary key for PROVIDERS table' sample_values ('3057357', '3057301', '3057307'),
-		PROVIDERS.SPECIALITY as SPECIALITY comment='Provider speciality.' sample_values ('GENERAL PRACTICE'),
-		PROVIDERS.STATE as STATE comment='Street address state abbreviation.' sample_values ('MA', 'OH', 'TX'),
-		PROVIDERS.SYNTHEA_CITY as SYNTHEA_CITY comment='City generated by Synthea.' sample_values ('BOSTON', 'CLEVELAND', 'AUSTIN'),
-		PROVIDERS.ZIP as ZIP comment='Street address zip or postal code.' sample_values ('441091900', '441182571', '440671086')
-	)
-	metrics (
-		ENCOUNTERS.TOTAL_COST_OF_CARE as SUM(TOTAL_CLAIM_COST) comment='Total cost of care across all encounters',
-		ENCOUNTERS.PAYER_COVERAGE_RATE as DIV0(SUM(PAYER_COVERAGE), SUM(TOTAL_CLAIM_COST)) comment='Payer coverage rate',
-		ENCOUNTERS.AVG_COST_PER_ENCOUNTER as AVG(TOTAL_CLAIM_COST) comment='Average cost per encounter',
-		ENCOUNTERS.TOTAL_ENCOUNTER_COUNT as COUNT(ENCOUNTER_ID) comment='Total count of encounters',
-		ENCOUNTERS.AVOIDABLE_ED_RATE as DIV0(SUM(CASE WHEN ENCOUNTERCLASS = 'emergency' AND REASONCODE IN ('59621000','15777000','195662009','10509002','444814009','40055000','271737000','427898007','195967001','233604007','82423001','431855005','431856006','162864005') THEN 1 ELSE 0 END), COUNT(ENCOUNTER_ID)) comment='Rate of avoidable ED visits for ambulatory-sensitive conditions relative to total encounters'
-	)
-	with extension (CA='{"tables":[{"name":"CONDITIONS","dimensions":[{"name":"_SYSTEM"},{"name":"CODE"},{"name":"CONDITION_ID"},{"name":"DESCRIPTION"},{"name":"ENCOUNTER_ID"},{"name":"PATIENT_ID"},{"name":"SYNTHEA_CITY"}],"time_dimensions":[{"name":"CONDITION_START"},{"name":"CONDITION_STOP"}]},{"name":"ENCOUNTERS","dimensions":[{"name":"CODE"},{"name":"DESCRIPTION"},{"name":"ENCOUNTER_ID"},{"name":"ENCOUNTERCLASS"},{"name":"ORGANIZATION_ID"},{"name":"PATIENT_ID"},{"name":"PAYER_ID"},{"name":"PROVIDER_ID"},{"name":"REASONCODE"},{"name":"REASONDESCRIPTION"},{"name":"SYNTHEA_CITY"},{"name":"ENCOUNTER_YEAR"}],"facts":[{"name":"BASE_ENCOUNTER_COST"},{"name":"PAYER_COVERAGE"},{"name":"TOTAL_CLAIM_COST"}],"time_dimensions":[{"name":"ENCOUNTER_START"},{"name":"ENCOUNTER_STOP"},{"name":"ENCOUNTER_MONTH"}],"metrics":[{"name":"TOTAL_COST_OF_CARE"},{"name":"PAYER_COVERAGE_RATE"},{"name":"AVG_COST_PER_ENCOUNTER"},{"name":"TOTAL_ENCOUNTER_COUNT"},{"name":"AVOIDABLE_ED_RATE"}]},{"name":"MEDICATIONS","dimensions":[{"name":"CODE"},{"name":"DESCRIPTION"},{"name":"DISPENSES"},{"name":"ENCOUNTER_ID"},{"name":"MEDICATION_ID"},{"name":"PATIENT_ID"},{"name":"PAYER_ID"},{"name":"REASONCODE"},{"name":"REASONDESCRIPTION"},{"name":"SYNTHEA_CITY"}],"facts":[{"name":"BASE_COST"},{"name":"PAYER_COVERAGE"},{"name":"TOTALCOST"}],"time_dimensions":[{"name":"MED_START"},{"name":"MED_STOP"}]},{"name":"OBSERVATIONS","dimensions":[{"name":"_TYPE"},{"name":"CATEGORY"},{"name":"CODE"},{"name":"DESCRIPTION"},{"name":"ENCOUNTER_ID"},{"name":"OBSERVATION_ID"},{"name":"PATIENT_ID"},{"name":"SYNTHEA_CITY"},{"name":"UNITS"},{"name":"VALUE"}],"time_dimensions":[{"name":"OBSERVATION_DATE"}]},{"name":"PATIENTS","dimensions":[{"name":"ADDRESS"},{"name":"BIRTHPLACE"},{"name":"CITY"},{"name":"COUNTY"},{"name":"DRIVERS"},{"name":"ETHNICITY"},{"name":"FIPS"},{"name":"FIRST"},{"name":"GENDER"},{"name":"INCOME"},{"name":"LAST"},{"name":"MAIDEN"},{"name":"MARITAL"},{"name":"MIDDLE"},{"name":"PASSPORT"},{"name":"PATIENT_ID"},{"name":"PREFIX"},{"name":"RACE"},{"name":"SSN"},{"name":"STATE"},{"name":"SUFFIX"},{"name":"SYNTHEA_CITY"},{"name":"ZIP"},{"name":"PATIENT_INCOME_BAND"}],"facts":[{"name":"HEALTHCARE_COVERAGE"},{"name":"HEALTHCARE_EXPENSES"},{"name":"LAT"},{"name":"LON"}],"time_dimensions":[{"name":"BIRTHDATE"},{"name":"DEATHDATE"}]},{"name":"PAYERS","dimensions":[{"name":"ADDRESS"},{"name":"CITY"},{"name":"COVERED_ENCOUNTERS"},{"name":"COVERED_IMMUNIZATIONS"},{"name":"COVERED_MEDICATIONS"},{"name":"COVERED_PROCEDURES"},{"name":"MEMBER_MONTHS"},{"name":"NAME"},{"name":"PAYER_ID"},{"name":"PHONE"},{"name":"STATE_HEADQUARTERED"},{"name":"SYNTHEA_CITY"},{"name":"UNCOVERED_ENCOUNTERS"},{"name":"UNCOVERED_IMMUNIZATIONS"},{"name":"UNCOVERED_MEDICATIONS"},{"name":"UNCOVERED_PROCEDURES"},{"name":"UNIQUE_CUSTOMERS"},{"name":"ZIP"}],"facts":[{"name":"AMOUNT_COVERED"},{"name":"AMOUNT_UNCOVERED"},{"name":"QOLS_AVG"},{"name":"REVENUE"}]},{"name":"PROCEDURES","dimensions":[{"name":"CODE"},{"name":"DESCRIPTION"},{"name":"ENCOUNTER_ID"},{"name":"PATIENT_ID"},{"name":"PROCEDURE_ID"},{"name":"REASONCODE"},{"name":"REASONDESCRIPTION"},{"name":"SYNTHEA_CITY"}],"facts":[{"name":"BASE_COST"}],"time_dimensions":[{"name":"PROC_START"},{"name":"PROC_STOP"}]},{"name":"PROVIDERS","dimensions":[{"name":"ADDRESS"},{"name":"CITY"},{"name":"ENCOUNTERS"},{"name":"GENDER"},{"name":"NAME"},{"name":"ORGANIZATION_ID"},{"name":"PROCEDURES"},{"name":"PROVIDER_ID"},{"name":"SPECIALITY"},{"name":"STATE"},{"name":"SYNTHEA_CITY"},{"name":"ZIP"}],"facts":[{"name":"LAT"},{"name":"LON"}]}],"relationships":[{"name":"CONDITIONS_TO_ENCOUNTERS","join_type":"inner"},{"name":"CONDITIONS_TO_PATIENTS","join_type":"inner"},{"name":"ENCOUNTERS_TO_PATIENTS","join_type":"inner"},{"name":"ENCOUNTERS_TO_PAYERS","join_type":"inner"},{"name":"ENCOUNTERS_TO_PROVIDERS","join_type":"inner"},{"name":"MEDICATIONS_TO_ENCOUNTERS","join_type":"inner"},{"name":"MEDICATIONS_TO_PATIENTS","join_type":"inner"},{"name":"MEDICATIONS_TO_PAYERS","join_type":"inner"},{"name":"OBSERVATIONS_TO_ENCOUNTERS","join_type":"inner"},{"name":"OBSERVATIONS_TO_PATIENTS","join_type":"inner"},{"name":"PROCEDURES_TO_ENCOUNTERS","join_type":"inner"},{"name":"PROCEDURES_TO_PATIENTS","join_type":"inner"}]}');</code></pre>
-  </div>
-
   <div class="callout callout-info" style="display:block; padding:16px 20px;">
     <div style="font-weight:600; margin-bottom:10px;">What we're adding to the semantic view</div>
     <table style="width:100%; border-collapse:collapse; font-size:13px;">
@@ -1190,9 +1115,93 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
     </table>
   </div>
 
-  <ol start="5">
-    <li>Go to <strong>AI &amp; ML → Analyst</strong> and click on <strong>VBC_ANALYTICS_SV</strong> to open it. Confirm the new metrics and dimensions appear in their respective logical tables (refer to the table above for which logical table each one belongs to), then click the <strong>Playground</strong> tab in the top-right panel to open the Analyst Playground.<br><em>Note: <code>ENCOUNTER_MONTH</code> appears under <strong>Time Dimensions</strong> (not the regular Dimensions list) since it's a date-based expression.</em></li>
+  <p>Because Semantic Studio works on the semantic view as a file, you don't need to recreate the view to add these — you add them to the file and publish, just like the relationships. We'll have CoCo make the edit, and you'll review it before anything goes live.</p>
+
+  <h3>Option A: Have CoCo add them (recommended)</h3>
+  <ol>
+    <li>Make sure <code>VBC_ANALYTICS_SV.sv.yaml</code> is the open tab, then open CoCo by clicking the <img src="images/cortex-code-ui-icon.png" alt="CoCo icon" style="height:18px; vertical-align:middle; margin:0 2px;"> icon in the lower-right corner.</li>
+    <li>Start a new chat by clicking the <strong>+</strong> at the top of the CoCo panel. A fresh chat keeps CoCo focused on this task instead of your earlier conversations.</li>
+    <li>Copy the prompt below, paste it into CoCo, and send it. It spells out every name, expression, and data type so CoCo adds exactly what the lab needs and nothing else.</li>
   </ol>
+  <div class="code-block-wrap">
+    <div class="code-block-header">
+      <div class="code-block-lang"><span class="lang-dot"></span>CoCo Prompt</div>
+      <button class="copy-btn" onclick="copyCode(this)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+    <pre style="white-space: pre-wrap; word-break: break-word;"><code>In the open semantic view file VBC_ANALYTICS_SV.sv.yaml, add exactly the following items and change nothing else. Do not rename, remove, or reorder any existing tables, dimensions, facts, time dimensions, or relationships, and do not publish — I will review and publish the changes myself.
+
+In the ENCOUNTERS logical table:
+
+1. Add a dimension:
+   - name: ENCOUNTER_YEAR
+   - description: Calendar year of the encounter.
+   - expr: YEAR(ENCOUNTER_START)
+   - data_type: NUMBER(4,0)
+
+2. Add a time dimension:
+   - name: ENCOUNTER_MONTH
+   - description: Month of the encounter (first day of the month).
+   - expr: DATE_TRUNC('MONTH', ENCOUNTER_START)
+   - data_type: TIMESTAMP_NTZ(9)
+
+3. Add these metrics:
+   - TOTAL_COST_OF_CARE — Total cost of care across all encounters. expr: SUM(TOTAL_CLAIM_COST)
+   - PAYER_COVERAGE_RATE — Share of total claim cost covered by the payer. expr: DIV0(SUM(PAYER_COVERAGE), SUM(TOTAL_CLAIM_COST))
+   - AVG_COST_PER_ENCOUNTER — Average total claim cost per encounter. expr: AVG(TOTAL_CLAIM_COST)
+   - TOTAL_ENCOUNTER_COUNT — Total count of encounters. expr: COUNT(ENCOUNTER_ID)
+   - AVOIDABLE_ED_RATE — Rate of avoidable ED visits for ambulatory-sensitive conditions relative to total encounters. expr: DIV0(SUM(CASE WHEN ENCOUNTERCLASS = 'emergency' AND REASONCODE IN ('59621000','15777000','195662009','10509002','444814009','40055000','271737000','427898007','195967001','233604007','82423001','431855005','431856006','162864005') THEN 1 ELSE 0 END), COUNT(ENCOUNTER_ID))
+
+In the PATIENTS logical table:
+
+4. Add a dimension:
+   - name: PATIENT_INCOME_BAND
+   - description: Patient income band: &lt;30k, 30-60k, 60-100k, 100k+, or Unknown.
+   - expr: CASE WHEN INCOME &lt; 30000 THEN '&lt;30k' WHEN INCOME &gt;= 30000 AND INCOME &lt; 60000 THEN '30-60k' WHEN INCOME &gt;= 60000 AND INCOME &lt; 100000 THEN '60-100k' WHEN INCOME &gt;= 100000 THEN '100k+' ELSE 'Unknown' END
+   - data_type: VARCHAR(16777216)
+
+Use public_access for all new items. Use the exact names, expressions, and data types above. When you're done, confirm that the file validates with no errors.</code></pre>
+  </div>
+  <ol start="3">
+    <li>CoCo edits the file and shows each change as a green inline diff in the editor, with <strong>Undo</strong> / <strong>Keep</strong> on each one. Use the navigator at the bottom of the editor (<strong>1 of 3</strong>, with previous/next arrows) to step through the three changes and check them against the table above: <code>ENCOUNTER_YEAR</code> in the ENCOUNTERS dimensions, <code>ENCOUNTER_MONTH</code> plus the five metrics after the ENCOUNTERS time dimensions, and <code>PATIENT_INCOME_BAND</code> in the PATIENTS dimensions.</li>
+    <li>When everything looks right, click <strong>Keep all</strong> (in the CoCo chat, under <strong>1 file changed</strong>, or <strong>Keep all in file</strong> in the editor navigator).</li>
+    <li>Check the footer at the bottom of the editor: it should show <strong>0</strong> errors and <strong>Valid semantic view</strong>. CoCo also validates the file and confirms this in the chat.</li>
+  </ol>
+
+  <h3>Option B: Paste the finished YAML (fallback)</h3>
+  <p>If CoCo's result doesn't match the table above, or you'd rather skip CoCo, replace the file with a finished copy instead. It includes the 12 relationships from part 1, so it also fixes any missed relationships.</p>
+  <ol>
+    <li>Open <a href="assets/VBC_ANALYTICS_SV.sv.yaml" target="_blank" style="color:var(--sf-blue)"><code>VBC_ANALYTICS_SV.sv.yaml</code></a> and copy its entire contents. (If your browser downloads the file instead of displaying it, open the downloaded file in any text editor.)</li>
+    <li>In Semantic Studio, switch the editor toggle from <strong>Visual</strong> to <strong>YAML</strong>.</li>
+    <li>Click inside the YAML editor, select everything (<strong>Cmd+A</strong> on Mac, <strong>Ctrl+A</strong> on Windows), and paste to replace it.</li>
+    <li>Confirm the footer shows <strong>0</strong> errors and <strong>Valid semantic view</strong>, then switch back to <strong>Visual</strong>.</li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">🔄</span>
+    <div><strong>No dot on Publish changes?</strong> Semantic Studio sometimes doesn't detect edits that CoCo makes to the file: <strong>Publish changes</strong> shows no dot, and its popover doesn't list <code>default</code> as <strong>Out of sync</strong>. The edits are already saved to the file, so just refresh your browser tab — after the refresh, <strong>Publish changes</strong> picks them up.</div>
+  </div>
+
+  <h3>Publish and verify</h3>
+  <ol>
+    <li>Click <strong>Publish changes</strong>, confirm <code>default</code> is checked and <strong>Out of sync</strong>, and click <strong>Publish</strong>.</li>
+    <li>In <strong>Review publish changes</strong>, the diff should show <strong>3 changes</strong> — the same three green blocks you reviewed. Click <strong>Publish</strong>.</li>
+    <li>In the Visual editor, expand the <strong>ENCOUNTERS</strong> and <strong>PATIENTS</strong> logical tables and confirm these eight new items appear:
+      <ul>
+        <li><strong>ENCOUNTERS &rarr; Metrics:</strong> <code>TOTAL_COST_OF_CARE</code>, <code>PAYER_COVERAGE_RATE</code>, <code>AVG_COST_PER_ENCOUNTER</code>, <code>AVOIDABLE_ED_RATE</code>, <code>TOTAL_ENCOUNTER_COUNT</code></li>
+        <li><strong>ENCOUNTERS &rarr; Dimensions:</strong> <code>ENCOUNTER_YEAR</code></li>
+        <li><strong>ENCOUNTERS &rarr; Time dimensions:</strong> <code>ENCOUNTER_MONTH</code> <em>(it shows up here, not in the regular Dimensions list, because it's a date-based expression)</em></li>
+        <li><strong>PATIENTS &rarr; Dimensions:</strong> <code>PATIENT_INCOME_BAND</code></li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="section-heading"><span class="dot"></span>Version History and Pull</div>
+  <p>Two more buttons are worth knowing about before you move on:</p>
+  <ul>
+    <li><strong>Version history</strong> — with no unpublished changes, click the <strong>∨</strong> arrow next to <strong>Publish changes</strong> and choose <strong>Version history</strong>. It lists each published version of the file with its date, time, and author. You should see three: Autopilot's original, your relationships, and your metrics and dimensions. Select a version to view its YAML, or check <strong>Compare with current version</strong> to see a diff. <strong>Restore this version</strong> rolls back to an earlier version — don't use it now; just click <strong>Close</strong>.</li>
+    <li><strong>Pull</strong> — click <strong>Pull</strong> to see <strong>Pull latest changes from live semantic view</strong>. Right now <code>default</code> shows <strong>No changes since last published</strong>. Pull matters when the live semantic view is changed somewhere other than this file — by a teammate, another workspace, or a SQL statement. Because publishing overwrites the target with your file, Pull gives you a way to bring those outside changes into your file before you publish, so you don't wipe them out. How (and whether) you use it depends on your team's change-management process.</li>
+  </ul>
+  <p>Next, open the <strong>Playground</strong> tab in the right panel — that's where you'll ask questions in Step 6.</p>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m1-create-sv')">← Create Semantic View</button>
@@ -1208,11 +1217,44 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
   <div class="timing-pill">⏱ ~5 min hands-on</div>
 
-  <p>With <strong>VBC_ANALYTICS_SV</strong> open in Cortex Analyst and the <strong>Playground</strong> tab active on the right, type a question into the prompt box and click <strong>Run</strong>. Try any of these — or ask anything you're curious about:</p>
+  <p>The <strong>Playground</strong> is where you test the semantic view before anyone else relies on it. When you ask a question in plain English, Cortex Analyst uses <strong>VBC_ANALYTICS_SV</strong> to turn it into SQL and runs that SQL. Your job here is to check that the conversion is right: that the question maps to the correct metrics, dimensions and joins, and that the answer makes sense.</p>
+
+  <h2>Cortex Analyst is not an agent</h2>
+  <p>It's easy to blur these two together, so be clear on what you're testing here. Cortex Analyst with a semantic view does one job: <strong>it turns a plain-language question into SQL</strong> and returns the results. It doesn't plan, pick between tools, look at documents, or reason about what the numbers mean. A <strong>Cortex Agent</strong> is the layer that does that work, and it uses Cortex Analyst as one of its tools.</p>
+  <div style="overflow-x:auto; margin:14px 0;">
+  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr style="border-bottom:1px solid var(--sf-border);">
+        <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600; width:130px;"></th>
+        <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600;">Cortex Analyst + semantic view<br><span style="font-weight:400;">(this step)</span></th>
+        <th style="text-align:left; padding:6px 10px; color:var(--sf-muted); font-weight:600;">Cortex Agent<br><span style="font-weight:400;">(Module 3)</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px; font-weight:600;">Job</td><td style="padding:7px 10px;">Translate a question into SQL over one semantic view and run it</td><td style="padding:7px 10px;">Plan how to answer, choose and call tools, check the results, and write a response</td></tr>
+      <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px; font-weight:600;">Data it can reach</td><td style="padding:7px 10px;">Structured data defined in the semantic view</td><td style="padding:7px 10px;">Whatever its tools reach: Cortex Analyst for structured data, Cortex Search for documents, charts, custom tools and more</td></tr>
+      <tr style="border-bottom:1px solid var(--sf-border);"><td style="padding:7px 10px; font-weight:600;">What you get back</td><td style="padding:7px 10px;">Its interpretation of the question, the SQL, and a result table</td><td style="padding:7px 10px;">A written answer that can combine several tool calls, with citations and charts</td></tr>
+      <tr><td style="padding:7px 10px; font-weight:600;">What drives quality</td><td style="padding:7px 10px;">The semantic view: metrics, dimensions, descriptions, synonyms, verified queries</td><td style="padding:7px 10px;">Orchestration instructions and tool descriptions, plus the quality of each tool underneath</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Question 2 below shows the difference. Cortex Analyst will tell you the avoidable ED rate for the lowest income band is roughly five times the rate for the highest. That's the whole answer. It won't tell you <em>why</em>, or what to do about it. An agent can take that result, search the care notes for those patients, and explain what's driving the gap.</p>
+  <div class="callout callout-wow">
+    <span class="callout-icon">🎯</span>
+    <div><strong>Why test here first:</strong> when an agent needs numbers, it hands the question to Cortex Analyst and this semantic view. If the SQL is wrong here, the agent's answer is wrong too, no matter how well it reasons. Get the semantic view right in the Playground, and every agent that uses it inherits that accuracy.</div>
+  </div>
+
+  <p>With <strong>VBC_ANALYTICS_SV</strong> open in Semantic Studio, open the <strong>Playground</strong> tab in the right panel and submit one of the questions below (or one of your own). For each answer, check:</p>
+  <ul>
+    <li><strong>The interpretation matches what you meant.</strong> Cortex Analyst restates the question under <em>"This is our interpretation of your question"</em>. If that restatement is off, the SQL will be too.</li>
+    <li><strong>The semantic query uses what you just added.</strong> Expand <strong>Semantic query</strong> under the results. For Question 1 you should see <code>METRICS avg_cost_per_encounter DIMENSIONS patients.patient_income_band</code>, which means Cortex Analyst used your new metric and dimension instead of improvising a calculation.</li>
+    <li><strong>The results are plausible.</strong> Rates should fall between 0 and 1 (or 0 and 100%), costs should be positive, and every income band should appear.</li>
+  </ul>
+  <p>If an answer is wrong, the fix usually belongs in the semantic view (a clearer description, a synonym, or a missing metric), not in the question. That edit, test, and fix loop is how a semantic view gets reliable enough to put in front of business users.</p>
 
   <h2>Question 1 — Cost by Income Band</h2>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <div class="prompt-label">💬 Semantic Studio Playground</div>
     <p>Which patient income bands have the highest average cost per encounter?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Which patient income bands have the highest average cost per encounter?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1221,7 +1263,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <h2>Question 2 — Avoidable ED by Income Band</h2>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <div class="prompt-label">💬 Semantic Studio Playground</div>
     <p>What is the avoidable ED utilization rate broken down by income band?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'What is the avoidable ED utilization rate broken down by income band?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1230,7 +1272,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <h2>Question 3 — Monthly Cost Trends</h2>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <div class="prompt-label">💬 Semantic Studio Playground</div>
     <p>Show me total cost of care trends month over month, segmented by encounter class.</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Show me total cost of care trends month over month, segmented by encounter class.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1239,11 +1281,40 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <h2>Question 4 — Payer Coverage Gap by State</h2>
   <div class="prompt-block">
-    <div class="prompt-label">💬 Cortex Analyst Playground</div>
+    <div class="prompt-label">💬 Semantic Studio Playground</div>
     <p>Which states have the highest payer coverage gap — meaning the highest proportion of costs not covered by insurance?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Which states have the highest payer coverage gap — meaning the highest proportion of costs not covered by insurance?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
+  </div>
+
+  <h2>Save good answers as verified queries</h2>
+  <p>When an answer is correct, click <strong>+ Add to verified query</strong> below the semantic query. This saves the question and its SQL into the semantic view's <strong>Verified Query Repository</strong>: a set of known-good question and SQL pairs that you, the semantic view owner, have signed off on.</p>
+  <ul>
+    <li><strong>Better accuracy.</strong> When a user asks the same or a similar question, Cortex Analyst uses the verified SQL instead of generating a new query from scratch.</li>
+    <li><strong>Consistent answers.</strong> Everyone who asks "average cost per encounter by income band" gets the same, approved logic, whether they ask here or through an agent.</li>
+    <li><strong>Smarter suggestions.</strong> Snowflake can analyze your verified queries to suggest new filters, metrics and descriptions for the rest of the semantic view, so it gets better at questions you haven't verified yet.</li>
+  </ul>
+  <p>Verified queries are stored in the semantic view itself, so adding one is an edit like any other: it isn't live until you publish.</p>
+  <ol>
+    <li>Run <strong>Question 1</strong> and confirm the results look right.</li>
+    <li>Click <strong>+ Add to verified query</strong>. The editor scrolls to the <strong>Verified queries</strong> section and shows the new entry, highlighted, with the question and its SQL.</li>
+    <li>Review the entry, then click <strong>Keep</strong> at the top right of it. (<strong>Undo</strong> discards it.) Until you click Keep, the change is only proposed.</li>
+    <li>Click <strong>Publish changes</strong>, make sure the <strong>default</strong> target is checked (it shows <em>Out of sync</em>), and click <strong>Publish</strong>. If the dot doesn't appear on <strong>Publish changes</strong>, refresh the page as you did earlier.</li>
+    <li>The <strong>Review publish changes</strong> dialog opens with an <em>Overwrite warning</em> and a diff of your file against the published semantic view. The warning is expected: publishing always replaces the semantic view object with your workspace file. The only change should be a new <code>verified_queries:</code> block at the end, containing:
+      <ul>
+        <li><code>name</code> and <code>question</code>: the question you asked</li>
+        <li><code>sql</code>: the semantic query Cortex Analyst generated</li>
+        <li><code>verified_at</code> and <code>verified_by</code>: when you verified it, and your username</li>
+        <li><code>use_as_onboarding_question: false</code>: set this to <code>true</code> if you want the question offered to users as a suggested starting question</li>
+      </ul>
+      If that's all you see, click <strong>Publish</strong>.
+    </li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">⚠️</span>
+    <div><strong>Only verify answers you've checked.</strong> Cortex Analyst trusts verified queries, so a wrong one teaches it the wrong logic and makes similar answers worse. If the SQL is close but not right, fix it before you save it.</div>
   </div>
 
   <div class="step-nav">
