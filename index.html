@@ -499,7 +499,7 @@
     <tr><td><code>PROVIDERS</code></td><td>Clinician data with specialties</td></tr>
     <tr><td><code>PAYERS</code></td><td>Payer/insurer reference data</td></tr>
     <tr><td><code>PROCEDURES</code></td><td>CPT-coded procedures with costs</td></tr>
-    <tr><td><code>CLINICAL_NOTES</code></td><td>AI-generated SOAP-format clinical notes from Synthea patient records — loaded via CSV (1,500 rows)</td></tr>
+    <tr><td><code>CLINICAL_NOTES</code></td><td>AI-generated SOAP-format clinical notes from Synthea patient records — loaded via CSV (1,510 rows)</td></tr>
   </table>
 
   <div class="step-nav">
@@ -688,25 +688,32 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <div class="timing-pill">⏱ ~5 min</div>
 
   <h2>What Is Cortex Search?</h2>
-  <p>Cortex Search is Snowflake's fully managed search service for unstructured text. Point it at any text column in a Snowflake table and it automatically indexes the content, generates <strong>vector embeddings</strong> (a numerical fingerprint of each piece of text that captures its meaning, not just its words), and serves search queries — with no infrastructure to manage, no model to train, and no pipeline to build.</p>
-  <p>Under the hood it uses <strong>hybrid search</strong>: a combination of those meaning-based embeddings and traditional keyword scoring (which handles exact word and phrase matching). Together these outperform either method alone, especially for domain-specific content like clinical documentation.</p>
+  <p>Cortex Search is Snowflake's fully managed search service for text. You point it at a text column in a table, and it indexes that column and answers search queries against it. You don't manage infrastructure, train a model, or build a pipeline. As part of indexing, it creates a <strong>vector embedding</strong> for each row: a list of numbers that represents what the text means, so text with similar meaning gets similar numbers.</p>
+  <p>Every query uses <strong>hybrid search</strong>, which combines three steps:</p>
+  <ol>
+    <li><strong>Vector search</strong> finds notes whose meaning is close to the query, using the embeddings.</li>
+    <li><strong>Keyword search</strong> finds notes that contain the query's exact words and phrases.</li>
+    <li><strong>Semantic reranking</strong> reorders the combined results so the most relevant notes come first.</li>
+  </ol>
+  <p>Together these find more of the right notes than either kind of search alone, which matters for specialized text like clinical documentation.</p>
 
-  <h2>Semantic Search — What That Means</h2>
-  <p>Traditional keyword search finds documents containing the exact words you typed. <strong>Semantic search</strong> finds documents that mean what you're asking, even if the words don't match.</p>
-  <p>In a clinical context this matters enormously. A care manager searching for <em>"patient with poorly controlled blood sugar missing labs"</em> should surface notes that mention HbA1c, A1C, glycemic index, or endocrinology follow-up — none of which contain the search phrase. Cortex Search handles this automatically because it understands the meaning behind words, not just the words themselves.</p>
+  <h2>What semantic search means</h2>
+  <p>Keyword search finds documents that contain the words you typed. <strong>Semantic search</strong> finds documents that mean what you asked, even when they use different words.</p>
+  <p>That matters a lot in clinical notes, because clinicians write in their own shorthand. A care manager who searches for <em>"patient who can't breathe and isn't using their inhaler"</em> should find notes that say <em>"increased shortness of breath and wheezing"</em> and <em>"reports non-adherence to prescribed inhalers"</em>, even though none of those notes contain the search phrase.</p>
 
   <h2>What We're Doing in This Lab</h2>
-  <p>We have a dataset of <strong>1,500 AI-generated clinical notes</strong> in SOAP format (Subjective, Objective, Assessment, Plan) — synthetic patient records produced from the Synthea dataset. These notes are in a CSV file called <code>Clinical_Notes_RAW.csv</code>.</p>
-  <p>In this module we will:</p>
+  <p>The lab includes <strong>1,510 AI-generated clinical notes</strong> for Synthea patients, in a CSV file called <code>Clinical_Notes_RAW.csv</code>. Each note uses the SOAP format: Subjective, Objective, Assessment, Plan. Most notes cover lung cancer, COVID-19, COPD and emphysema, and a small number contain personal data that shouldn't be stored.</p>
+  <p>In this module you will:</p>
   <ol>
-    <li>Load <code>Clinical_Notes_RAW.csv</code> into a Snowflake table in <code>VBC_LAB.CARE_ANALYTICS</code></li>
-    <li>Create a <strong>Cortex Search Service</strong> on top of that table — one SQL command</li>
-    <li>Query the service to verify it works</li>
+    <li>Use <code>AI_COMPLETE</code> to scan every note for personal data and for details that don't match the patient record</li>
+    <li>Load the notes into a <code>CLINICAL_NOTES</code> table in <code>VBC_LAB.CARE_ANALYTICS</code>, with <code>AI_REDACT</code> removing personal data as the rows are written</li>
+    <li>Create a Cortex Search service, <code>CLINICAL_NOTES_SEARCH</code>, on that table</li>
+    <li>Test the service with searches in the Playground</li>
   </ol>
 
   <div class="callout callout-info">
     <span class="callout-icon">🤖</span>
-    <div><strong>Why this matters for Module 3:</strong> The agent we build in Module 3 will have two tools available to it — the <strong>semantic view</strong> from Module 1 (structured VBC analytics via Cortex Analyst) and the <strong>Cortex Search service</strong> from this module (unstructured clinical notes). The agent decides which tool to use based on the question. Structured metrics questions route to Analyst; narrative patient history questions route to Search.</div>
+    <div><strong>Why this matters for Module 3:</strong> Like Cortex Analyst, Cortex Search does one job: it returns the notes that best match a query. It doesn't write an answer. In Module 3 you'll give a Cortex Agent both tools: Cortex Analyst with the semantic view from Module 1, for metrics, and this search service, for clinical notes. The agent decides which tool each question needs, calls one or both, and writes the answer.</div>
   </div>
 
   <h2>Other Example Uses for Cortex Search</h2>
@@ -732,7 +739,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
   <div class="timing-pill">⏱ ~20 min</div>
 
-  <p>This step uses a Snowflake Workspace Notebook to load <code>Clinical_Notes_RAW.csv</code> into Snowflake — but it's not a simple file import. Before the data ever lands in a table, the notebook uses <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql" target="_blank" style="color:var(--sf-blue)">Cortex AI Functions</a> to scan every note for PII and data quality issues, redact anything it finds in-flight, then create the clean <code>CLINICAL_NOTES</code> table and the Cortex Search service on top of it in one pass.</p>
+  <p>This step uses a Workspace notebook to load <code>Clinical_Notes_RAW.csv</code> into Snowflake, but it's more than a file import. The raw file stays on a stage while <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql" target="_blank" style="color:var(--sf-blue)">Cortex AI Functions</a> scan every note for personal data and quality issues. The notebook then writes the <code>CLINICAL_NOTES</code> table with that personal data redacted, so it never lands in a table, and creates the Cortex Search service on the clean table.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">📥</span>
@@ -742,7 +749,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <h2>Part 1 — Upload the Files to Your Workspace</h2>
   <p>The notebook reads <code>Clinical_Notes_RAW.csv</code> directly from your workspace root, so upload both files now. <strong>Do this before running any cells</strong> — the first SQL cell will fail if the CSV isn't present.</p>
   <ol>
-    <li>In Snowsight, navigate to <strong>Projects</strong> in the left sidebar and open your <strong>snowcamp</strong> workspace.</li>
+    <li>In the left sidebar, under <strong>Work with data</strong>, click <strong>Projects</strong> and confirm the workspace dropdown at the top of the Workspaces panel shows <strong>snowcamp</strong>.</li>
     <li>Click <strong>Add new</strong> and select <strong>Upload Files</strong> from the dropdown.</li>
     <li>In the file picker, navigate to the folder where you downloaded the files and select <strong>both</strong> <code>02_enriched_loading_demo.ipynb</code> and <code>Clinical_Notes_RAW.csv</code>.</li>
     <li>Confirm both files appear in the workspace file list on the left, then click <code>02_enriched_loading_demo.ipynb</code> to open it.</li>
@@ -764,7 +771,7 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
 
   <h2>Part 3 — Run the Notebook</h2>
   <p>Run each cell individually using the <strong>Run cell</strong> button on the right side of each cell, or press <strong>Shift + Enter</strong>. Read the markdown text above each cell before running it — the notebook is self-documenting and explains what each step does. Results appear directly below the cell after it executes.</p>
-  <p>Two cells take 1–2 minutes each (the AI_COMPLETE quality scan and the final load step). That's expected — an LLM is processing 1,500 rows.</p>
+  <p>Two cells take longer than the rest: the <code>AI_COMPLETE</code> quality scan (about 1–5 minutes, because an LLM reads all 1,510 notes) and the final load (about 1–2 minutes). That's expected.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
@@ -780,15 +787,16 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   <h2>What the Notebook Does</h2>
   <ol>
     <li><strong>Setup &amp; Stage</strong> — Sets the session context to <code>VBC_LAB.CARE_ANALYTICS</code>, creates an internal stage, and copies the CSV from your workspace onto it. A preview shows raw rows read directly from stage — no table exists yet.</li>
-    <li><strong>AI_COMPLETE — Data quality scan</strong> <em>(~1–2 min)</em> — An LLM scans all 1,500 notes for PII hidden in the note text (SSNs, phone numbers, email addresses, physical addresses) and flags any mismatches between the structured metadata and what the note actually says. Only rows with issues are returned.</li>
-    <li><strong>AI_REDACT — Preview</strong> — For the flagged rows, shows exactly what PII was found and what placeholder it will be replaced with (e.g. <code>[NATIONAL_ID]</code>, <code>[EMAIL]</code>, <code>[ADDRESS]</code>) before anything is written.</li>
-    <li><strong>AI_REDACT + Load</strong> <em>(~1–2 min)</em> — Creates the final <code>CLINICAL_NOTES</code> table in a single pass. Flagged rows have PII replaced in-flight; clean rows pass through unchanged. The raw PII never touches a permanent table.</li>
-    <li><strong>Create Cortex Search Service</strong> — Creates <code>CLINICAL_NOTES_SEARCH</code> on the clean table and runs a semantic test query to confirm it's working.</li>
+    <li><strong>AI_COMPLETE — Data quality scan</strong> <em>(~1–5 min)</em> — An LLM (<code>claude-haiku-4-5</code> by default; the cell comment lists others you can try) reads every note and flags two kinds of issue: personal data in the note text (SSNs, phone numbers, email addresses, physical addresses) and notes whose stated age or gender doesn't match the patient record. Only rows with issues are returned.</li>
+    <li><strong>Save the flagged rows</strong> — A short Python cell saves the flagged note IDs and their quality reports to a temporary table, so the SQL cells that follow can use them.</li>
+    <li><strong>AI_REDACT — Preview</strong> — For the flagged rows, shows what personal data was found and which placeholder will replace it (for example <code>[NATIONAL_ID]</code>, <code>[EMAIL]</code>, <code>[ADDRESS]</code>) before anything is written.</li>
+    <li><strong>AI_REDACT + Load</strong> <em>(~1–2 min)</em> — Creates the final <code>CLINICAL_NOTES</code> table by reading the stage once. Flagged rows have their personal data replaced as they're written; all other rows pass through unchanged. The raw personal data never reaches a table.</li>
+    <li><strong>Create Cortex Search Service</strong> — Creates <code>CLINICAL_NOTES_SEARCH</code> on the clean table, then runs a test search to confirm it works.</li>
   </ol>
 
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em> — a clinical term that doesn't appear verbatim in any note. If the results come back about Cystic Fibrosis (CF) patients, semantic search is working correctly.</div>
+    <div><strong>Checkpoint:</strong> The final cell searches for <em>"mucoviscidosis with pulmonary exacerbation"</em>. Mucoviscidosis is an older name for cystic fibrosis, and the word doesn't appear in any note. If the results are about cystic fibrosis (CF) patients, semantic search is working.</div>
   </div>
 
   <p>Once the notebook finishes, free up the compute it was using before moving on. Shutting down the kernel only clears memory — the notebook service keeps running (and consuming credits) until it's suspended. Click the <strong>Connected</strong> dropdown, hover over your service name, and click <strong>Suspend</strong> (the pause icon), then close the notebook tab.</p>
@@ -807,59 +815,63 @@ SHOW SCHEMAS IN DATABASE VBC_LAB;</code></pre>
   </div>
   <div class="timing-pill">⏱ ~5 min</div>
 
-  <p>The notebook created the <code>CLINICAL_NOTES</code> table and built a Cortex Search index on its <code>NOTE_TEXT</code> column, named <code>CLINICAL_NOTES_SEARCH</code>. Now let's verify it's working and explore it using the built-in Cortex Search Playground — a UI for running searches directly against your service without writing any code.</p>
+  <p>The notebook created the <code>CLINICAL_NOTES</code> table and a Cortex Search service on its <code>NOTE_TEXT</code> column, called <code>CLINICAL_NOTES_SEARCH</code>. In this step you'll check that the service works, using the Cortex Search <strong>Playground</strong>: a page in Snowsight where you can run searches against a service without writing code.</p>
+  <p>The Playground shows exactly what Cortex Search returns: a ranked list of matching notes. It doesn't write an answer or summarize anything. That ranked list is also what the agent receives in Module 3 when it calls this service as a tool, so if the right notes show up here, the agent has the right material to work with.</p>
 
   <h2>Navigate to Your Search Service</h2>
   <ol>
-    <li>In the Snowsight left sidebar, click <strong>AI &amp; ML</strong>, then select <strong>Search</strong>.</li>
-    <li>You'll see the Cortex Search service list. Confirm <code>CLINICAL_NOTES_SEARCH</code> is listed with both <strong>Indexing</strong> and <strong>Serving</strong> showing <strong>ACTIVE</strong> and 1,510 rows.</li>
-    <li>Click on <strong>CLINICAL_NOTES_SEARCH</strong> to open the service detail page.</li>
+    <li>In the Snowsight left sidebar, click <strong>AI &amp; ML</strong>, then select <strong>Cortex Search</strong>.</li>
+    <li>In the list of services, confirm <code>CLINICAL_NOTES_SEARCH</code> appears with both <strong>Indexing</strong> and <strong>Serving</strong> showing <strong>ACTIVE</strong> and 1,510 rows.</li>
+    <li>Click <strong>CLINICAL_NOTES_SEARCH</strong> to open its detail page.</li>
   </ol>
 
   <h2>Review the Service Details</h2>
-  <p>The detail page has three tabs — take a moment to look around:</p>
+  <p>The detail page has three tabs. Take a moment to look at each:</p>
   <ul>
-    <li><strong>Search Service</strong> — Shows which column is being searched (<code>NOTE_TEXT</code>), which columns are available as filter attributes (<code>NOTE_DATE</code>, <code>NOTE_TYPE</code>, <code>PROVIDER_NAME</code>, and others), the embedding model in use (<code>snowflake-arctic-embed-m-v1.5</code>), and the REST API endpoint if you want to call the service programmatically.</li>
-    <li><strong>Data Preview</strong> — Browse the raw rows in the underlying table.</li>
-    <li><strong>Costs</strong> — Track compute usage for the service.</li>
+    <li><strong>Search Service</strong> — The column being searched (<code>NOTE_TEXT</code>), the columns you can filter on (<code>NOTE_DATE</code>, <code>NOTE_TYPE</code>, <code>PROVIDER_NAME</code> and others), the embedding model (<code>snowflake-arctic-embed-m-v1.5</code>, the default), and the REST API endpoint for calling the service from code.</li>
+    <li><strong>Data Preview</strong> — The rows the service has indexed.</li>
+    <li><strong>Costs</strong> — Compute usage for the service.</li>
   </ul>
 
   <h2>Open the Playground</h2>
-  <p>Click <strong>Playground</strong> in the top-right corner of the service detail page. This opens an interactive search UI pointed at <code>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</code>.</p>
+  <p>Click <strong>Playground</strong> in the top-right corner of the detail page. It opens pointed at <code>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</code>.</p>
 
   <h2>Try These Searches</h2>
-  <p>Type a search phrase into the box and click the search button. Results appear as a ranked list — hover over any result to expand the full note text.</p>
+  <p>Paste each phrase into the search box and run it. Results appear as a ranked list; hover over a result to see the full note. For each search, check that the top results are about the topic you asked for, even when they use different words.</p>
 
-  <h2>Search 1 — Diabetes Care Gaps</h2>
+  <h2>Search 1 — Lung Disease Flare-Ups</h2>
   <div class="prompt-block">
     <div class="prompt-label">🔍 Search Phrase</div>
-    <p>patients with poorly controlled diabetes and missed lab follow-ups</p>
+    <p>patients with a lung disease flare-up who are struggling to breathe</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'patients with poorly controlled diabetes and missed lab follow-ups')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'patients with a lung disease flare-up who are struggling to breathe')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
+  <p><strong>Look for:</strong> notes about acute exacerbations of emphysema or chronic obstructive bronchitis (COPD), with wheezing, shortness of breath and low oxygen levels.</p>
 
-  <h2>Search 2 — High-Risk Heart Failure</h2>
+  <h2>Search 2 — Cancer Pain</h2>
   <div class="prompt-block">
     <div class="prompt-label">🔍 Search Phrase</div>
-    <p>high-risk patients with recent emergency department visits for heart failure</p>
+    <p>cancer patients whose pain is getting harder to control</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'high-risk patients with recent emergency department visits for heart failure')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'cancer patients whose pain is getting harder to control')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
+  <p><strong>Look for:</strong> notes about lung cancer patients with worsening pain from disease progression, often with changes to pain medication or palliative care.</p>
 
-  <h2>Search 3 — Preventive Care Gaps</h2>
+  <h2>Search 3 — Medications Patients Can't Afford</h2>
   <div class="prompt-block">
     <div class="prompt-label">🔍 Search Phrase</div>
-    <p>patients with gaps in preventive screenings or annual wellness visits</p>
+    <p>patients who skip their medications because they cannot afford them</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'patients with gaps in preventive screenings or annual wellness visits')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'patients who skip their medications because they cannot afford them')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
+  <p><strong>Look for:</strong> notes that say the patient reports non-adherence to prescribed inhalers <em>due to cost</em>. For a value-based care program, these are patients at risk of a preventable hospital stay.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
-    <div>None of these phrases appear verbatim in the notes — the search works because it understands meaning, not just words.</div>
+    <div>None of these phrases appear word for word in the notes. The right notes come back because Cortex Search matches on meaning, not just on words.</div>
   </div>
 
   <div class="step-nav">
@@ -1326,7 +1338,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 <!-- ─────────────────── M3 CONTEXT ─────────────────── -->
 <div id="step-m3-context" class="step-content">
   <div class="step-header">
-    <div class="step-tag"><span class="dot"></span>Module 3 · Cortex Agents</div>
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 10</div>
     <h1>Why Agents?</h1>
     <div class="step-meta">
       <span class="step-meta-item">⏱ ~30 minutes total</span>
@@ -1335,19 +1347,19 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="timing-pill">⏱ 3 min — Business Context</div>
 
-  <p>You now have two powerful tools: a semantic search over clinical documentation, and a natural language analytics engine over VBC metrics. But real care management questions don't fit neatly into one category:</p>
+  <p>You now have two tools, and each does one job. Cortex Analyst turns a question into SQL over <code>VBC_ANALYTICS_SV</code> and returns the results. Cortex Search returns the clinical notes that best match a query. Neither one can answer a question that needs both kinds of data, and real care management questions often do:</p>
 
   <div class="callout callout-wow">
     <span class="callout-icon">💬</span>
-    <div><em>"This patient had three ED visits this year — what's driving it, and does their care plan address it?"</em><br><br>That requires both their <strong>clinical notes</strong> AND their <strong>utilization data</strong>. That's what a Cortex Agent does — it reasons across both tools and synthesizes one answer.</div>
+    <div><em>"This patient was admitted three times this year. What's driving it, and does their care plan address it?"</em><br><br>Answering that takes both their <strong>utilization data</strong> and their <strong>clinical notes</strong>. A Cortex Agent can do it: it works out which tools the question needs, calls each one, and combines the results into one answer.</div>
   </div>
 
   <h2>Key Concepts</h2>
   <ul>
-    <li><strong>Tool orchestration</strong> — The agent is given a set of tools (a search service and a semantic view) and decides which to use per question. No if/else routing logic to write.</li>
-    <li><strong>Multi-tool synthesis</strong> — For complex questions, the agent calls multiple tools and synthesizes a single coherent answer.</li>
-    <li><strong>Guardrails</strong> — Agents are scoped to their tools. Questions outside that scope are declined gracefully.</li>
-    <li><strong>Auditability</strong> — Every tool call and reasoning step can be logged — critical in a regulated environment like healthcare.</li>
+    <li><strong>Tool orchestration</strong> — You give the agent a set of tools (here, Cortex Analyst and Cortex Search) and instructions for when to use each. It picks the tools for every question, so you don't write routing logic.</li>
+    <li><strong>Multi-tool answers</strong> — For questions that span both kinds of data, the agent calls several tools and combines their results into one answer.</li>
+    <li><strong>Scope</strong> — An agent can only reach data through its tools, and its instructions set what it should answer. This agent's instructions tell it to decline questions outside its two data sources.</li>
+    <li><strong>Auditability</strong> — Agent requests, including which tools were called, are logged and can be reviewed later. That matters in a regulated field like healthcare.</li>
   </ul>
 
   <h2>VBC Use Cases</h2>
@@ -1360,27 +1372,27 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m1-s4')">← Query the Search Service</button>
-    <button class="step-nav-btn primary" onclick="showStep('step-m3-s1')">Step 1: Create the Agent →</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-s1')">Step 11: Create the Agent →</button>
   </div>
 </div>
 
 <!-- ─────────────────── M3 S1: CREATE AGENT ─────────────────── -->
 <div id="step-m3-s1" class="step-content">
   <div class="step-header">
-    <div class="step-tag"><span class="dot"></span>Module 3 · Step 1</div>
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 11</div>
     <h1>Create the VBC Care Agent</h1>
   </div>
   <div class="timing-pill">⏱ ~5 min</div>
 
-  <p>You'll create a Cortex Agent using CoCo, then navigate to the Agent UI in Snowsight to review what was built. The agent will have two tools: structured VBC analytics via Cortex Analyst, and unstructured clinical notes via Cortex Search.</p>
+  <p>You'll use CoCo to create a Cortex Agent, then open it in Snowsight to review what was built. The agent gets two tools: <strong>VBCAnalytics</strong> (Cortex Analyst with <code>VBC_ANALYTICS_SV</code>) for metrics, and <strong>ClinicalNotes</strong> (Cortex Search with <code>CLINICAL_NOTES_SEARCH</code>) for clinical notes.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">📖</span>
     <div>This step follows the patterns from the <a href="https://www.snowflake.com/en/developers/guides/best-practices-to-building-cortex-agents/" target="_blank" style="color:var(--sf-blue)">Snowflake Cortex Agents Best Practices Guide</a>. Worth bookmarking for production agent development.</div>
   </div>
 
-  <h2>Step 1 — Create the Agent with CoCo <span style="font-size:0.6em; font-weight:400; color:var(--sf-muted);">(formerly Cortex Code)</span></h2>
-  <p>Open a <strong>new CoCo chat</strong> in Snowsight and paste the prompt below. CoCo will create the agent, configure both tools, and set the orchestration and response instructions.</p>
+  <h2>Part 1 — Create the Agent with CoCo <span style="font-size:0.6em; font-weight:400; color:var(--sf-muted);">(formerly Cortex Code)</span></h2>
+  <p>Open a <strong>new CoCo chat</strong> in Snowsight and paste the prompt below. CoCo will create the agent, add both tools, set its orchestration and response instructions, and register it with Snowflake CoWork.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">💡</span>
@@ -1393,10 +1405,10 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <p>Create a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:</p>
     <p>Name: VBCCAREAGENT<br>Display name: VBC_CARE_AGENT</p>
     <p>Add two tools:<br>
-    1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics<br>
-    2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives</p>
+    1. A Cortex Analyst tool named VBCAnalytics, using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics<br>
+    2. A Cortex Search tool named ClinicalNotes, using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives</p>
     <p>Orchestration instructions:<br>
-    You are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.</p>
+    You are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBCAnalytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the ClinicalNotes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.</p>
     <p>Response instructions:<br>
     Always cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.</p>
     <p>CoWork setup:<br>
@@ -1408,17 +1420,22 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     3. Grant usage on the Intelligence object to the appropriate role:<br>
     <code>GRANT USAGE ON SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT TO ROLE ACCOUNTADMIN;</code></p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Execute the following directly:\n\nCreate a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBC Analytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the Clinical Notes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.\n\nCoWork setup:\nAfter creating the agent, register it with Snowflake CoWork so it can be previewed and used:\n1. Create a Snowflake Intelligence object if one does not already exist:\nCREATE SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT;\n2. Add the agent to the Intelligence object:\nALTER SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT ADD AGENT VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT;\n3. Grant usage on the Intelligence object to the appropriate role:\nGRANT USAGE ON SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT TO ROLE ACCOUNTADMIN;')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Execute the following directly:\n\nCreate a Cortex Agent in VBC_LAB.CARE_ANALYTICS with the following configuration:\n\nName: VBCCAREAGENT\nDisplay name: VBC_CARE_AGENT\n\nAdd two tools:\n1. A Cortex Analyst tool named VBCAnalytics, using semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV — for structured questions about costs, encounters, utilization, and VBC metrics\n2. A Cortex Search tool named ClinicalNotes, using service VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH — for searching clinical notes and patient narratives\n\nOrchestration instructions:\nYou are VBC Care Agent, an intelligence assistant for care managers and program analysts working with value-based care data. Your scope covers two data sources: structured VBC metrics and unstructured clinical notes. Use the VBCAnalytics tool for questions about costs, utilization rates, encounter volumes, quality measures, and population trends. Use the ClinicalNotes tool for questions about individual patient notes, care plan documentation, clinical narratives, or care gaps documented by providers. For complex questions that require both structured data and clinical context, use both tools and synthesize the results into one answer. Politely decline questions that fall outside these two data sources.\n\nResponse instructions:\nAlways cite which tool or data source was used to answer. Present numbers clearly with appropriate context. Lead with the direct answer, then provide supporting detail. Do not make clinical recommendations — present data and documentation only.\n\nCoWork setup:\nAfter creating the agent, register it with Snowflake CoWork so it can be previewed and used:\n1. Create a Snowflake Intelligence object if one does not already exist:\nCREATE SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT;\n2. Add the agent to the Intelligence object:\nALTER SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT ADD AGENT VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT;\n3. Grant usage on the Intelligence object to the appropriate role:\nGRANT USAGE ON SNOWFLAKE INTELLIGENCE SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT TO ROLE ACCOUNTADMIN;')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy Prompt</button>
     </div>
   </div>
 
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div><strong>Checkpoint:</strong> CoCo will confirm the agent was created and list both tools — <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It will also suggest a follow-up test query — you can skip this for now and proceed to the next step.</div>
+    <div><strong>Checkpoint:</strong> CoCo confirms the agent was created and lists both tools: <strong>VBCAnalytics</strong> (Cortex Analyst using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search using <code>CLINICAL_NOTES_SEARCH</code>). It may suggest a test query; you can skip it and continue.</div>
   </div>
 
-  <h2>Step 2 — Review the Agent in Snowsight</h2>
-  <p>After CoCo confirms creation, navigate to the Agent UI to review what was built:</p>
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>The CoWork setup SQL in the prompt says <code>SNOWFLAKE INTELLIGENCE</code> because the SQL object kept its old name when the product was renamed to Snowflake CoWork. This object controls which agents appear in CoWork; once it exists, an agent has to be added to it to show up there.</div>
+  </div>
+
+  <h2>Part 2 — Review the Agent in Snowsight</h2>
+  <p>After CoCo confirms the agent was created, open it in Snowsight:</p>
   <ol>
     <li>In the Snowsight left nav, go to <strong>AI &amp; ML → Agents</strong></li>
     <li>Click on <strong>VBCCAREAGENT</strong></li>
@@ -1426,8 +1443,8 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <li>Review the tabs:
       <ul>
         <li><strong>About</strong> — confirm the display name is <code>VBC_CARE_AGENT</code></li>
-        <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCANALYTICS</strong> (Cortex Analyst, bound to <code>VBC_ANALYTICS_SV</code>) and <strong>CLINICALNOTES</strong> (Cortex Search Services, bound to <code>CLINICAL_NOTES_SEARCH</code>)</li>
-        <li><strong>Orchestration</strong> — review the orchestration and response instructions that were set by CoCo</li>
+        <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCAnalytics</strong> (Cortex Analyst, using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search Services, using <code>CLINICAL_NOTES_SEARCH</code>)</li>
+        <li><strong>Orchestration</strong> — review the orchestration and response instructions CoCo set</li>
       </ul>
     </li>
     <li>Click <strong>Cancel</strong> when done — no changes needed</li>
@@ -1438,11 +1455,11 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <div>The <strong>Access</strong> tab controls which roles can use this agent. For this lab you can leave the defaults. In production you would restrict access here before deploying to end users.</div>
   </div>
 
-  <h2>Step 3 — Quick Verification in Agent Chat</h2>
-  <p>Before moving to Snowflake CoWork, do a quick sanity check using the chat panel on the right side of the agent detail page. This confirms the agent is live and both tools are reachable.</p>
+  <h2>Part 3 — Quick Check in the Agent Playground</h2>
+  <p>Before moving to Snowflake CoWork, ask two quick questions in the chat panel on the right side of the agent detail page. One question needs each tool, so together they confirm the agent can reach both.</p>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Agent Chat (Snowsight)</div>
+    <div class="prompt-label">💬 Agent Chat (Snowsight) — Analyst check</div>
     <p>How many patients are in the dataset?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'How many patients are in the dataset?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1450,28 +1467,28 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   </div>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Agent Chat (Snowsight) — Search verification</div>
-    <p>Is there any PII data in the clinical notes?</p>
+    <div class="prompt-label">💬 Agent Chat (Snowsight) — Search check</div>
+    <p>Find clinical notes about patients with cystic fibrosis.</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Is there any PII data in the clinical notes?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Find clinical notes about patients with cystic fibrosis.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
 
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div>The first question should return a number via <strong>Cortex Analyst</strong>. The second should return clinical note excerpts via <strong>Cortex Search</strong>. If both respond — not errors — both tools are reachable. Move on to the next step.</div>
+    <div>The first question should return a patient count from <strong>VBCAnalytics</strong>. The second should return excerpts from cystic fibrosis notes from <strong>ClinicalNotes</strong>. If both return an answer rather than an error, both tools work and you can move on.</div>
   </div>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m3-context')">← Why Agents?</button>
-    <button class="step-nav-btn primary" onclick="showStep('step-m3-test')">Step 2: Test in Snowflake CoWork →</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-test')">Step 12: Test in Snowflake CoWork →</button>
   </div>
 </div>
 
 <!-- ─────────────────── M3 TEST ─────────────────── -->
 <div id="step-m3-test" class="step-content">
   <div class="step-header">
-    <div class="step-tag"><span class="dot"></span>Module 3 · Step 2</div>
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 12</div>
     <h1>Test in Snowflake CoWork <span style="font-size:0.5em; font-weight:400; color:var(--sf-muted);">(formerly Snowflake Intelligence)</span></h1>
   </div>
   <div class="timing-pill">⏱ ~15 min · Slow down here!</div>
@@ -1491,65 +1508,67 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     <div>The right panel shows <strong>Agent details</strong>: key data objects (ClinicalNotes, VBCAnalytics) and the agent's connection to Snowflake. Type your questions in the chat bar at the bottom — it shows <strong>VBC_CARE_AGENT</strong> as the active agent.</div>
   </div>
 
+  <p>All three questions focus on one population: patients with COPD or emphysema. They appear in both the clinical notes and the Synthea condition data, so the agent can answer about them from either source, or both.</p>
+
   <h2>Question 1 — Clinical Notes (Search)</h2>
-  <p>This should route to <strong>Cortex Search</strong>. Watch the reasoning trace — you'll see it search ClinicalNotes multiple times before composing its answer.</p>
+  <p>This should use <strong>ClinicalNotes</strong>. Watch the reasoning trace: the agent searches the notes one or more times before it writes its answer.</p>
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork</div>
-    <p>Find patients in clinical notes who have documented gaps in diabetes management or missed HbA1c follow-ups.</p>
+    <p>What do the clinical notes say about patients hospitalized for COPD or emphysema flare-ups, and are they following their treatment plans?</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Find patients in clinical notes who have documented gaps in diabetes management or missed HbA1c follow-ups.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'What do the clinical notes say about patients hospitalized for COPD or emphysema flare-ups, and are they following their treatment plans?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div>You'll see "Searched ClinicalNotes" appear in the reasoning trace as the agent works. The final response will surface specific patient findings with source citations.</div>
+    <div>You'll see a search of ClinicalNotes in the reasoning trace. The answer should describe what the notes report, such as exacerbations triggered by infection and patients not using their inhalers because of cost, with citations to the notes it used.</div>
   </div>
 
   <h2>Question 2 — VBC Metrics (Analyst)</h2>
-  <p>This should route to <strong>Cortex Analyst</strong>. The agent will query the VBC analytics semantic view and return structured data.</p>
+  <p>This should use <strong>VBCAnalytics</strong>. The agent sends the question to Cortex Analyst, which turns it into SQL over <code>VBC_ANALYTICS_SV</code>, and the agent writes up the results.</p>
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork</div>
-    <p>What is the total cost of care for patients with diabetes diagnoses, and how does their ED utilization rate compare to the overall population?</p>
+    <p>What is the total cost of care for patients with COPD or emphysema, and how does their avoidable ED rate compare to the overall population?</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'What is the total cost of care for patients with diabetes diagnoses, and how does their ED utilization rate compare to the overall population?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'What is the total cost of care for patients with COPD or emphysema, and how does their avoidable ED rate compare to the overall population?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div>The agent automatically selected a different tool this time — no routing logic required. Look for the VBCAnalytics tool in the reasoning trace.</div>
+    <div>This time the agent picked a different tool without any routing logic from you. Look for VBCAnalytics in the reasoning trace; you can expand it to see the SQL Cortex Analyst generated.</div>
   </div>
 
   <h2>Question 3 — Both Tools (The Wow Moment)</h2>
-  <p>This question requires <em>both</em> tools. Watch the agent decompose it, call each tool in sequence, then synthesize a single answer. Read the full response.</p>
+  <p>This question needs <em>both</em> tools. Watch the agent split it into parts, call each tool, then combine the results into one answer. Read the full response.</p>
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork — Multi-Tool Question</div>
-    <p>We're seeing high avoidable ED utilization in our diabetic population. What do the clinical notes say about care plan adherence for these patients, and what does the data show about their encounter patterns?</p>
+    <p>COPD and emphysema patients are one of our costliest groups. What do the clinical notes say is driving their hospital stays, and what does the data show about their encounter patterns and costs?</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, &quot;We're seeing high avoidable ED utilization in our diabetic population. What do the clinical notes say about care plan adherence for these patients, and what does the data show about their encounter patterns?&quot;)"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'COPD and emphysema patients are one of our costliest groups. What do the clinical notes say is driving their hospital stays, and what does the data show about their encounter patterns and costs?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
 
   <div class="callout callout-wow">
     <span class="callout-icon">⭐</span>
-    <div>This is what makes agents different from a search bar or a dashboard. The agent:<br><br>
-    <strong>1.</strong> Breaks the question into two sub-questions<br>
-    <strong>2.</strong> Searches <strong>ClinicalNotes</strong> → retrieves notes about diabetes care plan adherence<br>
-    <strong>3.</strong> Queries <strong>VBCAnalytics</strong> → pulls encounter patterns for diabetic patients<br>
-    <strong>4.</strong> Synthesizes both results into one coherent answer — citing both sources<br><br>
-    No if/else routing logic to write. No joins across systems. The agent does the reasoning.
+    <div>This is what makes an agent different from a search bar or a dashboard. The agent:<br><br>
+    <strong>1.</strong> Splits the question into two parts: why these patients are in the hospital, and what their encounters and costs look like<br>
+    <strong>2.</strong> Searches <strong>ClinicalNotes</strong> for notes about COPD and emphysema hospital stays<br>
+    <strong>3.</strong> Queries <strong>VBCAnalytics</strong> for encounter patterns and costs for those patients<br>
+    <strong>4.</strong> Combines both results into one answer that cites both sources<br><br>
+    Cortex Analyst only wrote the SQL in step 3. Planning the steps, choosing the tools, and writing the answer were the agent's work, and you didn't write any routing logic or joins between the two systems.
     </div>
   </div>
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-m3-s1')">← Create the Agent</button>
-    <button class="step-nav-btn primary" onclick="showStep('step-m3-explore')">Step 3: Free Exploration →</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-m3-explore')">Step 13: Free Exploration →</button>
   </div>
 </div>
 
 <!-- ─────────────────── M3 EXPLORE ─────────────────── -->
 <div id="step-m3-explore" class="step-content">
   <div class="step-header">
-    <div class="step-tag"><span class="dot"></span>Module 3 · Step 3</div>
+    <div class="step-tag"><span class="dot"></span>Module 3 · Step 13</div>
     <h1>Free Exploration</h1>
   </div>
   <div class="timing-pill">⏱ ~5 min</div>
@@ -1559,31 +1578,31 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   <h2>Suggested Prompts if You're Stuck</h2>
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork — Option A</div>
-    <p>Which providers have the highest rate of patients with unresolved care plan goals in their notes?</p>
+    <p>Find clinical notes about lung cancer patients whose pain is getting worse, and compare the average cost per encounter for lung cancer patients with the overall population.</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Which providers have the highest rate of patients with unresolved care plan goals in their notes?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Find clinical notes about lung cancer patients whose pain is getting worse, and compare the average cost per encounter for lung cancer patients with the overall population.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
 
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork — Option B</div>
-    <p>Find clinical notes that mention social determinants of health concerns like housing or food insecurity, and compare the cost profile of those patients to the overall population.</p>
+    <p>Find notes where patients say they can't afford their medications, and show how those patients' total cost of care compares to everyone else's.</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Find clinical notes that mention social determinants of health concerns like housing or food insecurity, and compare the cost profile of those patients to the overall population.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Find notes where patients say they can\'t afford their medications, and show how those patients\' total cost of care compares to everyone else\'s.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
 
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork — Option C</div>
-    <p>What patterns appear in notes for patients who had inpatient admissions within 30 days of an outpatient encounter?</p>
+    <p>What do the clinical notes say about patients hospitalized with COVID-19 respiratory failure, and how many COVID-19 encounters were there each year?</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'What patterns appear in notes for patients who had inpatient admissions within 30 days of an outpatient encounter?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'What do the clinical notes say about patients hospitalized with COVID-19 respiratory failure, and how many COVID-19 encounters were there each year?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
 
   <div class="callout callout-tip">
     <span class="callout-icon">🚀</span>
-    <div><strong>Fast finisher bonus:</strong> Go back to the Orchestration tab on VBCCAREAGENT and tighten the response instructions — for example, add a rule that responses must always include a confidence caveat for clinical findings. How does the answer change?</div>
+    <div><strong>Fast finisher bonus:</strong> Change how the agent answers. In Snowsight, go to <strong>AI &amp; ML → Agents → VBCCAREAGENT</strong>, click <strong>Edit</strong>, and open <strong>Orchestration</strong>. Add a line to the response instructions, for example: <em>"For every finding from the clinical notes, say how many notes support it."</em> Click <strong>Save</strong>, then ask one of your earlier questions again in Snowflake CoWork. How does the answer change?</div>
   </div>
 
   <div class="step-nav">
@@ -1602,12 +1621,12 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <h2>What You Built Today</h2>
   <ul class="discussion-list">
-    <li><span class="bullet">📊</span><strong>Cortex Analyst + Semantic View</strong> — democratizes VBC analytics. Program managers ask in plain English; governance and consistent definitions stay intact.</li>
-    <li><span class="bullet">🛡️</span><strong>Cortex AI Functions</strong> — in the loading notebook, <code>AI_COMPLETE</code> scanned 1,500 clinical notes for hidden PII and data quality issues, and <code>AI_REDACT</code> stripped that PII in-flight before the data ever landed in a table. AI ran directly in SQL, inside the pipeline.</li>
-    <li><span class="bullet">🔍</span><strong>Cortex Search</strong> — makes clinical documentation conversationally discoverable. Care managers find relevant patient history using natural language, in seconds.</li>
-    <li><span class="bullet">🤖</span><strong>Cortex Agent</strong> — bridges clinical notes and structured data. The most complex care management questions can now be answered automatically, across both sources.</li>
+    <li><span class="bullet">📊</span><strong>Cortex Analyst + Semantic View</strong> — turns plain-English questions into SQL over shared VBC definitions. You tested the conversion in the Playground and saved a checked answer as a verified query, so similar questions get consistent results.</li>
+    <li><span class="bullet">🛡️</span><strong>Cortex AI Functions</strong> — in the loading notebook, <code>AI_COMPLETE</code> scanned 1,510 clinical notes for personal data and quality issues, and <code>AI_REDACT</code> removed that personal data as the rows were written, so it never landed in a table. The AI ran in SQL, inside the load.</li>
+    <li><span class="bullet">🔍</span><strong>Cortex Search</strong> — makes clinical notes searchable by meaning. Care managers can find relevant patient history in plain language, even when the notes use different words.</li>
+    <li><span class="bullet">🤖</span><strong>Cortex Agent</strong> — connects clinical notes and structured data. It plans which tools a question needs, calls them, and combines the results into one answer.</li>
     <li><span class="bullet">🧠</span><strong>Snowflake CoWork</strong> (formerly Snowflake Intelligence) — surfaces the agent as a polished conversational UI for business users, no SQL required.</li>
-    <li><span class="bullet">❄️</span><strong>Everything runs inside Snowflake</strong> — no data egress, no separate AI infrastructure, no new security perimeter. Critical for HIPAA compliance.</li>
+    <li><span class="bullet">❄️</span><strong>Everything runs inside Snowflake</strong> — the data, models and agent stay within Snowflake's security and governance boundary, with no separate AI infrastructure to stand up. That simplifies security and compliance reviews in regulated settings such as HIPAA.</li>
   </ul>
 
   <div class="callout callout-wow">
@@ -1649,10 +1668,16 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   <h2>Objects You Created</h2>
   <table>
     <tr><th>Object</th><th>Name</th></tr>
+    <tr><td>Workspace</td><td>snowcamp</td></tr>
+    <tr><td>Database and schema</td><td>VBC_LAB.CARE_ANALYTICS</td></tr>
+    <tr><td>Marketplace database</td><td>SYNTHEA</td></tr>
+    <tr><td>Semantic View</td><td>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</td></tr>
+    <tr><td>File format and stage</td><td>VBC_LAB.CARE_ANALYTICS.NOTES_CSV, VBC_LAB.CARE_ANALYTICS.NOTES_STAGE</td></tr>
     <tr><td>Table</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES</td></tr>
     <tr><td>Cortex Search Service</td><td>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</td></tr>
-    <tr><td>Semantic View</td><td>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</td></tr>
+    <tr><td>Notebook service</td><td>The runtime service you created in Step 8 (suspended at the end of that step)</td></tr>
     <tr><td>Cortex Agent</td><td>VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT</td></tr>
+    <tr><td>Snowflake CoWork object</td><td>SNOWFLAKE_INTELLIGENCE_OBJECT_DEFAULT</td></tr>
   </table>
 
   <h2>Bonus Extensions — If There's Extra Time</h2>
@@ -1674,7 +1699,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
       <ol style="font-size:13px; padding-left:18px; margin:0 0 10px 0">
         <li>Search for <strong>PubMed Knowledge Extension</strong> in Snowflake Marketplace and install it</li>
         <li>Add it as a third tool to VBCCAREAGENT — it's already a search index, no additional setup required</li>
-        <li>Ask: <em>"What does the evidence say about care management for reducing avoidable ED utilization in diabetic patients?"</em></li>
+        <li>Ask: <em>"What does the evidence say about care management for reducing hospital readmissions in patients with COPD?"</em></li>
       </ol>
       <p style="font-size:12.5px; margin:0"><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-knowledge-extensions/cke-overview" target="_blank" style="color:var(--sf-blue)">📄 Cortex Knowledge Extensions overview →</a></p>
     </div>
