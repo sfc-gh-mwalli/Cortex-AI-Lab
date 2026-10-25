@@ -1771,7 +1771,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   </div>
   <div class="timing-pill">⏱ On your own, after class</div>
 
-  <p>Build a small web app on the semantic view you created in Module 1. CoCo in Snowsight writes the app, and Snowflake runs it on <strong>Snowflake App Runtime</strong> at its own URL, behind Snowflake sign-in.</p>
+  <p>Build a multi-page web app on the semantic view you created in Module 1. CoCo in Snowsight writes the app, and Snowflake runs it on <strong>Snowflake App Runtime</strong> at its own URL, behind Snowflake sign-in.</p>
 
   <div class="callout callout-info">
     <span class="callout-icon">ℹ️</span>
@@ -1782,19 +1782,27 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   <ol>
     <li>Open the <code>snowcamp</code> workspace and choose <strong>+ Add new → Next.js App</strong>.</li>
     <li>Open a new CoCo chat and paste the prompt below.</li>
-    <li>Preview the app and check that it shows real figures from your data.</li>
-    <li>Ask CoCo for one change, for example a filter by encounter year.</li>
+    <li>Preview the app and click through each page. Check that it shows real figures from your data and that the year filter stays set as you move between pages.</li>
+    <li>Ask CoCo for one change, for example a CSV download on the Encounter Classes table.</li>
     <li>Deploy the app and open its URL.</li>
     <li>Suspend the app when you're done (see below).</li>
   </ol>
 
   <div class="prompt-block">
     <div class="prompt-label">💬 Paste into CoCo</div>
-    <p>Build a one-page Value-Based Care cost dashboard in the Next.js app I just added to this workspace. Get all data from the semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV, not sample data. Show three KPI tiles (total cost of care, average cost per encounter and payer coverage rate), a bar chart of total cost of care by encounter class, and a table of the same three figures by encounter year. Keep the design simple and easy to read.</p>
+    <p>Build a Value-Based Care cost explorer in the Next.js app I just added to this workspace, using the App Router. Get all data from the semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV, not sample data.<br><br>
+    Pages, in a shared layout with a sidebar that highlights the current page:<br>
+    1. Overview: KPI tiles for total cost of care, average cost per encounter, payer coverage rate and avoidable ED rate.<br>
+    2. Encounter Classes: a sortable table with one row per encounter class. Each row links to a detail page for that class, built as a dynamic route, showing its metrics by year.<br>
+    3. Trends: a monthly chart of total cost of care, with tabs to switch to encounter count or avoidable ED rate.<br>
+    4. Populations: the same KPIs by patient income band.<br><br>
+    Across the app: an encounter year filter in the header, kept in the URL so it stays set between pages, a filtered page can be shared and the back button works; loading skeletons while data loads; an error page with a retry button; and chart tooltips. Keep the design clean and consistent across pages.</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'Build a one-page Value-Based Care cost dashboard in the Next.js app I just added to this workspace. Get all data from the semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV, not sample data. Show three KPI tiles (total cost of care, average cost per encounter and payer coverage rate), a bar chart of total cost of care by encounter class, and a table of the same three figures by encounter year. Keep the design simple and easy to read.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'Build a Value-Based Care cost explorer in the Next.js app I just added to this workspace, using the App Router. Get all data from the semantic view VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV, not sample data.\n\nPages, in a shared layout with a sidebar that highlights the current page:\n1. Overview: KPI tiles for total cost of care, average cost per encounter, payer coverage rate and avoidable ED rate.\n2. Encounter Classes: a sortable table with one row per encounter class. Each row links to a detail page for that class, built as a dynamic route, showing its metrics by year.\n3. Trends: a monthly chart of total cost of care, with tabs to switch to encounter count or avoidable ED rate.\n4. Populations: the same KPIs by patient income band.\n\nAcross the app: an encounter year filter in the header, kept in the URL so it stays set between pages, a filtered page can be shared and the back button works; loading skeletons while data loads; an error page with a retry button; and chart tooltips. Keep the design clean and consistent across pages.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
+
+  <p>The prompt asks for Next.js features a one-page dashboard doesn't use: a shared layout with client-side navigation, a dynamic route for drill-down pages, filters kept in the URL, and loading and error states.</p>
 
   <h2>Good to Know</h2>
   <ul>
