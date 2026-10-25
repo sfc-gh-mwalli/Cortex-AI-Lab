@@ -1533,16 +1533,24 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   <p>Snowflake CoWork is the end-user experience built on top of your agent — a polished conversational interface designed for care managers and analysts who don't live in Snowsight. You'll run three questions here to see the agent route, reason, and respond.</p>
 
   <h2>Open Snowflake CoWork</h2>
+  <p>The prompt in Step 11 already added the agent to Snowflake CoWork (that's the <strong>Added to Snowflake CoWork</strong> label on the Overview tab), so you don't need to publish anything first. Open CoWork either way:</p>
+  <ul>
+    <li><strong>From the menu:</strong> in Snowsight, go to <strong>AI &amp; ML → Snowflake CoWork</strong>. You can also go straight to <code>https://ai.snowflake.com</code>.</li>
+    <li><strong>From the agent:</strong> on the VBCCAREAGENT page from Step 11, open the <strong>Preview</strong> tab and click <strong>Preview in Snowflake CoWork</strong> at the top right, above the chat.</li>
+  </ul>
   <ol>
-    <li>In Snowsight, navigate to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong> (or stay on the agent page from Step 11)</li>
-    <li>Open the <strong>Preview</strong> tab and click <strong>Preview in Snowflake CoWork</strong> at the top right, above the chat</li>
-    <li>A <strong>Sign in to Snowflake</strong> screen will appear — use the same username and password as your Snowflake account</li>
-    <li>After signing in, Snowflake CoWork opens with <strong>VBC_CARE_AGENT</strong> loaded and ready</li>
+    <li>CoWork opens in a new browser tab. If a <strong>Sign in to Snowflake</strong> screen appears, use the same username and password as your Snowflake account.</li>
+    <li>You land on a new chat, with <strong>What insights can I help with?</strong> above the chat box in the center of the page.</li>
+    <li>Check that the chat box shows <strong>VBC_CARE_AGENT</strong> next to the <strong>+</strong> button. If it shows a different agent, click it and choose <strong>VBC_CARE_AGENT</strong>.</li>
+    <li>Paste each question below into the chat box (<em>Ask a question to get started...</em>) and press Enter.</li>
   </ol>
 
   <div class="callout callout-info">
     <span class="callout-icon">💡</span>
-    <div>The right panel shows <strong>Agent details</strong>: key data objects (ClinicalNotes, VBCAnalytics) and the agent's connection to Snowflake. Type your questions in the chat bar at the bottom — it shows <strong>VBC_CARE_AGENT</strong> as the active agent.</div>
+    <div><strong>Finding your way around:</strong> CoWork has no panel on the right; the conversation takes up the middle of the page. The left navigation has <strong>New chat</strong>, <strong>Artifacts</strong>, <strong>Automations</strong>, <strong>Capabilities</strong>, and <strong>Search</strong>. Two of these are worth knowing about for later:<br><br>
+    <strong>Artifacts</strong> holds the charts and tables you save from answers, plus conversations you've shared as a snapshot. Saved charts rerun their query with the viewer's permissions when they refresh.<br>
+    <strong>Automations</strong> turns a question into a scheduled report. CoWork reruns it hourly, daily, weekly, or monthly against the latest data and emails you a summary with a link back to the full report.<br><br>
+    You won't need Artifacts, Automations, or the <strong>Extended thinking</strong> button in the chat box for this lab.</div>
   </div>
 
   <p>All three questions focus on one population: patients with COPD or emphysema. They appear in both the clinical notes and the Synthea condition data, so the agent can answer about them from either source, or both.</p>
