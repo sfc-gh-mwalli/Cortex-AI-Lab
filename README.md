@@ -10,12 +10,18 @@ The guide is a single static page (`index.html`) served via GitHub Pages.
 
 ## What the lab covers
 
-The guide walks attendees through 14 steps, grouped into setup plus three modules, all built on the Synthea synthetic healthcare dataset (no PHI):
+The guide walks attendees through 14 steps, grouped into setup, three modules, and a wrap-up, all built on the Synthea synthetic healthcare dataset (no PHI):
 
 - **Setup** — create a trial account, enable cross-region inference with CoCo, create the `snowcamp` workspace, database, and schema, and get the Synthea dataset from the Marketplace.
 - **Module 1 · Cortex Analyst** — build a semantic view in Workspaces with Semantic View Autopilot (**Add new → Semantic View**), refine it in Semantic Studio (relationships from Suggestions, then VBC metrics and dimensions added by a CoCo prompt, with a finished YAML file as a fallback), publish it, and ask natural-language questions.
 - **Module 2 · Cortex Search** — load 1,510 clinical notes through a notebook that uses `AI_COMPLETE` and `AI_REDACT` to scan and redact PII in-flight, then build and query a Cortex Search service.
 - **Module 3 · Cortex Agents** — create an agent with CoCo using Cortex Analyst and Cortex Search tools, register it with Snowflake CoWork, and test multi-tool reasoning.
+- **Wrap-Up** — key takeaways and next steps.
+
+Two additional activities for after class build on the same objects, using CoCo to write a Next.js app that runs on Snowflake App Runtime (in preview):
+
+- **Activity A · Build a Next.js App** — a multi-page cost explorer on the semantic view, with a shared layout, a dynamic route per encounter class, and a year filter that persists across pages.
+- **Activity B · Add Your Agent to the App** — a movable assistant tray that streams answers from the VBC Care Agent through the Cortex Agents REST API (tool steps, SQL, tables, charts, citations, threads, cancel, and feedback), plus side panels, a command palette, Suspense streaming, server caching, and animation.
 
 ## Repository layout
 
