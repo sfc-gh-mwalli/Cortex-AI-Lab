@@ -1558,20 +1558,20 @@ Use public_access for all new items. Use the exact names, expressions, and data 
     You won't need Artifacts, Automations, or the <strong>Extended thinking</strong> button in the chat box for this lab.</div>
   </div>
 
-  <p>All three questions focus on one population: patients with COPD or emphysema. They appear in both the clinical notes and the Synthea condition data, so the agent can answer about them from either source, or both.</p>
+  <p>Question 1 is about lung cancer patients on chemotherapy, the largest group in the clinical notes. Questions 2 and 3 focus on patients with COPD or emphysema. They appear in both the clinical notes and the Synthea condition data, so the agent can answer about them from either source, or both.</p>
 
   <h2>Question 1 — Clinical Notes (Search)</h2>
   <p>This should use <strong>ClinicalNotes</strong>. Watch the reasoning trace: the agent searches the notes one or more times before it writes its answer.</p>
   <div class="prompt-block">
     <div class="prompt-label">💬 Snowflake CoWork</div>
-    <p>What do the clinical notes say about patients hospitalized for COPD or emphysema flare-ups, and are they following their treatment plans?</p>
+    <p>What do the clinical notes say about side effects in patients getting chemotherapy for non-small cell lung cancer, and how are providers managing them?</p>
     <div class="prompt-copy-row">
-      <button class="copy-btn" onclick="copyPrompt(this, 'What do the clinical notes say about patients hospitalized for COPD or emphysema flare-ups, and are they following their treatment plans?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+      <button class="copy-btn" onclick="copyPrompt(this, 'What do the clinical notes say about side effects in patients getting chemotherapy for non-small cell lung cancer, and how are providers managing them?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
     </div>
   </div>
   <div class="callout callout-tip">
     <span class="callout-icon">✅</span>
-    <div>You'll see a search of ClinicalNotes in the reasoning trace. The answer should describe what the notes report, such as exacerbations triggered by infection and patients not using their inhalers because of cost, with citations to the notes it used.</div>
+    <div>You'll see a search of ClinicalNotes in the reasoning trace. The answer should describe what the notes report, such as fatigue, nausea, and decreased appetite, and how providers manage them: continuing the chemotherapy, giving anti-nausea medication, and advising on diet and fluids. It cites the notes it used.</div>
   </div>
 
   <h2>Question 2 — VBC Metrics (Analyst)</h2>
