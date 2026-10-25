@@ -437,6 +437,10 @@
         <div class="step-num">A</div>
         <div class="step-label">Build a Next.js App</div>
       </a>
+      <a class="nav-step" onclick="showStep('step-extra-agent-app')" href="#">
+        <div class="step-num">B</div>
+        <div class="step-label">Add Your Agent to the App</div>
+      </a>
     </div>
   </div>
 </nav>
@@ -1745,7 +1749,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="callout callout-tip">
     <span class="callout-icon">🚀</span>
-    <div><strong>Keep building after class.</strong> One more activity is in the left navigation under <strong>Additional Lab Activities</strong>: build a multi-page Next.js app on your semantic view with CoCo.</div>
+    <div><strong>Keep building after class.</strong> Two more activities are in the left navigation under <strong>Additional Lab Activities</strong>: build a multi-page Next.js app on your semantic view with CoCo, then add an assistant tray for your Cortex Agent and richer interactions.</div>
   </div>
 
   <div style="text-align:center; padding: 32px 0 16px; color: var(--sf-muted); font-size: 13px;">
@@ -1811,6 +1815,70 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="step-nav">
     <button class="step-nav-btn" onclick="showStep('step-takeaways')">← Key Takeaways</button>
+    <button class="step-nav-btn primary" onclick="showStep('step-extra-agent-app')">Activity B →</button>
+  </div>
+</div>
+
+<!-- ─────────────────── ADDITIONAL ACTIVITY B ─────────────────── -->
+<div id="step-extra-agent-app" class="step-content">
+  <div class="step-header">
+    <div class="step-tag"><span class="dot"></span>Additional Lab Activity B</div>
+    <h1>Add Your Agent to the Next.js App</h1>
+  </div>
+  <div class="timing-pill">⏱ On your own, after class</div>
+
+  <p>Turn the Activity A app into a richer one. Prompt 1 adds an assistant in a tray you can move around the screen; it talks to <strong>VBCCAREAGENT</strong> through the Cortex Agents REST API. Prompt 2 adds side panels, a command palette, faster loading and animation.</p>
+  <p>The <a href="https://docs.snowflake.com/en/developer-guide/snowflake-app-runtime/about-snowflake-app-runtime" target="_blank" style="color:var(--sf-blue)">App Runtime docs</a> describe Streamlit as the right choice for dashboards and analyst self-serve tools, and App Runtime for custom UI, multi-step workflows and rich interactions. This activity shows what the second group looks like.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <div>Complete Activity A first. This activity adds to the app you built there and keeps its URL.</div>
+  </div>
+
+  <h2>What to Do</h2>
+  <ol>
+    <li>Open the <code>snowcamp</code> workspace, open your Activity A app and start a new CoCo chat.</li>
+    <li>Paste Prompt 1. When CoCo finishes, preview the app and open the assistant tray.</li>
+    <li>Ask the three questions from Step 12: one for ClinicalNotes, one for VBCAnalytics and one that needs both. Check that each answer streams in, that a step card appears for each tool call, that the SQL is shown for VBCAnalytics, and that clicking a citation opens the note.</li>
+    <li>Move between pages while an answer is streaming, and check that the conversation stays in the tray. Then ask a follow-up question to check that the agent remembers the thread.</li>
+    <li>Paste Prompt 2 in the same chat. Preview again: open the command palette with Ctrl+K or Cmd+K, open an encounter class in the drawer, change a filter, and click <strong>Ask the assistant</strong> on a chart.</li>
+    <li>Deploy the app and open its URL.</li>
+    <li>Suspend the app when you're done (see Activity A).</li>
+  </ol>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Prompt 1 — Add the assistant tray</div>
+    <p>Add an AI assistant to the cost explorer app in this workspace, the Next.js app built in Activity A. The assistant chats with the Cortex Agent VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT, which has two tools: VBCAnalytics (Cortex Analyst on VBC_ANALYTICS_SV) and ClinicalNotes (Cortex Search on CLINICAL_NOTES_SEARCH).<br><br>Connection:<br>- Call the Cortex Agents REST API from a server-side route handler, never from the browser: POST /api/v2/databases/VBC_LAB/schemas/CARE_ANALYTICS/agents/VBCCAREAGENT:run. Authenticate with the session token the app runtime provides and send requests to the SNOWFLAKE_HOST address, not the public account URL, so no external access integration is needed. Stream the events from the route to the browser as they arrive.<br>- Before building, check that the role the app runs as can use the agent, both of its tools and warehouse COMPUTE_WH, and grant anything that is missing.<br><br>Tray:<br>- A floating button in the bottom-right corner opens the assistant in a tray. I can drag the tray by its header, resize it from a corner, dock it to the right edge as a full-height panel, expand it to full screen or minimize it back to the button. Remember its position and size across reloads.<br>- Put the tray in the root layout so the conversation stays open while I move between pages.<br><br>Support everything the agent API streams:<br>- The answer as it streams, token by token, formatted as Markdown.<br>- Live status updates, and the reasoning in a collapsible section.<br>- A step card for each tool call with the tool name, input and result. For VBCAnalytics, show the generated SQL with a copy button.<br>- Returned tables as sortable tables, and returned charts (Vega-Lite specs) as interactive charts.<br>- ClinicalNotes citations as numbered chips in the answer. Clicking a chip opens the cited note excerpt in a side panel.<br>- Multi-turn conversations using threads, so follow-up questions keep their context, with a thread list in the tray to start a new thread or switch threads.<br>- A stop button that cancels a run in progress.<br>- Thumbs-up and thumbs-down feedback on each answer, sent to the agent feedback API.<br>- Warnings and errors shown in plain language, with a retry button.<br>- Starter questions when a thread is empty.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Add an AI assistant to the cost explorer app in this workspace, the Next.js app built in Activity A. The assistant chats with the Cortex Agent VBC_LAB.CARE_ANALYTICS.VBCCAREAGENT, which has two tools: VBCAnalytics (Cortex Analyst on VBC_ANALYTICS_SV) and ClinicalNotes (Cortex Search on CLINICAL_NOTES_SEARCH).\n\nConnection:\n- Call the Cortex Agents REST API from a server-side route handler, never from the browser: POST /api/v2/databases/VBC_LAB/schemas/CARE_ANALYTICS/agents/VBCCAREAGENT:run. Authenticate with the session token the app runtime provides and send requests to the SNOWFLAKE_HOST address, not the public account URL, so no external access integration is needed. Stream the events from the route to the browser as they arrive.\n- Before building, check that the role the app runs as can use the agent, both of its tools and warehouse COMPUTE_WH, and grant anything that is missing.\n\nTray:\n- A floating button in the bottom-right corner opens the assistant in a tray. I can drag the tray by its header, resize it from a corner, dock it to the right edge as a full-height panel, expand it to full screen or minimize it back to the button. Remember its position and size across reloads.\n- Put the tray in the root layout so the conversation stays open while I move between pages.\n\nSupport everything the agent API streams:\n- The answer as it streams, token by token, formatted as Markdown.\n- Live status updates, and the reasoning in a collapsible section.\n- A step card for each tool call with the tool name, input and result. For VBCAnalytics, show the generated SQL with a copy button.\n- Returned tables as sortable tables, and returned charts (Vega-Lite specs) as interactive charts.\n- ClinicalNotes citations as numbered chips in the answer. Clicking a chip opens the cited note excerpt in a side panel.\n- Multi-turn conversations using threads, so follow-up questions keep their context, with a thread list in the tray to start a new thread or switch threads.\n- A stop button that cancels a run in progress.\n- Thumbs-up and thumbs-down feedback on each answer, sent to the agent feedback API.\n- Warnings and errors shown in plain language, with a retry button.\n- Starter questions when a thread is empty.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <div class="prompt-block">
+    <div class="prompt-label">💬 Prompt 2 — Panels, interactions and performance</div>
+    <p>Make the cost explorer app in this workspace richer. Keep everything that already works, including the assistant tray.<br><br>Panels:<br>- Make the left sidebar collapsible to icons only, and remember the choice.<br>- On the Encounter Classes page, open a class in a slide-over drawer instead of leaving the page, using intercepting and parallel routes. The URL changes so the drawer can be shared, the back button closes it, and opening the URL directly shows the full detail page.<br>- A filters panel that slides in from the right with encounter year, encounter class and income band. Keep every filter in the URL and show active filters as removable chips under the header.<br><br>Interactions:<br>- A command palette, opened with Ctrl+K or Cmd+K, to jump to any page or encounter class, switch theme, or send a question to the assistant.<br>- An Ask the assistant button on each KPI tile and chart that opens the tray with a question about that metric and the current filters already filled in.<br>- Keyboard shortcuts: Esc closes the top panel and the / key focuses the assistant input.<br><br>Performance:<br>- Render the page layout immediately and stream in each KPI tile and chart with its own Suspense boundary and skeleton, so one slow query does not hold up the page.<br>- Cache semantic view query results on the server for 10 minutes, show when the data was last refreshed, and add a refresh button.<br>- When a filter changes, keep the current data on screen, with a slim progress bar at the top, until the new data arrives.<br>- Load the chart library only on pages that use it.<br><br>Visuals:<br>- A light and dark theme toggle that remembers the choice.<br>- KPI tiles that count up to their value and show a small trend sparkline.<br>- Animated chart transitions, slide animations for panels and the drawer, and toast messages for actions such as copying SQL or sending feedback.<br>- A responsive layout: on a narrow screen the sidebar becomes a menu and the tray opens full screen.</p>
+    <div class="prompt-copy-row">
+      <button class="copy-btn" onclick="copyPrompt(this, 'Make the cost explorer app in this workspace richer. Keep everything that already works, including the assistant tray.\n\nPanels:\n- Make the left sidebar collapsible to icons only, and remember the choice.\n- On the Encounter Classes page, open a class in a slide-over drawer instead of leaving the page, using intercepting and parallel routes. The URL changes so the drawer can be shared, the back button closes it, and opening the URL directly shows the full detail page.\n- A filters panel that slides in from the right with encounter year, encounter class and income band. Keep every filter in the URL and show active filters as removable chips under the header.\n\nInteractions:\n- A command palette, opened with Ctrl+K or Cmd+K, to jump to any page or encounter class, switch theme, or send a question to the assistant.\n- An Ask the assistant button on each KPI tile and chart that opens the tray with a question about that metric and the current filters already filled in.\n- Keyboard shortcuts: Esc closes the top panel and the / key focuses the assistant input.\n\nPerformance:\n- Render the page layout immediately and stream in each KPI tile and chart with its own Suspense boundary and skeleton, so one slow query does not hold up the page.\n- Cache semantic view query results on the server for 10 minutes, show when the data was last refreshed, and add a refresh button.\n- When a filter changes, keep the current data on screen, with a slim progress bar at the top, until the new data arrives.\n- Load the chart library only on pages that use it.\n\nVisuals:\n- A light and dark theme toggle that remembers the choice.\n- KPI tiles that count up to their value and show a small trend sparkline.\n- Animated chart transitions, slide animations for panels and the drawer, and toast messages for actions such as copying SQL or sending feedback.\n- A responsive layout: on a narrow screen the sidebar becomes a menu and the tray opens full screen.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
+    </div>
+  </div>
+
+  <p>The prompts use Next.js features that go beyond a single dashboard page: a root layout that keeps the tray and its conversation alive between pages, route handlers that call Snowflake on the server and stream the result to the browser, intercepting and parallel routes for a drawer with its own URL, React Server Components with Suspense so each card loads on its own, and server-side caching and code splitting to keep pages fast.</p>
+
+  <h2>Good to Know</h2>
+  <ul>
+    <li><strong>No external access integration needed.</strong> The app calls the agent from its server with the session token Snowflake gives every App Runtime app, at the <code>SNOWFLAKE_HOST</code> address, so the call reaches your own account without leaving Snowflake. An external access integration is needed only to reach Snowflake through its public internet address. If CoCo reports an external access error, ask it to send the request to <code>SNOWFLAKE_HOST</code>.</li>
+    <li><strong>Fallback:</strong> if the REST call doesn't work, ask CoCo to call the SQL function <code>SNOWFLAKE.CORTEX.DATA_AGENT_RUN</code> instead. It returns the whole answer at once instead of streaming it.</li>
+    <li><strong>Whose access the agent uses:</strong> the agent runs as the app's role, so everyone who can open the app gets answers based on that role's access. That's fine for this lab. For an app shared with other people, use caller's rights so each user sees only their own data.</li>
+    <li><strong>Cost:</strong> each question uses Cortex Agent credits and warehouse time on <code>COMPUTE_WH</code>, and the app bills until you suspend it.</li>
+    <li>If something breaks, paste the error message into CoCo and ask it to fix it.</li>
+  </ul>
+  <p style="font-size:13px"><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-run" target="_blank" style="color:var(--sf-blue)">📄 Cortex Agents Run API →</a><br>
+  <a href="https://docs.snowflake.com/en/developer-guide/snowflake-app-runtime/runtime-environment" target="_blank" style="color:var(--sf-blue)">📄 Snowflake App Runtime environment →</a><br>
+  <a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/spcs-execute-sql" target="_blank" style="color:var(--sf-blue)">📄 Connecting to Snowflake from a container →</a><br>
+  <a href="https://docs.snowflake.com/en/developer-guide/snowflake-app-runtime/secure-development" target="_blank" style="color:var(--sf-blue)">📄 Developing secure Snowflake App Runtime applications →</a></p>
+
+  <div class="step-nav">
+    <button class="step-nav-btn" onclick="showStep('step-extra-nextjs')">← Activity A</button>
     <button class="step-nav-btn hidden">→</button>
   </div>
 </div>
