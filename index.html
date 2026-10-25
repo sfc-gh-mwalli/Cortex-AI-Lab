@@ -1463,31 +1463,40 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   </div>
 
   <h2>Part 2 — Review the Agent in Snowsight</h2>
-  <p>After CoCo confirms the agent was created, open it in Snowsight:</p>
+  <p>After CoCo confirms the agent was created, open it in Agent Studio. There's no separate Edit mode: the agent page opens with all its settings on tabs (<strong>Overview</strong>, <strong>Configuration</strong>, <strong>Access</strong>, <strong>Evaluations</strong>, <strong>Observability</strong>, <strong>Preview</strong>).</p>
   <ol>
     <li>In the Snowsight left nav, go to <strong>AI &amp; ML → Agent Studio</strong></li>
-    <li>Click on <strong>VBCCAREAGENT</strong></li>
-    <li>Click the <strong>Edit</strong> button in the top right — this opens the full configuration view</li>
-    <li>Review the tabs:
+    <li>Click on <strong>VBCCAREAGENT</strong>. The page opens on the <strong>Overview</strong> tab, which shows an agent readiness checklist and usage for the last 7 days (all zeros for now). Under the agent name you'll see <code>VBC_LAB</code> · <code>CARE_ANALYTICS</code> and an <strong>Added to Snowflake CoWork</strong> label, which confirms the CoWork setup step in the prompt worked.</li>
+    <li>Click the <strong>Configuration</strong> tab. It has five sub-tabs: <strong>General</strong>, <strong>Instructions</strong>, <strong>Tools</strong>, <strong>Skills</strong>, and <strong>MCP</strong>. Click through the first three:
       <ul>
-        <li><strong>About</strong> — confirm the display name is <code>VBC_CARE_AGENT</code></li>
-        <li><strong>Tools</strong> — confirm both tools are present: <strong>VBCAnalytics</strong> (Cortex Analyst, using <code>VBC_ANALYTICS_SV</code>) and <strong>ClinicalNotes</strong> (Cortex Search Services, using <code>CLINICAL_NOTES_SEARCH</code>)</li>
-        <li><strong>Orchestration</strong> — review the orchestration and response instructions CoCo set</li>
+        <li><strong>General</strong> — confirm <strong>Display name</strong> is <code>VBC_CARE_AGENT</code>. <strong>Description</strong> holds a one-line summary CoCo wrote. These are what users see; they don't change how the agent behaves. <strong>Example questions</strong> is empty, and you can leave it that way.</li>
+        <li><strong>Instructions</strong> — <strong>Model</strong> is set to <code>auto</code>, so Snowflake picks the model that plans each answer. Below it are the two instructions from your prompt. <strong>Orchestration instructions</strong> tell the agent which tool to use for which kind of question: VBCAnalytics for costs, utilization, and quality measures; ClinicalNotes for notes and care gaps; both when a question needs numbers and clinical context. <strong>Response instructions</strong> set how it answers: cite the source, lead with the direct answer, and make no clinical recommendations.</li>
+        <li><strong>Tools</strong> — confirm both tools are listed. Under <strong>Query structured data</strong>, <strong>VBCANALYTICS</strong> uses semantic view <code>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</code> and a warehouse (usually <code>COMPUTE_WH</code>). Under <strong>Search documents and unstructured data</strong>, <strong>CLINICALNOTES</strong> uses service <code>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</code>. The <strong>Code Execution tool</strong> toggle at the top stays off.</li>
       </ul>
     </li>
-    <li>Click <strong>Cancel</strong> when done — no changes needed</li>
+    <li><strong>Skills</strong> and <strong>MCP</strong> add other kinds of capabilities (packaged skills and remote MCP servers). This agent doesn't use them.</li>
+    <li>Don't change anything. The button at the top right reads <strong>Saved</strong>, which means there are no unsaved changes. You don't need to click <strong>Publish</strong> for this lab.</li>
   </ol>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">💡</span>
+    <div>Not sure what an instruction does? Click <strong>Explain with CoCo</strong> under either instruction box on the <strong>Instructions</strong> sub-tab, and CoCo will walk you through it.</div>
+  </div>
 
   <div class="callout callout-info">
     <span class="callout-icon">💡</span>
     <div>The <strong>Access</strong> tab controls which roles can use this agent. For this lab you can leave the defaults. In production you would restrict access here before deploying to end users.</div>
   </div>
 
-  <h2>Part 3 — Quick Check in the Agent Playground</h2>
-  <p>Before moving to Snowflake CoWork, ask two quick questions in the chat panel on the right side of the agent detail page. One question needs each tool, so together they confirm the agent can reach both.</p>
+  <h2>Part 3 — Quick Check on the Preview Tab</h2>
+  <p>Before moving to Snowflake CoWork, click the <strong>Preview</strong> tab. It's a test chat for the agent: type in the <strong>Enter a message to test your agent</strong> box at the bottom and press Enter. Ask the two questions below. Each one needs a different tool, so together they confirm the agent can reach both.</p>
+  <ul>
+    <li>Click <strong>New thread</strong> (top right) before the second question so it starts fresh.</li>
+    <li>After an answer appears, click <strong>Show Traces</strong> to see the steps the agent took, including which tool it called.</li>
+  </ul>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Agent Chat (Snowsight) — Analyst check</div>
+    <div class="prompt-label">💬 Agent Preview (Snowsight) — Analyst check</div>
     <p>How many patients are in the dataset?</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'How many patients are in the dataset?')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1495,7 +1504,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
   </div>
 
   <div class="prompt-block">
-    <div class="prompt-label">💬 Agent Chat (Snowsight) — Search check</div>
+    <div class="prompt-label">💬 Agent Preview (Snowsight) — Search check</div>
     <p>Find clinical notes about patients with cystic fibrosis.</p>
     <div class="prompt-copy-row">
       <button class="copy-btn" onclick="copyPrompt(this, 'Find clinical notes about patients with cystic fibrosis.')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm0 1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1H4z"/><path d="M2 5H1a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-1H9v1H1V6h1V5z"/></svg> Copy</button>
@@ -1525,8 +1534,8 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <h2>Open Snowflake CoWork</h2>
   <ol>
-    <li>In Snowsight, navigate to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong></li>
-    <li>Click the <strong>Preview in Snowflake CoWork</strong> button at the top of the agent detail page</li>
+    <li>In Snowsight, navigate to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong> (or stay on the agent page from Step 11)</li>
+    <li>Open the <strong>Preview</strong> tab and click <strong>Preview in Snowflake CoWork</strong> at the top right, above the chat</li>
     <li>A <strong>Sign in to Snowflake</strong> screen will appear — use the same username and password as your Snowflake account</li>
     <li>After signing in, Snowflake CoWork opens with <strong>VBC_CARE_AGENT</strong> loaded and ready</li>
   </ol>
@@ -1630,7 +1639,7 @@ Use public_access for all new items. Use the exact names, expressions, and data 
 
   <div class="callout callout-tip">
     <span class="callout-icon">🚀</span>
-    <div><strong>Fast finisher bonus:</strong> Change how the agent answers. In Snowsight, go to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong>, click <strong>Edit</strong>, and open <strong>Orchestration</strong>. Add a line to the response instructions, for example: <em>"For every finding from the clinical notes, say how many notes support it."</em> Click <strong>Save</strong>, then ask one of your earlier questions again in Snowflake CoWork. How does the answer change?</div>
+    <div><strong>Fast finisher bonus:</strong> Change how the agent answers. In Snowsight, go to <strong>AI &amp; ML → Agent Studio → VBCCAREAGENT</strong>, open the <strong>Configuration</strong> tab, then the <strong>Instructions</strong> sub-tab. Add a line to the end of <strong>Response instructions</strong>, for example: <em>"For every finding from the clinical notes, say how many notes support it."</em> Click <strong>Save</strong> at the top right. Then open the <strong>Preview</strong> tab, click <strong>New thread</strong>, and ask one of your earlier questions again. How does the answer change?</div>
   </div>
 
   <div class="step-nav">
