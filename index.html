@@ -1474,7 +1474,12 @@ Use public_access for all new items. Use the exact names, expressions, and data 
         <li><strong>Tools</strong> — confirm both tools are listed. Under <strong>Query structured data</strong>, <strong>VBCANALYTICS</strong> uses semantic view <code>VBC_LAB.CARE_ANALYTICS.VBC_ANALYTICS_SV</code> and a warehouse (usually <code>COMPUTE_WH</code>). Under <strong>Search documents and unstructured data</strong>, <strong>CLINICALNOTES</strong> uses service <code>VBC_LAB.CARE_ANALYTICS.CLINICAL_NOTES_SEARCH</code>. The <strong>Code Execution tool</strong> toggle at the top stays off.</li>
       </ul>
     </li>
-    <li><strong>Skills</strong> and <strong>MCP</strong> add other kinds of capabilities (packaged skills and remote MCP servers). This agent doesn't use them.</li>
+    <li>The last two sub-tabs hold capabilities this agent doesn't use, so leave them empty:
+      <ul>
+        <li><strong>Skills</strong> — <strong>agent skills</strong> are reusable workflows. Each one is a folder with a <code>SKILL.md</code> file of instructions (and optional scripts) stored in a stage or Git repository. The agent reads each skill's name and description to decide when to use it. You'll see <strong>No skills added</strong>, with <strong>Add skill</strong> and <strong>Add skill with Cortex</strong> buttons at the top right.</li>
+        <li><strong>MCP</strong> — connects the agent to a remote MCP server, such as Atlassian Jira or Salesforce, so it can call the tools that server provides.</li>
+      </ul>
+    </li>
     <li>Don't change anything. The button at the top right reads <strong>Saved</strong>, which means there are no unsaved changes. You don't need to click <strong>Publish</strong> for this lab.</li>
   </ol>
 
